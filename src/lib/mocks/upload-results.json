@@ -1,0 +1,8 @@
+{
+  "pos": { "rows": 24, "dedupedRows": 0, "warnings": [] },
+  "card_settlement": { "rows": 24, "dedupedRows": 0, "warnings": ["2026-05 POS 카드매출과 카드사 정산이 5.0% 불일치"] },
+  "delivery": { "rows": 24, "dedupedRows": 6, "warnings": ["2025-10~2025-12 배달 매출이 POS에 포함되어 6건 중복 제거"] },
+  "purchases": { "rows": 33, "dedupedRows": 0, "warnings": ["2026-03 원재료 매입 자료 누락"] },
+  "fixed": { "rows": 48, "dedupedRows": 0, "warnings": [] },
+  "payroll": { "rows": 36, "dedupedRows": 0, "warnings": [] }
+}

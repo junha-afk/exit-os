@@ -1,0 +1,498 @@
+{
+  "id": "mock-listing-1",
+  "storeId": "mock-store-mangwon",
+  "premiumBreakdownLevel": "approved",
+  "detail": {
+    "displayName": "망원동 카페 A",
+    "industry": "카페",
+    "region": "서울 마포구 망원동",
+    "openedAt": "2022-09",
+    "intro": "망원시장 도보 3분, 직접 로스팅한 원두로 4년간 단골을 쌓은 22석 카페입니다.",
+    "photos": [],
+    "areaM2": {
+      "value": 49.6,
+      "provenance": "user_input"
+    },
+    "floor": {
+      "value": 1,
+      "provenance": "user_input"
+    },
+    "seats": {
+      "value": 22,
+      "provenance": "user_input"
+    },
+    "saleReason": "해외 이주",
+    "desiredHandover": "2027-01",
+    "premiumAsk": {
+      "value": 160000000,
+      "provenance": "user_input"
+    },
+    "deposit": {
+      "value": 50000000,
+      "provenance": "user_input"
+    },
+    "monthlyRent": {
+      "value": 3000000,
+      "provenance": "user_input"
+    },
+    "maintenanceFee": {
+      "value": 350000,
+      "provenance": "user_input"
+    },
+    "estInitialCost": {
+      "value": 15000000,
+      "provenance": "user_input",
+      "note": "재고·소모품·리뉴얼"
+    },
+    "premiumBreakdown": {
+      "value": {
+        "facility": 40000000,
+        "goodwill": 110000000,
+        "other": 10000000
+      },
+      "provenance": "user_input"
+    },
+    "avgRevenue": {
+      "value": 28300000,
+      "provenance": "needs_check",
+      "note": "8월 포함 12개월 평균"
+    },
+    "avgOperatingProfit": {
+      "value": 10950500,
+      "provenance": "needs_check",
+      "note": "8월 포함 12개월 평균"
+    },
+    "margin": {
+      "value": 0.387,
+      "provenance": "needs_check"
+    },
+    "monthlyTrend": [
+      {
+        "month": "2025-10",
+        "revenue": {
+          "value": 26450000,
+          "provenance": "user_input"
+        },
+        "posCard": 24800000,
+        "posCash": 1650000,
+        "delivery": 4800000,
+        "dedupedAmount": 4800000,
+        "cogs": 7410000,
+        "labor": 5000000,
+        "fixed": 3920000,
+        "fees": 1216750,
+        "operatingProfit": {
+          "value": 8903250,
+          "provenance": "user_input"
+        }
+      },
+      {
+        "month": "2025-11",
+        "revenue": {
+          "value": 25100000,
+          "provenance": "user_input"
+        },
+        "posCard": 23600000,
+        "posCash": 1500000,
+        "delivery": 4600000,
+        "dedupedAmount": 4600000,
+        "cogs": 7030000,
+        "labor": 5000000,
+        "fixed": 4020000,
+        "fees": 1166500,
+        "operatingProfit": {
+          "value": 7883500,
+          "provenance": "user_input"
+        }
+      },
+      {
+        "month": "2025-12",
+        "revenue": {
+          "value": 28600000,
+          "provenance": "user_input"
+        },
+        "posCard": 26900000,
+        "posCash": 1700000,
+        "delivery": 5400000,
+        "dedupedAmount": 5400000,
+        "cogs": 8010000,
+        "labor": 5000000,
+        "fixed": 4120000,
+        "fees": 1349000,
+        "operatingProfit": {
+          "value": 10121000,
+          "provenance": "user_input"
+        }
+      },
+      {
+        "month": "2026-01",
+        "revenue": {
+          "value": 23900000,
+          "provenance": "user_input"
+        },
+        "posCard": 18000000,
+        "posCash": 1400000,
+        "delivery": 4500000,
+        "dedupedAmount": 0,
+        "cogs": 6690000,
+        "labor": 5000000,
+        "fixed": 4170000,
+        "fees": 1128500,
+        "operatingProfit": {
+          "value": 6911500,
+          "provenance": "user_input"
+        }
+      },
+      {
+        "month": "2026-02",
+        "revenue": {
+          "value": 23150000,
+          "provenance": "user_input"
+        },
+        "posCard": 17500000,
+        "posCash": 1350000,
+        "delivery": 4300000,
+        "dedupedAmount": 0,
+        "cogs": 6490000,
+        "labor": 5000000,
+        "fixed": 4120000,
+        "fees": 1077250,
+        "operatingProfit": {
+          "value": 6462750,
+          "provenance": "user_input"
+        }
+      },
+      {
+        "month": "2026-03",
+        "revenue": {
+          "value": 27100000,
+          "provenance": "needs_check",
+          "note": "원재료 매입 누락"
+        },
+        "posCard": 20500000,
+        "posCash": 1600000,
+        "delivery": 5000000,
+        "dedupedAmount": 0,
+        "cogs": 0,
+        "labor": 5000000,
+        "fixed": 3970000,
+        "fees": 1256500,
+        "operatingProfit": {
+          "value": 16873500,
+          "provenance": "needs_check",
+          "note": "원재료 매입 누락"
+        }
+      },
+      {
+        "month": "2026-04",
+        "revenue": {
+          "value": 27800000,
+          "provenance": "user_input"
+        },
+        "posCard": 21000000,
+        "posCash": 1700000,
+        "delivery": 5100000,
+        "dedupedAmount": 0,
+        "cogs": 7790000,
+        "labor": 5000000,
+        "fixed": 3920000,
+        "fees": 1287000,
+        "operatingProfit": {
+          "value": 9803000,
+          "provenance": "user_input"
+        }
+      },
+      {
+        "month": "2026-05",
+        "revenue": {
+          "value": 29050000,
+          "provenance": "needs_check",
+          "note": "카드 정산 불일치"
+        },
+        "posCard": 22000000,
+        "posCash": 1750000,
+        "delivery": 5300000,
+        "dedupedAmount": 0,
+        "cogs": 8140000,
+        "labor": 5000000,
+        "fixed": 3970000,
+        "fees": 1335750,
+        "operatingProfit": {
+          "value": 10604250,
+          "provenance": "needs_check",
+          "note": "카드 정산 불일치"
+        }
+      },
+      {
+        "month": "2026-06",
+        "revenue": {
+          "value": 29300000,
+          "provenance": "user_input"
+        },
+        "posCard": 22500000,
+        "posCash": 1800000,
+        "delivery": 5000000,
+        "dedupedAmount": 0,
+        "cogs": 8200000,
+        "labor": 5000000,
+        "fixed": 4120000,
+        "fees": 1289500,
+        "operatingProfit": {
+          "value": 10690500,
+          "provenance": "user_input"
+        }
+      },
+      {
+        "month": "2026-07",
+        "revenue": {
+          "value": 29650000,
+          "provenance": "user_input"
+        },
+        "posCard": 23000000,
+        "posCash": 1850000,
+        "delivery": 4800000,
+        "dedupedAmount": 0,
+        "cogs": 8310000,
+        "labor": 5000000,
+        "fixed": 4270000,
+        "fees": 1264750,
+        "operatingProfit": {
+          "value": 10805250,
+          "provenance": "user_input"
+        }
+      },
+      {
+        "month": "2026-08",
+        "revenue": {
+          "value": 41900000,
+          "provenance": "needs_check",
+          "note": "매출 급변, 현금 매출 비중 급증, 매입 대비 매출 비율 이상"
+        },
+        "posCard": 22800000,
+        "posCash": 14000000,
+        "delivery": 5100000,
+        "dedupedAmount": 0,
+        "cogs": 8280000,
+        "labor": 5000000,
+        "fixed": 4320000,
+        "fees": 1498500,
+        "operatingProfit": {
+          "value": 22801500,
+          "provenance": "needs_check",
+          "note": "매출 급변, 현금 매출 비중 급증, 매입 대비 매출 비율 이상"
+        }
+      },
+      {
+        "month": "2026-09",
+        "revenue": {
+          "value": 27600000,
+          "provenance": "user_input"
+        },
+        "posCard": 21000000,
+        "posCash": 1650000,
+        "delivery": 4950000,
+        "dedupedAmount": 0,
+        "cogs": 7730000,
+        "labor": 5000000,
+        "fixed": 4070000,
+        "fees": 1254000,
+        "operatingProfit": {
+          "value": 9546000,
+          "provenance": "user_input"
+        }
+      }
+    ],
+    "openDays": "매일 (명절 당일 휴무)",
+    "openHours": "08:00–22:00",
+    "staffCount": {
+      "value": 3,
+      "provenance": "user_input"
+    },
+    "ownerWeeklyHours": {
+      "value": 60,
+      "provenance": "user_input",
+      "note": "원두 로스팅·발주·SNS 점주 전담"
+    },
+    "staffRoles": [
+      {
+        "role": "매니저(바리스타)",
+        "count": 1,
+        "weeklyHours": 48,
+        "duties": [
+          "음료 제조",
+          "오픈·마감 관리"
+        ]
+      },
+      {
+        "role": "파트타임(오픈)",
+        "count": 1,
+        "weeklyHours": 23,
+        "duties": [
+          "오픈 준비",
+          "베이커리 진열"
+        ]
+      },
+      {
+        "role": "파트타임(마감)",
+        "count": 1,
+        "weeklyHours": 20,
+        "duties": [
+          "마감 청소",
+          "정산 보조"
+        ]
+      }
+    ],
+    "customerSegments": "20~30대 직장인·인근 주민, 주말 방문객",
+    "channelMix": "매장 82% · 배달 18%",
+    "equipment": [
+      {
+        "name": "에스프레소 머신",
+        "qty": 1,
+        "year": 2021,
+        "condition": "양호",
+        "purchasePrice": 18000000
+      },
+      {
+        "name": "그라인더",
+        "qty": 2,
+        "year": 2022,
+        "condition": "양호",
+        "purchasePrice": 5000000
+      },
+      {
+        "name": "제빙기",
+        "qty": 1,
+        "year": 2020,
+        "condition": "보통",
+        "repairs": [
+          "2025-07 컴프레서 수리"
+        ],
+        "purchasePrice": 4000000
+      },
+      {
+        "name": "오븐",
+        "qty": 1,
+        "year": 2023,
+        "condition": "양호",
+        "purchasePrice": 6000000
+      },
+      {
+        "name": "쇼케이스 냉장고",
+        "qty": 1,
+        "year": 2022,
+        "condition": "양호",
+        "purchasePrice": 4500000
+      }
+    ],
+    "inventoryIncluded": "원두·소모품 재고 일체 포함",
+    "leaseExpiry": "2027-06",
+    "renewalNeeded": true,
+    "franchiseTerms": "개인 매장 (가맹 없음)",
+    "scores": {
+      "revenueStability": 68,
+      "dataCompleteness": 69,
+      "ownerDependency": 84
+    },
+    "riskFactors": [
+      {
+        "month": "2026-03",
+        "kind": "missing",
+        "severity": "medium",
+        "detail": "2026-03 원재료 매입 자료 누락"
+      },
+      {
+        "month": "2026-05",
+        "kind": "settlement_mismatch",
+        "severity": "medium",
+        "detail": "2026-05 POS 카드매출 2,200만 원 ↔ 카드사 정산 2,090만 원 (5.0% 불일치)"
+      },
+      {
+        "month": "2026-08",
+        "kind": "revenue_spike",
+        "severity": "medium",
+        "detail": "2026-08 매출 4,190만 원으로 12개월 평균(2,830만 원) 대비 +48.1%"
+      },
+      {
+        "month": "2026-08",
+        "kind": "cash_ratio",
+        "severity": "high",
+        "detail": "2026-08 현금 매출 1,400만 원 (매출의 33.4%, 평소 6.0%). 현금영수증·통장 입금 내역 제출 시 증빙 전환 가능"
+      },
+      {
+        "month": "2026-08",
+        "kind": "cogs_ratio",
+        "severity": "medium",
+        "detail": "2026-08 매출/원재료 매입 비율 5.06 (평균 3.71, +36.6%)"
+      }
+    ],
+    "paybackScenarios": [
+      {
+        "label": "보수",
+        "monthlyProfit": 8648313,
+        "months": 20.2
+      },
+      {
+        "label": "기준",
+        "monthlyProfit": 9962000,
+        "months": 17.6
+      },
+      {
+        "label": "낙관",
+        "monthlyProfit": 10719188,
+        "months": 16.3
+      }
+    ],
+    "valuation": {
+      "goodwillLow": 93865200,
+      "goodwillHigh": 187730400,
+      "facilityValue": 1716667,
+      "premiumLow": 95581867,
+      "premiumHigh": 189447067,
+      "monthlyProfitP25": 8648313,
+      "monthlyProfitMedian": 9962000,
+      "monthlyProfitP75": 10719188,
+      "adjustedMonthlyProfit": 7822100
+    },
+    "handoverSupport": "인수 후 4주 현장 교육, 로스팅 레시피 전달",
+    "trainingWeeks": {
+      "value": 4,
+      "provenance": "user_input"
+    },
+    "suppliers": [
+      {
+        "name": "망원커피상사",
+        "item": "원두"
+      },
+      {
+        "name": "서울우유대리점",
+        "item": "유제품"
+      },
+      {
+        "name": "베이크마켓",
+        "item": "베이커리 재료"
+      }
+    ],
+    "digitalAccounts": [
+      {
+        "platform": "배달의민족",
+        "kind": "delivery"
+      },
+      {
+        "platform": "쿠팡이츠",
+        "kind": "delivery"
+      },
+      {
+        "platform": "토스플레이스 POS",
+        "kind": "pos"
+      },
+      {
+        "platform": "인스타그램",
+        "kind": "sns"
+      },
+      {
+        "platform": "네이버 플레이스",
+        "kind": "map"
+      }
+    ]
+  }
+}

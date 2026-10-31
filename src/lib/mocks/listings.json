@@ -1,0 +1,25 @@
+{
+  "listings": [
+    {
+      "id": "mock-listing-1", "displayName": "망원동 카페 A", "industry": "카페", "region": "서울 마포구 망원동",
+      "openedAt": "2022-09", "photos": [],
+      "premiumAsk": { "value": 160000000, "provenance": "user_input" },
+      "deposit": { "value": 50000000, "provenance": "user_input" },
+      "monthlyRent": { "value": 3000000, "provenance": "user_input" }
+    },
+    {
+      "id": "mock-listing-2", "displayName": "연남동 베이커리 B", "industry": "베이커리", "region": "서울 마포구 연남동",
+      "openedAt": "2021-04", "photos": [],
+      "premiumAsk": { "value": 120000000, "provenance": "user_input" },
+      "deposit": { "value": 40000000, "provenance": "user_input" },
+      "monthlyRent": { "value": 2600000, "provenance": "user_input" }
+    },
+    {
+      "id": "mock-listing-3", "displayName": "성수동 분식 C", "industry": "음식점", "region": "서울 성동구 성수동",
+      "openedAt": "2023-02", "photos": [],
+      "premiumAsk": { "value": 70000000, "provenance": "user_input" },
+      "deposit": { "value": 30000000, "provenance": "user_input" },
+      "monthlyRent": { "value": 2200000, "provenance": "user_input" }
+    }
+  ]
+}

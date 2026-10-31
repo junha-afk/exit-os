@@ -1,0 +1,302 @@
+{
+  "storeId": "mock-store-mangwon",
+  "months": [
+    {
+      "month": "2025-10",
+      "revenue": {
+        "value": 26450000,
+        "provenance": "user_input"
+      },
+      "posCard": 24800000,
+      "posCash": 1650000,
+      "delivery": 4800000,
+      "dedupedAmount": 4800000,
+      "cogs": 7410000,
+      "labor": 5000000,
+      "fixed": 3920000,
+      "fees": 1216750,
+      "operatingProfit": {
+        "value": 8903250,
+        "provenance": "user_input"
+      }
+    },
+    {
+      "month": "2025-11",
+      "revenue": {
+        "value": 25100000,
+        "provenance": "user_input"
+      },
+      "posCard": 23600000,
+      "posCash": 1500000,
+      "delivery": 4600000,
+      "dedupedAmount": 4600000,
+      "cogs": 7030000,
+      "labor": 5000000,
+      "fixed": 4020000,
+      "fees": 1166500,
+      "operatingProfit": {
+        "value": 7883500,
+        "provenance": "user_input"
+      }
+    },
+    {
+      "month": "2025-12",
+      "revenue": {
+        "value": 28600000,
+        "provenance": "user_input"
+      },
+      "posCard": 26900000,
+      "posCash": 1700000,
+      "delivery": 5400000,
+      "dedupedAmount": 5400000,
+      "cogs": 8010000,
+      "labor": 5000000,
+      "fixed": 4120000,
+      "fees": 1349000,
+      "operatingProfit": {
+        "value": 10121000,
+        "provenance": "user_input"
+      }
+    },
+    {
+      "month": "2026-01",
+      "revenue": {
+        "value": 23900000,
+        "provenance": "user_input"
+      },
+      "posCard": 18000000,
+      "posCash": 1400000,
+      "delivery": 4500000,
+      "dedupedAmount": 0,
+      "cogs": 6690000,
+      "labor": 5000000,
+      "fixed": 4170000,
+      "fees": 1128500,
+      "operatingProfit": {
+        "value": 6911500,
+        "provenance": "user_input"
+      }
+    },
+    {
+      "month": "2026-02",
+      "revenue": {
+        "value": 23150000,
+        "provenance": "user_input"
+      },
+      "posCard": 17500000,
+      "posCash": 1350000,
+      "delivery": 4300000,
+      "dedupedAmount": 0,
+      "cogs": 6490000,
+      "labor": 5000000,
+      "fixed": 4120000,
+      "fees": 1077250,
+      "operatingProfit": {
+        "value": 6462750,
+        "provenance": "user_input"
+      }
+    },
+    {
+      "month": "2026-03",
+      "revenue": {
+        "value": 27100000,
+        "provenance": "needs_check",
+        "note": "원재료 매입 누락"
+      },
+      "posCard": 20500000,
+      "posCash": 1600000,
+      "delivery": 5000000,
+      "dedupedAmount": 0,
+      "cogs": 0,
+      "labor": 5000000,
+      "fixed": 3970000,
+      "fees": 1256500,
+      "operatingProfit": {
+        "value": 16873500,
+        "provenance": "needs_check",
+        "note": "원재료 매입 누락"
+      }
+    },
+    {
+      "month": "2026-04",
+      "revenue": {
+        "value": 27800000,
+        "provenance": "user_input"
+      },
+      "posCard": 21000000,
+      "posCash": 1700000,
+      "delivery": 5100000,
+      "dedupedAmount": 0,
+      "cogs": 7790000,
+      "labor": 5000000,
+      "fixed": 3920000,
+      "fees": 1287000,
+      "operatingProfit": {
+        "value": 9803000,
+        "provenance": "user_input"
+      }
+    },
+    {
+      "month": "2026-05",
+      "revenue": {
+        "value": 29050000,
+        "provenance": "needs_check",
+        "note": "카드 정산 불일치"
+      },
+      "posCard": 22000000,
+      "posCash": 1750000,
+      "delivery": 5300000,
+      "dedupedAmount": 0,
+      "cogs": 8140000,
+      "labor": 5000000,
+      "fixed": 3970000,
+      "fees": 1335750,
+      "operatingProfit": {
+        "value": 10604250,
+        "provenance": "needs_check",
+        "note": "카드 정산 불일치"
+      }
+    },
+    {
+      "month": "2026-06",
+      "revenue": {
+        "value": 29300000,
+        "provenance": "user_input"
+      },
+      "posCard": 22500000,
+      "posCash": 1800000,
+      "delivery": 5000000,
+      "dedupedAmount": 0,
+      "cogs": 8200000,
+      "labor": 5000000,
+      "fixed": 4120000,
+      "fees": 1289500,
+      "operatingProfit": {
+        "value": 10690500,
+        "provenance": "user_input"
+      }
+    },
+    {
+      "month": "2026-07",
+      "revenue": {
+        "value": 29650000,
+        "provenance": "user_input"
+      },
+      "posCard": 23000000,
+      "posCash": 1850000,
+      "delivery": 4800000,
+      "dedupedAmount": 0,
+      "cogs": 8310000,
+      "labor": 5000000,
+      "fixed": 4270000,
+      "fees": 1264750,
+      "operatingProfit": {
+        "value": 10805250,
+        "provenance": "user_input"
+      }
+    },
+    {
+      "month": "2026-08",
+      "revenue": {
+        "value": 41900000,
+        "provenance": "needs_check",
+        "note": "매출 급변, 현금 매출 비중 급증, 매입 대비 매출 비율 이상"
+      },
+      "posCard": 22800000,
+      "posCash": 14000000,
+      "delivery": 5100000,
+      "dedupedAmount": 0,
+      "cogs": 8280000,
+      "labor": 5000000,
+      "fixed": 4320000,
+      "fees": 1498500,
+      "operatingProfit": {
+        "value": 22801500,
+        "provenance": "needs_check",
+        "note": "매출 급변, 현금 매출 비중 급증, 매입 대비 매출 비율 이상"
+      }
+    },
+    {
+      "month": "2026-09",
+      "revenue": {
+        "value": 27600000,
+        "provenance": "user_input"
+      },
+      "posCard": 21000000,
+      "posCash": 1650000,
+      "delivery": 4950000,
+      "dedupedAmount": 0,
+      "cogs": 7730000,
+      "labor": 5000000,
+      "fixed": 4070000,
+      "fees": 1254000,
+      "operatingProfit": {
+        "value": 9546000,
+        "provenance": "user_input"
+      }
+    }
+  ],
+  "avgRevenue": {
+    "value": 28300000,
+    "provenance": "needs_check",
+    "note": "8월 포함 12개월 평균"
+  },
+  "avgOperatingProfit": {
+    "value": 10950500,
+    "provenance": "needs_check",
+    "note": "8월 포함 12개월 평균"
+  },
+  "margin": 0.387,
+  "dedupeCount": 6,
+  "anomalies": [
+    {
+      "month": "2026-03",
+      "kind": "missing",
+      "severity": "medium",
+      "detail": "2026-03 원재료 매입 자료 누락"
+    },
+    {
+      "month": "2026-05",
+      "kind": "settlement_mismatch",
+      "severity": "medium",
+      "detail": "2026-05 POS 카드매출 2,200만 원 ↔ 카드사 정산 2,090만 원 (5.0% 불일치)"
+    },
+    {
+      "month": "2026-08",
+      "kind": "revenue_spike",
+      "severity": "medium",
+      "detail": "2026-08 매출 4,190만 원으로 12개월 평균(2,830만 원) 대비 +48.1%"
+    },
+    {
+      "month": "2026-08",
+      "kind": "cash_ratio",
+      "severity": "high",
+      "detail": "2026-08 현금 매출 1,400만 원 (매출의 33.4%, 평소 6.0%). 현금영수증·통장 입금 내역 제출 시 증빙 전환 가능"
+    },
+    {
+      "month": "2026-08",
+      "kind": "cogs_ratio",
+      "severity": "medium",
+      "detail": "2026-08 매출/원재료 매입 비율 5.06 (평균 3.71, +36.6%)"
+    }
+  ],
+  "missing": [
+    "2026-03 원재료 매입"
+  ],
+  "scores": {
+    "revenueStability": 68,
+    "dataCompleteness": 69,
+    "ownerDependency": 84
+  },
+  "valuation": {
+    "goodwillLow": 93865200,
+    "goodwillHigh": 187730400,
+    "facilityValue": 1716667,
+    "premiumLow": 95581867,
+    "premiumHigh": 189447067,
+    "monthlyProfitP25": 8648313,
+    "monthlyProfitMedian": 9962000,
+    "monthlyProfitP75": 10719188,
+    "adjustedMonthlyProfit": 7822100
+  }
+}

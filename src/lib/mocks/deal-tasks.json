@@ -1,0 +1,346 @@
+{
+  "tasks": [
+    {
+      "id": "task-01",
+      "dealId": "mock-deal-1",
+      "priority": "normal",
+      "status": "done",
+      "dependsOn": [],
+      "stage": "prep",
+      "category": "admin",
+      "title": "양도 준비: 매각 자료 정리",
+      "owner": "seller"
+    },
+    {
+      "id": "task-02",
+      "dealId": "mock-deal-1",
+      "priority": "normal",
+      "status": "done",
+      "dependsOn": [
+        "task-01"
+      ],
+      "stage": "valuation",
+      "category": "admin",
+      "title": "가치 산정: 매각 보고서 확정",
+      "owner": "seller"
+    },
+    {
+      "id": "task-03",
+      "dealId": "mock-deal-1",
+      "priority": "normal",
+      "status": "done",
+      "dependsOn": [
+        "task-02"
+      ],
+      "stage": "buyer_search",
+      "category": "admin",
+      "title": "양수자 확정",
+      "owner": "seller"
+    },
+    {
+      "id": "task-04",
+      "dealId": "mock-deal-1",
+      "priority": "normal",
+      "status": "todo",
+      "dependsOn": [
+        "task-03"
+      ],
+      "stage": "due_diligence",
+      "category": "admin",
+      "title": "실사: 확인 필요 항목 증빙 제출",
+      "owner": "both",
+      "checklist": [
+        "2026-08 현금 매출 증빙(현금영수증·통장 입금 내역)",
+        "2026-03 원재료 매입 명세",
+        "2026-05 카드사 정산 내역"
+      ]
+    },
+    {
+      "id": "task-05",
+      "dealId": "mock-deal-1",
+      "priority": "high",
+      "status": "todo",
+      "dependsOn": [
+        "task-04"
+      ],
+      "stage": "landlord",
+      "category": "contract",
+      "title": "임대인 갱신 협의",
+      "owner": "seller",
+      "description": "임대차 만료 2027-06 (12개월 이내)"
+    },
+    {
+      "id": "task-06",
+      "dealId": "mock-deal-1",
+      "priority": "high",
+      "status": "todo",
+      "dependsOn": [
+        "task-05"
+      ],
+      "stage": "premium_contract",
+      "category": "contract",
+      "title": "권리금 계약 체결",
+      "owner": "both"
+    },
+    {
+      "id": "task-07",
+      "dealId": "mock-deal-1",
+      "priority": "high",
+      "status": "todo",
+      "dependsOn": [
+        "task-06"
+      ],
+      "stage": "lease_contract",
+      "category": "contract",
+      "title": "임대차 계약 체결(양수인 명의)",
+      "owner": "buyer"
+    },
+    {
+      "id": "task-08",
+      "dealId": "mock-deal-1",
+      "priority": "high",
+      "status": "todo",
+      "dependsOn": [
+        "task-07"
+      ],
+      "stage": "license_transfer",
+      "category": "admin",
+      "title": "영업신고 지위승계 신고",
+      "owner": "buyer"
+    },
+    {
+      "id": "task-09",
+      "dealId": "mock-deal-1",
+      "priority": "normal",
+      "status": "todo",
+      "dependsOn": [
+        "task-07"
+      ],
+      "stage": "tax_registration",
+      "category": "admin",
+      "title": "사업자등록(양수인)·폐업신고(양도인)",
+      "owner": "both"
+    },
+    {
+      "id": "task-10",
+      "dealId": "mock-deal-1",
+      "priority": "normal",
+      "status": "todo",
+      "dependsOn": [
+        "task-06"
+      ],
+      "stage": "staff_contracts",
+      "category": "staff",
+      "title": "고용 승계 협의: 매니저(바리스타)",
+      "owner": "both"
+    },
+    {
+      "id": "task-11",
+      "dealId": "mock-deal-1",
+      "priority": "normal",
+      "status": "todo",
+      "dependsOn": [
+        "task-06"
+      ],
+      "stage": "staff_contracts",
+      "category": "staff",
+      "title": "고용 승계 협의: 파트타임(오픈)",
+      "owner": "both"
+    },
+    {
+      "id": "task-12",
+      "dealId": "mock-deal-1",
+      "priority": "normal",
+      "status": "todo",
+      "dependsOn": [
+        "task-06"
+      ],
+      "stage": "staff_contracts",
+      "category": "staff",
+      "title": "고용 승계 협의: 파트타임(마감)",
+      "owner": "both"
+    },
+    {
+      "id": "task-13",
+      "dealId": "mock-deal-1",
+      "priority": "normal",
+      "status": "todo",
+      "dependsOn": [
+        "task-07"
+      ],
+      "stage": "staff_contracts",
+      "category": "supplier",
+      "title": "거래처 명의 변경: 망원커피상사",
+      "owner": "seller"
+    },
+    {
+      "id": "task-14",
+      "dealId": "mock-deal-1",
+      "priority": "normal",
+      "status": "todo",
+      "dependsOn": [
+        "task-07"
+      ],
+      "stage": "staff_contracts",
+      "category": "supplier",
+      "title": "거래처 명의 변경: 서울우유대리점",
+      "owner": "seller"
+    },
+    {
+      "id": "task-15",
+      "dealId": "mock-deal-1",
+      "priority": "normal",
+      "status": "todo",
+      "dependsOn": [
+        "task-07"
+      ],
+      "stage": "staff_contracts",
+      "category": "supplier",
+      "title": "거래처 명의 변경: 베이크마켓",
+      "owner": "seller"
+    },
+    {
+      "id": "task-16",
+      "dealId": "mock-deal-1",
+      "priority": "normal",
+      "status": "todo",
+      "dependsOn": [
+        "task-07"
+      ],
+      "stage": "handover_settlement",
+      "category": "equipment",
+      "title": "장비 인계: 에스프레소 머신 작동 확인·매뉴얼 전달",
+      "owner": "both"
+    },
+    {
+      "id": "task-17",
+      "dealId": "mock-deal-1",
+      "priority": "normal",
+      "status": "todo",
+      "dependsOn": [
+        "task-07"
+      ],
+      "stage": "handover_settlement",
+      "category": "equipment",
+      "title": "장비 인계: 그라인더 작동 확인·매뉴얼 전달",
+      "owner": "both"
+    },
+    {
+      "id": "task-18",
+      "dealId": "mock-deal-1",
+      "priority": "normal",
+      "status": "todo",
+      "dependsOn": [
+        "task-07"
+      ],
+      "stage": "handover_settlement",
+      "category": "equipment",
+      "title": "장비 인계: 제빙기 작동 확인·매뉴얼 전달",
+      "owner": "both"
+    },
+    {
+      "id": "task-19",
+      "dealId": "mock-deal-1",
+      "priority": "normal",
+      "status": "todo",
+      "dependsOn": [
+        "task-07"
+      ],
+      "stage": "handover_settlement",
+      "category": "equipment",
+      "title": "장비 인계: 오븐 작동 확인·매뉴얼 전달",
+      "owner": "both"
+    },
+    {
+      "id": "task-20",
+      "dealId": "mock-deal-1",
+      "priority": "normal",
+      "status": "todo",
+      "dependsOn": [
+        "task-07"
+      ],
+      "stage": "handover_settlement",
+      "category": "equipment",
+      "title": "장비 인계: 쇼케이스 냉장고 작동 확인·매뉴얼 전달",
+      "owner": "both"
+    },
+    {
+      "id": "task-21",
+      "dealId": "mock-deal-1",
+      "priority": "normal",
+      "status": "todo",
+      "dependsOn": [
+        "task-07"
+      ],
+      "stage": "handover_settlement",
+      "category": "account",
+      "title": "계정 이전: 배달의민족",
+      "owner": "seller"
+    },
+    {
+      "id": "task-22",
+      "dealId": "mock-deal-1",
+      "priority": "normal",
+      "status": "todo",
+      "dependsOn": [
+        "task-07"
+      ],
+      "stage": "handover_settlement",
+      "category": "account",
+      "title": "계정 이전: 쿠팡이츠",
+      "owner": "seller"
+    },
+    {
+      "id": "task-23",
+      "dealId": "mock-deal-1",
+      "priority": "normal",
+      "status": "todo",
+      "dependsOn": [
+        "task-07"
+      ],
+      "stage": "handover_settlement",
+      "category": "account",
+      "title": "계정 이전: 토스플레이스 POS",
+      "owner": "seller"
+    },
+    {
+      "id": "task-24",
+      "dealId": "mock-deal-1",
+      "priority": "normal",
+      "status": "todo",
+      "dependsOn": [
+        "task-07"
+      ],
+      "stage": "handover_settlement",
+      "category": "account",
+      "title": "계정 이전: 인스타그램",
+      "owner": "seller"
+    },
+    {
+      "id": "task-25",
+      "dealId": "mock-deal-1",
+      "priority": "normal",
+      "status": "todo",
+      "dependsOn": [
+        "task-07"
+      ],
+      "stage": "handover_settlement",
+      "category": "account",
+      "title": "계정 이전: 네이버 플레이스",
+      "owner": "seller"
+    },
+    {
+      "id": "task-26",
+      "dealId": "mock-deal-1",
+      "priority": "normal",
+      "status": "todo",
+      "dependsOn": [
+        "task-07"
+      ],
+      "stage": "post_tax",
+      "category": "admin",
+      "title": "양도소득·부가세 신고 및 증빙 보관",
+      "owner": "seller"
+    }
+  ]
+}

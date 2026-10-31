@@ -1,0 +1,202 @@
+{
+  "facts": {
+    "industry": {
+      "value": "카페",
+      "provenance": "user_input"
+    },
+    "region": {
+      "value": "서울 마포구 망원동",
+      "provenance": "user_input"
+    },
+    "opened_at": {
+      "value": "2022-09",
+      "provenance": "user_input"
+    },
+    "sale_reason": {
+      "value": "해외 이주",
+      "provenance": "user_input"
+    },
+    "desired_handover": {
+      "value": "2027-01",
+      "provenance": "user_input"
+    },
+    "area_m2": {
+      "value": 49.6,
+      "provenance": "user_input"
+    },
+    "floor": {
+      "value": 1,
+      "provenance": "user_input"
+    },
+    "seats": {
+      "value": 22,
+      "provenance": "user_input"
+    },
+    "open_days": {
+      "value": "매일 (명절 당일 휴무)",
+      "provenance": "user_input"
+    },
+    "open_hours": {
+      "value": "08:00–22:00",
+      "provenance": "user_input"
+    },
+    "staff_count": {
+      "value": 3,
+      "provenance": "user_input"
+    },
+    "owner_weekly_hours": {
+      "value": 60,
+      "provenance": "user_input",
+      "note": "원두 로스팅·발주·SNS 점주 전담"
+    },
+    "staff_roles": {
+      "value": [
+        {
+          "role": "매니저(바리스타)",
+          "count": 1,
+          "weeklyHours": 48,
+          "duties": [
+            "음료 제조",
+            "오픈·마감 관리"
+          ]
+        },
+        {
+          "role": "파트타임(오픈)",
+          "count": 1,
+          "weeklyHours": 23,
+          "duties": [
+            "오픈 준비",
+            "베이커리 진열"
+          ]
+        },
+        {
+          "role": "파트타임(마감)",
+          "count": 1,
+          "weeklyHours": 20,
+          "duties": [
+            "마감 청소",
+            "정산 보조"
+          ]
+        }
+      ],
+      "provenance": "user_input"
+    },
+    "customer_segments": {
+      "value": "20~30대 직장인·인근 주민, 주말 방문객",
+      "provenance": "user_input"
+    },
+    "channel_mix": {
+      "value": "매장 82% · 배달 18%",
+      "provenance": "user_input"
+    },
+    "equipment": {
+      "value": [
+        {
+          "name": "에스프레소 머신",
+          "qty": 1,
+          "year": 2021,
+          "condition": "양호",
+          "purchasePrice": 18000000
+        },
+        {
+          "name": "그라인더",
+          "qty": 2,
+          "year": 2022,
+          "condition": "양호",
+          "purchasePrice": 5000000
+        },
+        {
+          "name": "제빙기",
+          "qty": 1,
+          "year": 2020,
+          "condition": "보통",
+          "repairs": [
+            "2025-07 컴프레서 수리"
+          ],
+          "purchasePrice": 4000000
+        },
+        {
+          "name": "오븐",
+          "qty": 1,
+          "year": 2023,
+          "condition": "양호",
+          "purchasePrice": 6000000
+        },
+        {
+          "name": "쇼케이스 냉장고",
+          "qty": 1,
+          "year": 2022,
+          "condition": "양호",
+          "purchasePrice": 4500000
+        }
+      ],
+      "provenance": "user_input"
+    },
+    "inventory_included": {
+      "value": "원두·소모품 재고 일체 포함",
+      "provenance": "user_input"
+    },
+    "lease_expiry": {
+      "value": "2027-06",
+      "provenance": "user_input"
+    },
+    "renewal_needed": {
+      "value": true,
+      "provenance": "user_input"
+    },
+    "franchise_terms": {
+      "value": "개인 매장 (가맹 없음)",
+      "provenance": "user_input"
+    },
+    "handover_support": {
+      "value": "인수 후 4주 현장 교육, 로스팅 레시피 전달",
+      "provenance": "user_input"
+    },
+    "training_weeks": {
+      "value": 4,
+      "provenance": "user_input"
+    },
+    "suppliers": {
+      "value": [
+        {
+          "name": "망원커피상사",
+          "item": "원두"
+        },
+        {
+          "name": "서울우유대리점",
+          "item": "유제품"
+        },
+        {
+          "name": "베이크마켓",
+          "item": "베이커리 재료"
+        }
+      ],
+      "provenance": "user_input"
+    },
+    "digital_accounts": {
+      "value": [
+        {
+          "platform": "배달의민족",
+          "kind": "delivery"
+        },
+        {
+          "platform": "쿠팡이츠",
+          "kind": "delivery"
+        },
+        {
+          "platform": "토스플레이스 POS",
+          "kind": "pos"
+        },
+        {
+          "platform": "인스타그램",
+          "kind": "sns"
+        },
+        {
+          "platform": "네이버 플레이스",
+          "kind": "map"
+        }
+      ],
+      "provenance": "user_input"
+    }
+  }
+}
