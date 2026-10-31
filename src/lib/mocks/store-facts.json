@@ -61,11 +61,22 @@
       "provenance": "user_input"
     },
     "open_days": {
-      "value": ["월", "화", "수", "목", "금", "토", "일"],
+      "value": [
+        "월",
+        "화",
+        "수",
+        "목",
+        "금",
+        "토",
+        "일"
+      ],
       "provenance": "user_input"
     },
     "open_hours": {
-      "value": { "open": "08:00", "close": "22:00" },
+      "value": {
+        "open": "08:00",
+        "close": "22:00"
+      },
       "provenance": "user_input"
     },
     "staff_count": {
@@ -109,15 +120,27 @@
       "provenance": "user_input"
     },
     "owner_tasks": {
-      "value": ["원두 로스팅", "발주", "SNS 운영"],
+      "value": [
+        "원두 로스팅",
+        "발주",
+        "SNS 운영"
+      ],
       "provenance": "user_input"
     },
     "customer_segments": {
-      "value": ["20~30대 직장인", "인근 주민", "주말 방문객"],
+      "value": [
+        "20~30대 직장인",
+        "인근 주민",
+        "주말 방문객"
+      ],
       "provenance": "user_input"
     },
     "channel_mix": {
-      "value": { "hall": 82, "takeout": 0, "delivery": 18 },
+      "value": {
+        "hall": 82,
+        "takeout": 0,
+        "delivery": 18
+      },
       "provenance": "user_input"
     },
     "equipment": {
@@ -164,7 +187,10 @@
       "provenance": "user_input"
     },
     "inventory_included": {
-      "value": ["원두 재고", "소모품 재고"],
+      "value": [
+        "원두 재고",
+        "소모품 재고"
+      ],
       "provenance": "user_input"
     },
     "lease_expiry": {
@@ -176,7 +202,9 @@
       "provenance": "user_input"
     },
     "franchise_terms": {
-      "value": { "type": "independent" },
+      "value": {
+        "type": "independent"
+      },
       "provenance": "user_input"
     },
     "handover_support": {
@@ -230,6 +258,67 @@
           "kind": "map"
         }
       ],
+      "provenance": "user_input"
+    },
+    "training_items": {
+      "value": [
+        "에스프레소 추출",
+        "우유 스티밍",
+        "오픈·마감 체크",
+        "POS 정산"
+      ],
+      "provenance": "user_input"
+    },
+    "knowhow_artifacts": {
+      "value": {
+        "roleManual": [
+          {
+            "role": "매니저(바리스타)",
+            "duties": [
+              "음료 제조",
+              "오픈·마감 관리"
+            ]
+          },
+          {
+            "role": "파트타임(오픈)",
+            "duties": [
+              "오픈 준비",
+              "베이커리 진열"
+            ]
+          },
+          {
+            "role": "파트타임(마감)",
+            "duties": [
+              "마감 청소",
+              "정산 보조"
+            ]
+          }
+        ],
+        "trainingChecklist": [
+          "에스프레소 추출 기준(18g·30초) 익히기",
+          "우유 스티밍 연습",
+          "오픈·마감 체크리스트 숙지",
+          "POS 정산 방법 익히기"
+        ],
+        "ownerBurdenSummary": "점주가 원두 로스팅·발주·SNS 운영을 직접 맡고 있어, 인수 후 이 업무를 이어받을 사람과 교육이 필요합니다.",
+        "supplierHandover": [
+          {
+            "name": "망원커피상사",
+            "item": "원두",
+            "orderCycle": "주 1회"
+          },
+          {
+            "name": "서울우유대리점",
+            "item": "유제품",
+            "orderCycle": "주 3회"
+          },
+          {
+            "name": "베이크마켓",
+            "item": "베이커리 재료",
+            "orderCycle": "주 1회"
+          }
+        ]
+      },
       "provenance": "user_input"
     }
   }
