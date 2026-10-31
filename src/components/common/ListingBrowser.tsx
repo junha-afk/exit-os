@@ -2,8 +2,8 @@
 // 매물 목록 (소유: A). 세로 스크롤 목록 + ☰ 메뉴(정렬·필터). 필터는 받은 목록 안에서만 거른다.
 import Image from 'next/image';
 import Link from 'next/link';
-import { Lock, SlidersHorizontal, X } from 'lucide-react';
-import { useMemo, useState, type ReactNode } from 'react';
+import { Lock, Search, SlidersHorizontal, X } from 'lucide-react';
+import { useEffect, useMemo, useState, type ReactNode } from 'react';
 import { formatKRW } from '@/lib/format';
 import type { Sourced, Viewer } from '@/lib/types';
 import { MobileTabBar } from './MobileTabBar';
@@ -41,6 +41,17 @@ const SORTS: { key: SortKey; label: string }[] = [
   { key: 'verified', label: '증빙 확인 많은순' },
 ];
 
+type AreaKey = 'all' | 's' | 'm' | 'l';
+const AREAS: { key: AreaKey; label: string; test: (py: number) => boolean }[] = [
+  { key: 'all', label: '전체', test: () => true },
+  { key: 's', label: '10평 이하', test: (py) => py <= 10 },
+  { key: 'm', label: '10~20평', test: (py) => py > 10 && py <= 20 },
+  { key: 'l', label: '20평 이상', test: (py) => py > 20 },
+];
+// 금액 상한 선택지 (원). null = 제한 없음
+const PREMIUM_MAX = [50_000_000, 100_000_000, 150_000_000, 200_000_000];
+const RENT_MAX = [2_000_000, 3_000_000, 4_000_000];
+
 const verifiedRatio = (r: ListingRow) => r.trust.verified / (r.trust.verified + r.trust.user_input + r.trust.needs_check || 1);
 
 export function ListingBrowser({ rows, viewer }: { rows: ListingRow[]; viewer: Viewer }) {
@@ -50,30 +61,54 @@ export function ListingBrowser({ rows, viewer }: { rows: ListingRow[]; viewer: V
   const [district, setDistrict] = useState<string | null>(null);
   const [mostlyVerified, setMostlyVerified] = useState(false);
   const [noCheck, setNoCheck] = useState(false);
+  const [query, setQuery] = useState('');
+  const [premiumMax, setPremiumMax] = useState<number | null>(null);
+  const [rentMax, setRentMax] = useState<number | null>(null);
+  const [area, setArea] = useState<AreaKey>('all');
+
+  // 상세 필터 서랍: Esc 로 닫기
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && setOpen(false);
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+  }, [open]);
 
   const allIndustries = useMemo(() => [...new Set(rows.map((r) => r.industry))], [rows]);
   const allDistricts = useMemo(() => [...new Set(rows.map((r) => r.district))], [rows]);
 
+  const q = query.trim();
   const shown = useMemo(() => {
     const list = rows.filter(
       (r) =>
         (industries.length === 0 || industries.includes(r.industry)) &&
         (!district || r.district === district) &&
         (!mostlyVerified || verifiedRatio(r) >= 0.5) &&
-        (!noCheck || r.trust.needs_check === 0),
+        (!noCheck || r.trust.needs_check === 0) &&
+        (!premiumMax || r.premiumAsk <= premiumMax) &&
+        (!rentMax || r.monthlyRent <= rentMax) &&
+        AREAS.find((a) => a.key === area)!.test(r.areaPyeong) &&
+        (!q || [r.displayName, r.district, r.near, r.industry, r.intro].some((t) => t.includes(q))),
     );
     if (sort === 'premium') list.sort((a, b) => a.premiumAsk - b.premiumAsk);
     if (sort === 'rent') list.sort((a, b) => a.monthlyRent - b.monthlyRent);
     if (sort === 'verified') list.sort((a, b) => verifiedRatio(b) - verifiedRatio(a));
     return list;
-  }, [rows, sort, industries, district, mostlyVerified, noCheck]);
+  }, [rows, sort, industries, district, mostlyVerified, noCheck, premiumMax, rentMax, area, q]);
 
   const summary = [
     district ?? '전체 지역',
     industries.length ? industries.join(', ') : '전체 업종',
     mostlyVerified && '증빙 절반 이상',
+    premiumMax && `권리금 ${formatKRW(premiumMax, { unit: false })} 이하`,
+    rentMax && `월세 ${formatKRW(rentMax, { unit: false })} 이하`,
+    area !== 'all' && AREAS.find((a) => a.key === area)!.label,
+    mostlyVerified && '증빙 절반 이상',
     noCheck && '확인 필요 없음',
+    q && `"${q}"`,
   ].filter(Boolean);
+  // 상세 필터 버튼에 표시할, 띠 밖(서랍)에서만 고르는 조건 수
+  const detailCount = [district, area !== 'all', mostlyVerified, noCheck].filter(Boolean).length;
 
   function reset() {
     setSort('latest');
@@ -81,20 +116,79 @@ export function ListingBrowser({ rows, viewer }: { rows: ListingRow[]; viewer: V
     setDistrict(null);
     setMostlyVerified(false);
     setNoCheck(false);
+    setQuery('');
+    setPremiumMax(null);
+    setRentMax(null);
+    setArea('all');
   }
 
   const avg = (f: (r: ListingRow) => number) => (shown.length ? shown.reduce((a, r) => a + f(r), 0) / shown.length : 0);
 
   return (
     <>
-      <SiteHeader viewer={viewer} active="listings" onMenuClick={() => setOpen(true)} />
+      <SiteHeader viewer={viewer} active="listings" hideSearch />
 
       {/* 페이지 머리: 연한 회녹 띠 + 업종 빠른 선택 */}
       <div className="border-b bg-accent">
         <div className="mx-auto max-w-6xl px-4 pb-4 pt-5 md:px-6 md:pb-5 md:pt-8">
           <h1 className="text-xl font-bold tracking-tight md:text-[26px]">매물 찾기</h1>
           <p className="mt-1 text-sm text-accent-foreground/80">숫자마다 출처가 붙은 매장 양도 매물이에요.</p>
-          <div className="no-scrollbar -mx-4 mt-4 flex gap-2 overflow-x-auto px-4 md:mx-0 md:px-0">
+
+          {/* 검색줄 (레퍼런스: BizBuySell 목록 상단 검색·필터 줄) */}
+          <div role="search" className="mt-4 flex gap-2">
+            <label className="flex h-12 min-w-0 flex-1 items-center gap-2 border bg-background px-3 focus-within:outline-2 focus-within:outline-ring">
+              <Search aria-hidden className="size-5 text-muted-foreground" />
+              <span className="sr-only">매물 검색</span>
+              <input
+                type="search"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder="매장명, 동네, 역 이름"
+                className="h-full min-w-0 flex-1 bg-transparent text-[15px] outline-none placeholder:text-muted-foreground"
+              />
+            </label>
+            <div className="flex gap-2">
+              <BandSelect
+                label="업종"
+                value={industries.length === 1 ? industries[0] : ''}
+                onChange={(v) => setIndustries(v ? [v] : [])}
+                options={allIndustries.map((i) => [i, i])}
+                allLabel="업종 전체"
+                className="hidden md:block"
+              />
+              <BandSelect
+                label="권리금"
+                value={premiumMax ? String(premiumMax) : ''}
+                onChange={(v) => setPremiumMax(v ? Number(v) : null)}
+                options={PREMIUM_MAX.map((n) => [String(n), `권리금 ${formatKRW(n, { unit: false })} 이하`])}
+                allLabel="권리금 전체"
+                className="hidden md:block"
+              />
+              <BandSelect
+                label="월세"
+                value={rentMax ? String(rentMax) : ''}
+                onChange={(v) => setRentMax(v ? Number(v) : null)}
+                options={RENT_MAX.map((n) => [String(n), `월세 ${formatKRW(n, { unit: false })} 이하`])}
+                allLabel="월세 전체"
+                className="hidden lg:block"
+              />
+              <button
+                type="button"
+                onClick={() => setOpen(true)}
+                className="inline-flex h-12 shrink-0 items-center justify-center gap-1.5 border bg-background px-4 text-sm font-medium"
+              >
+                <SlidersHorizontal aria-hidden className="size-4" />
+                <span className="md:hidden">필터</span>
+                <span className="hidden md:inline">상세 필터</span>
+                {detailCount > 0 && <span className="grid size-5 place-items-center bg-primary text-[11px] text-primary-foreground">{detailCount}</span>}
+              </button>
+              <button type="button" onClick={reset} className="hidden h-12 px-3 text-sm text-accent-foreground underline-offset-4 hover:underline md:block">
+                초기화
+              </button>
+            </div>
+          </div>
+
+          <div className="no-scrollbar -mx-4 mt-3 flex gap-2 overflow-x-auto px-4 md:mx-0 md:px-0">
             {[null, ...allIndustries].map((ind) => {
               const on = ind === null ? industries.length === 0 : industries.length === 1 && industries[0] === ind;
               return (
@@ -111,10 +205,6 @@ export function ListingBrowser({ rows, viewer }: { rows: ListingRow[]; viewer: V
                 </button>
               );
             })}
-            <button type="button" onClick={() => setOpen(true)} className="inline-flex h-9 shrink-0 items-center gap-1.5 border border-border bg-background px-3.5 text-sm">
-              <SlidersHorizontal aria-hidden className="size-4" />
-              필터
-            </button>
           </div>
         </div>
       </div>
@@ -175,28 +265,17 @@ export function ListingBrowser({ rows, viewer }: { rows: ListingRow[]; viewer: V
       <MobileTabBar active="listings" />
 
       {open && (
-        <div className="fixed inset-0 z-30" role="dialog" aria-modal="true" aria-label="정렬과 필터">
+        <div className="fixed inset-0 z-30" role="dialog" aria-modal="true" aria-label="상세 필터">
           <button type="button" aria-label="닫기" onClick={() => setOpen(false)} className="absolute inset-0 bg-black/40" />
-          <aside className="absolute inset-y-0 left-0 flex w-[min(380px,100%)] flex-col bg-background">
+          <aside className="absolute inset-y-0 right-0 flex w-[min(400px,100%)] flex-col bg-background">
             <div className="flex h-14 items-center justify-between border-b px-5">
-              <p className="font-semibold">정렬 · 필터</p>
+              <p className="font-semibold">상세 필터</p>
               <button type="button" aria-label="닫기" onClick={() => setOpen(false)} className="-mr-2 grid size-11 place-items-center text-muted-foreground">
                 <X aria-hidden className="size-5" />
               </button>
             </div>
 
             <div className="flex-1 divide-y overflow-y-auto px-5 text-sm">
-              <Group title="정렬">
-                <div className="space-y-1">
-                  {SORTS.map((s) => (
-                    <label key={s.key} className="flex min-h-10 cursor-pointer items-center justify-between">
-                      <span className={cn(sort !== s.key && 'text-muted-foreground')}>{s.label}</span>
-                      <input type="radio" name="sort" checked={sort === s.key} onChange={() => setSort(s.key)} className="size-4 accent-foreground" />
-                    </label>
-                  ))}
-                </div>
-              </Group>
-
               <Group title="지역">
                 <div className="grid grid-cols-3 border-l border-t">
                   {[null, ...allDistricts].map((d) => (
@@ -228,6 +307,28 @@ export function ListingBrowser({ rows, viewer }: { rows: ListingRow[]; viewer: V
                 </div>
               </Group>
 
+              <Group title="금액">
+                <div className="space-y-2">
+                  <BandSelect label="권리금" value={premiumMax ? String(premiumMax) : ''} onChange={(v) => setPremiumMax(v ? Number(v) : null)} options={PREMIUM_MAX.map((n) => [String(n), `${formatKRW(n, { unit: false })} 이하`])} allLabel="권리금 전체" full />
+                  <BandSelect label="월세" value={rentMax ? String(rentMax) : ''} onChange={(v) => setRentMax(v ? Number(v) : null)} options={RENT_MAX.map((n) => [String(n), `${formatKRW(n, { unit: false })} 이하`])} allLabel="월세 전체" full />
+                </div>
+              </Group>
+
+              <Group title="면적">
+                <div className="grid grid-cols-4 border-l border-t">
+                  {AREAS.map((a) => (
+                    <button
+                      key={a.key}
+                      type="button"
+                      onClick={() => setArea(a.key)}
+                      className={cn('min-h-10 border-b border-r text-[13px]', area === a.key ? 'bg-foreground font-medium text-background' : 'hover:bg-muted')}
+                    >
+                      {a.label}
+                    </button>
+                  ))}
+                </div>
+              </Group>
+
               <Group title="자료" hint="판매자가 올린 매출 자료를 증빙과 맞춰본 결과로 걸러요">
                 <Toggle label="증빙 확인된 숫자가 절반 이상" on={mostlyVerified} onChange={setMostlyVerified} />
                 <Toggle label="확인 필요 항목 없음" on={noCheck} onChange={setNoCheck} />
@@ -236,7 +337,7 @@ export function ListingBrowser({ rows, viewer }: { rows: ListingRow[]; viewer: V
 
             <div className="flex gap-2 border-t p-4">
               <button type="button" onClick={reset} className="h-12 w-24 border text-sm">초기화</button>
-              <button type="button" onClick={() => setOpen(false)} className="h-12 flex-1 bg-foreground text-sm font-semibold text-background">
+              <button type="button" onClick={() => setOpen(false)} className="h-12 flex-1 bg-primary text-sm font-semibold text-primary-foreground">
                 매물 {shown.length}개 보기
               </button>
             </div>
@@ -284,6 +385,40 @@ function Row({ row: r }: { row: ListingRow }) {
     </div>
   );
   return r.hasDetail ? <Link href={ROUTES.listing(r.id)} className="block focus-visible:outline-2 focus-visible:outline-ring">{body}</Link> : body;
+}
+
+function BandSelect({
+  label,
+  value,
+  onChange,
+  options,
+  allLabel,
+  className,
+  full,
+}: {
+  label: string;
+  value: string;
+  onChange: (v: string) => void;
+  options: [string, string][];
+  allLabel: string;
+  className?: string;
+  full?: boolean;
+}) {
+  return (
+    <label className={cn(full ? 'block' : 'w-40', className)}>
+      <span className="sr-only">{label}</span>
+      <select
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        className={cn('h-12 w-full border bg-background px-3 text-sm', value && 'border-primary font-medium text-accent-foreground')}
+      >
+        <option value="">{allLabel}</option>
+        {options.map(([v, t]) => (
+          <option key={v} value={v}>{t}</option>
+        ))}
+      </select>
+    </label>
+  );
 }
 
 function SummaryRow({ label, value }: { label: string; value: string }) {
