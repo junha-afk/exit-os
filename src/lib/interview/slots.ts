@@ -4,11 +4,11 @@
 // - format: 자료 읽기 LLM에 알려주는 값 형식 설명
 import { z } from 'zod';
 import { formatKRW } from '@/lib/format';
-import type { DigitalAccount, Equipment, FactKey, StaffRole, Supplier } from '@/lib/types';
+import type { Equipment, FactKey, StaffRole } from '@/lib/types';
 import { FNB_INDUSTRIES } from './fnb';
 import type { InputSpec } from './types';
 
-export type SlotGroup = '기본 정보' | '매각 가격·임대' | '운영' | '시설·자산' | '인수인계';
+export type SlotGroup = '기본 정보' | '매각 가격·임대' | '운영' | '시설·자산';
 
 export interface SlotDef {
   key: FactKey;
@@ -38,20 +38,6 @@ const yesNo = (yes: string, no: string, unknown = '모름') => (v: unknown) => (
 
 const DAYS = ['월', '화', '수', '목', '금', '토', '일'] as const;
 const STAFF_ROLES = ['매니저', '바리스타', '주방(조리)', '홀 서빙', '파트타임', '배달·포장', '기타'];
-const SUPPLY_ITEMS = ['원두', '유제품', '식자재', '주류', '베이커리 재료', '포장재', '기타'];
-const ORDER_CYCLES = ['매일', '주 2~3회', '주 1회', '월 1~2회', '필요할 때'];
-const PLATFORMS: { name: string; kind: DigitalAccount['kind'] }[] = [
-  { name: '배달의민족', kind: 'delivery' },
-  { name: '쿠팡이츠', kind: 'delivery' },
-  { name: '요기요', kind: 'delivery' },
-  { name: '토스플레이스 POS', kind: 'pos' },
-  { name: '배민포스', kind: 'pos' },
-  { name: '키오스크', kind: 'pos' },
-  { name: '인스타그램', kind: 'sns' },
-  { name: '네이버 플레이스', kind: 'map' },
-  { name: '카카오맵', kind: 'map' },
-];
-
 export const SLOTS: SlotDef[] = [
   // ── 기본 정보 ──
   {
@@ -83,7 +69,7 @@ export const SLOTS: SlotDef[] = [
     schema: z.enum(['해외 이주', '건강', '업종 전환', '수익 악화', '은퇴', '기타']), display: (v) => String(v),
   },
   {
-    key: 'desired_handover', label: '희망 인수 시기', group: '기본 정보', input: { type: 'month' },
+    key: 'desired_handover', label: '희망 매각 시기', group: '기본 정보', input: { type: 'month' },
     question: '언제쯤 넘기고 싶으신가요?', format: "'YYYY-MM'", schema: month, display: (v) => String(v).replace('-', '년 ') + '월',
   },
   {
@@ -231,49 +217,10 @@ export const SLOTS: SlotDef[] = [
     toInput: (v) => ((v as { type: string }).type === 'franchise' ? '프랜차이즈' : '개인 매장'),
     display: (v) => ((v as { type: string }).type === 'franchise' ? '프랜차이즈' : '개인 매장'),
   },
-
-  // ── 인수인계 ──
-  {
-    key: 'suppliers', label: '거래처', group: '인수인계',
-    input: {
-      type: 'table', addLabel: '거래처 추가',
-      columns: [
-        { key: 'name', label: '거래처', input: { type: 'name', maxLength: 30, placeholder: '예: 망원커피상사' } },
-        { key: 'item', label: '품목', input: { type: 'choice', options: SUPPLY_ITEMS } },
-        { key: 'orderCycle', label: '발주 주기', input: { type: 'choice', options: ORDER_CYCLES } },
-      ],
-    },
-    question: '정기적으로 발주하는 거래처를 알려주세요.',
-    format: 'Supplier[]: [{ name: string, item: string, orderCycle?: string }]',
-    schema: z.array(z.object({ name: z.string().min(1).max(30), item: z.string().min(1).max(30), orderCycle: z.string().max(20).optional() })).max(30),
-    display: (v) => { const rows = v as Supplier[]; return rows.length ? rows.map((s) => `${s.name}(${s.item})`).join(', ') : '없음'; },
-  },
-  {
-    key: 'digital_accounts', label: '디지털 계정', group: '인수인계',
-    input: { type: 'multi', options: PLATFORMS.map((p) => p.name) },
-    question: '사용 중인 배달앱·POS·SNS 계정을 모두 골라 주세요.', format: "DigitalAccount[]: [{ platform: string, kind: 'delivery'|'pos'|'sns'|'map'|'other' }]",
-    schema: z.array(z.object({ platform: z.string().min(1).max(30), kind: z.enum(['delivery', 'pos', 'sns', 'map', 'other']) })).max(20),
-    fromInput: (raw) => (Array.isArray(raw) ? raw : []).map((name: string) => ({
-      platform: name, kind: PLATFORMS.find((p) => p.name === name)?.kind ?? 'other',
-    })),
-    toInput: (v) => (v as DigitalAccount[]).map((a) => a.platform),
-    display: (v) => { const rows = v as DigitalAccount[]; return rows.length ? rows.map((a) => a.platform).join(', ') : '없음'; },
-  },
-  {
-    key: 'handover_support', label: '인수인계 지원', group: '인수인계',
-    input: { type: 'boolean', labels: ['지원할 수 있어요', '어려워요'] },
-    question: '인수 후 현장 교육 등 인수인계를 도와주실 수 있나요?', format: 'boolean',
-    schema: z.boolean(), display: yesNo('지원 가능', '어려움'),
-  },
-  {
-    key: 'training_weeks', label: '교육 가능 기간', group: '인수인계', input: { type: 'number', unit: '주', min: 0, max: 52 },
-    question: '인수자 교육은 몇 주까지 가능하신가요?', format: 'number (주)',
-    schema: z.number().int().min(0).max(52), display: (v) => `${v}주`,
-  },
 ];
 
 export const SLOT_BY_KEY = Object.fromEntries(SLOTS.map((s) => [s.key, s])) as Partial<Record<FactKey, SlotDef>>;
-export const SLOT_GROUPS: SlotGroup[] = ['기본 정보', '매각 가격·임대', '운영', '시설·자산', '인수인계'];
+export const SLOT_GROUPS: SlotGroup[] = ['기본 정보', '매각 가격·임대', '운영', '시설·자산'];
 
 /** 입력값 → 저장값 검증. 실패하면 화면에 보여줄 한국어 문구 */
 export function parseSlotInput(slot: SlotDef, raw: unknown): { ok: true; value: unknown } | { ok: false; error: string } {

@@ -1,7 +1,7 @@
 'use client';
 // 사이트 머리글 (소유: A). ☰ = 사이트 메뉴(왼쪽 서랍). 데스크톱: 로고·주 메뉴·검색·관심·내 정보 / 모바일: ☰·로고·검색·내 정보.
 import Link from 'next/link';
-import { ChevronDown, ChevronLeft, ClipboardList, Heart, Menu, Search, Store, Tag, UserRound, X } from 'lucide-react';
+import { ChevronDown, ChevronLeft, Heart, Menu, Search, Store, Tag, UserRound, X } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import type { Viewer } from '@/lib/types';
@@ -9,12 +9,11 @@ import { cn } from '@/lib/utils';
 import { useMembership } from './RoleSwitcher';
 import { ROUTES } from './routes';
 
-export type NavKey = 'listings' | 'sell' | 'handover';
+export type NavKey = 'listings' | 'sell';
 
 export const NAV: { key: NavKey; label: string; href: string }[] = [
   { key: 'listings', label: '매물 찾기', href: ROUTES.listings },
   { key: 'sell', label: '내 가게 팔기', href: ROUTES.sell },
-  { key: 'handover', label: '인수인계', href: ROUTES.handover },
 ];
 
 export function SiteHeader({
@@ -97,7 +96,7 @@ export function SiteHeader({
   );
 }
 
-const MENU_ICON: Record<NavKey, typeof Store> = { listings: Store, sell: Tag, handover: ClipboardList };
+const MENU_ICON: Record<NavKey, typeof Store> = { listings: Store, sell: Tag };
 
 // ☰ 사이트 메뉴: 주 메뉴 + 관심 매물 + 안내
 function SiteMenu({ active, onClose }: { active?: NavKey; onClose: () => void }) {
@@ -216,7 +215,6 @@ function AccountMenu({ viewer }: { viewer: Viewer }) {
           <div className="flex flex-col py-1 text-sm">
             <MenuLink href={ROUTES.sell}>내 가게 팔기 · 가치 진단</MenuLink>
             <MenuLink href={ROUTES.listings}>관심 매물</MenuLink>
-            <MenuLink href={ROUTES.handover}>인수인계 진행 상황</MenuLink>
           </div>
         </div>
       )}

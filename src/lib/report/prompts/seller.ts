@@ -4,7 +4,7 @@ import { chatJson } from '@/lib/ai/llm';
 import { formatKRW, formatPercent } from '@/lib/format';
 import type { AnalysisResult, StoreFacts } from '@/lib/types';
 import {
-  factsView, franchiseText, handoverSupportText, monthsBetween, neighborhood, openDaysText, openHoursText, staffTotal,
+  factsView, franchiseText, monthsBetween, neighborhood, openDaysText, openHoursText, staffTotal,
 } from '../facts';
 import type { SellerReport } from '../types';
 import { EVIDENCE } from './anomaly';
@@ -25,6 +25,7 @@ export const SELLER_REPORT_SYSTEM = [
   '강점은 출처가 verified 인 수치 위주로 쓰고, 위험은 needs_check 항목과 운영 의존도에서 도출하세요.',
   'seller_todo 는 "확인 필요"를 "증빙 확인"으로 바꾸는 구체적 행동으로 쓰세요.',
   '법률 판단("불법", "무효")이나 가공 매출 단정은 금지합니다. "확인이 필요한 항목"으로 표현하세요.',
+  '인수인계나 거래 후 교육 지원에 관한 내용은 작성하지 마세요.',
   'headline 은 30자 이내 한 줄 매력 포인트, summary 는 3문장. headline·summary 는 판매 페이지 매장 소개로도 쓰입니다.',
 ].join('\n');
 
@@ -52,7 +53,6 @@ export function sellerReportUserPrompt(analysis: AnalysisResult, facts: StoreFac
       deposit_text: v.deposit !== undefined ? formatKRW(v.deposit) : null,
       monthly_rent_text: v.monthlyRent !== undefined ? formatKRW(v.monthlyRent) : null,
       lease_expiry: v.leaseExpiry, renewal_needed: v.renewalNeeded, franchise: franchiseText(v.franchiseTerms),
-      handover: handoverSupportText(v),
     },
   });
 }
@@ -76,8 +76,6 @@ export function fallbackSellerReport(analysis: AnalysisResult, facts: StoreFacts
   if (verifiedCard) strengths.push(`카드매출은 ${analysis.months.length}개월 중 ${verifiedCard}개월이 카드사 정산과 일치합니다.`);
   if (analysis.months.some((m) => m.delivery > 0)) strengths.push('배달 매출은 플랫폼 정산서로 확인됩니다.');
   if (analysis.scores.revenueStability >= 60) strengths.push(`매출 안정성 점수가 ${analysis.scores.revenueStability}점입니다.`);
-  if (v.handoverSupport) strengths.push(`${handoverSupportText(v)}을 제공합니다.`);
-
   const todo = [...new Set(analysis.anomalies.map((a) => `${a.month ? `${a.month} ` : ''}증빙 올리기: ${EVIDENCE[a.kind]}`))];
   if (v.ownerTasks.length) todo.push(`${v.ownerTasks.join('·')} 업무를 매뉴얼로 정리하면 운영 의존도를 낮출 수 있습니다.`);
 

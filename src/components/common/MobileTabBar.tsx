@@ -1,6 +1,6 @@
 // 모바일 하단 탭바 (소유: A). md 이상에서는 숨기고 머리글 메뉴를 쓴다.
 import Link from 'next/link';
-import { ClipboardList, Heart, Store, Tag } from 'lucide-react';
+import { Heart, Store, Tag } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { NavKey } from './SiteHeader';
 import { ROUTES } from './routes';
@@ -9,13 +9,12 @@ const TABS: { key: NavKey | 'saved'; label: string; href: string; Icon: typeof S
   { key: 'listings', label: '매물', href: ROUTES.listings, Icon: Store },
   { key: 'saved', label: '관심', href: ROUTES.listings, Icon: Heart },
   { key: 'sell', label: '내 가게 팔기', href: ROUTES.sell, Icon: Tag },
-  { key: 'handover', label: '인수인계', href: ROUTES.handover, Icon: ClipboardList },
 ];
 
 export function MobileTabBar({ active }: { active?: NavKey }) {
   return (
     <nav aria-label="하단 메뉴" className="fixed inset-x-0 bottom-0 z-20 border-t bg-background pb-[env(safe-area-inset-bottom)] md:hidden">
-      <ul className="grid grid-cols-4">
+      <ul className="grid grid-cols-3">
         {TABS.map(({ key, label, href, Icon }) => {
           const on = key === active;
           return (

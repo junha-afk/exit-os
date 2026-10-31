@@ -1,5 +1,5 @@
 'use client';
-// 랜딩 (소유: A). ① 영수증 히어로 → ② 기능(브라우저 화면이 스크롤로 바뀜) → ③ 흐름(빈 종이가 채워져 전해짐) → 마무리 CTA.
+// 랜딩 (소유: A). ① 영수증 히어로 → ② 기능(브라우저 화면이 스크롤로 바뀜) → 마무리 CTA.
 // 원본 목업: docs/mockups/landing/index.html
 import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
@@ -9,9 +9,8 @@ import './landing.css';
 
 const STEPS = [
   { label: '01 · 진단', title: '묻는 대로 답하고, 자료를 올리면 끝', body: 'AI가 가게에 대해 하나씩 물어보고, POS·카드·배달 정산 파일을 올리면 겹치는 매출은 지우고 숫자마다 출처를 붙여요.', url: 'exitos.kr/seller/diagnose' },
-  { label: '02 · 가치 정산서', title: '수상한 달은 먼저 잡아내요', body: '평소와 다른 달은 주황색으로 표시하고, 시설·바닥·영업 권리금을 나눠 범위로 보여줘요. 막대를 눌러 이유를 확인해 보세요.', url: 'exitos.kr/seller/report' },
+  { label: '02 · 가치 정산서', title: '수상한 달은 먼저 잡아내요', body: '평소와 다른 달은 주황색으로 표시하고, 시설·영업 권리금을 나눠 범위로 보여줘요. 막대를 눌러 이유를 확인해 보세요.', url: 'exitos.kr/seller/report' },
   { label: '03 · 판매 페이지', title: '보여줄 만큼만, 단계적으로 공개', body: '누구나 보는 정보, 구독자가 보는 재무, 판매자가 승인해야 보는 권리금 구성까지 공개 범위를 나눠요.', url: 'exitos.kr/listings/mangwon-a' },
-  { label: '04 · 인수인계', title: '거래가 끝나면 할 일이 저절로', body: '장비·거래처·계정·직원 정보가 12단계 체크리스트가 되고, 진행률을 판매자와 인수자가 같이 봐요.', url: 'exitos.kr/handover/deal-1' },
 ];
 
 // 화면 2: 최근 12개월 매출(백만 원)과 확인이 필요한 달
@@ -23,38 +22,23 @@ const NOTES: Record<number, string> = {
   10: '8월: 현금 매출 1,400만 원 — 평소의 9배예요. 현금영수증·통장 내역을 내면 반영돼요',
 };
 
-const TODO = [
-  ['장비 인계: 에스프레소 머신', '함께'],
-  ['계정 이전: 배달의민족', '판매자'],
-  ['거래처 명의 변경: 망원커피상사', '판매자'],
-];
-
-const PAPER_ROWS: [string, number][] = [['매출 증빙', 0.36], ['시설 목록', 0.42], ['권리금 정산', 0.48], ['인수인계 12단계', 0.54]];
-
 const ramp = (p: number, a: number, b: number) => Math.min(1, Math.max(0, (p - a) / (b - a)));
 const progress = (el: HTMLElement) => Math.min(1, Math.max(0, -el.getBoundingClientRect().top / (el.offsetHeight - innerHeight)));
 
 export function Landing() {
   const heroRef = useRef<HTMLElement>(null);
-  const flowRef = useRef<HTMLElement>(null);
-  const stageRef = useRef<HTMLDivElement>(null);
   const [heroP, setHeroP] = useState(0);
-  const [flowP, setFlowP] = useState(0);
-  const [stageW, setStageW] = useState(0);
   const [step, setStep] = useState(0);
   const [barNote, setBarNote] = useState('막대를 눌러 보세요');
   const [subbed, setSubbed] = useState(false);
-  const [done, setDone] = useState<boolean[]>(TODO.map(() => false));
 
-  // ①·③ 섹션 안 스크롤 진행도(0~1). 움직임 줄이기 설정이면 완성된 상태만 보여준다
+  // ① 섹션 안 스크롤 진행도(0~1). 움직임 줄이기 설정이면 완성된 상태만 보여준다
   useEffect(() => {
     const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
     let raf = 0;
     const update = () => {
       raf = 0;
       if (heroRef.current) setHeroP(reduce ? 1 : progress(heroRef.current));
-      if (flowRef.current) setFlowP(reduce ? 1 : progress(flowRef.current));
-      if (stageRef.current) setStageW(stageRef.current.clientWidth);
     };
     const onScroll = () => { if (!raf) raf = requestAnimationFrame(update); };
     update();
@@ -77,12 +61,6 @@ export function Landing() {
 
   const out = ramp(heroP, 0.1, 0.4);
   const inn = ramp(heroP, 0.4, 0.7);
-  const narrow = stageW > 0 && stageW < 640; // 모바일은 종이를 머리 위로 띄워 좌우 끝까지 보낸다
-  const paperW = narrow ? 150 : 170;
-  const startX = narrow ? 16 : 175;
-  const endX = Math.max(startX, stageW - paperW - startX); // 두 사람 손 앞에서 시작·끝 (얼굴을 가리지 않게)
-  const inDesk = flowP > 0.3 && flowP < 0.62;
-  const pct = 42 + done.filter(Boolean).length * 6;
 
   return (
     <div className="landing bg-background text-foreground">
@@ -94,7 +72,6 @@ export function Landing() {
           </Link>
           <nav aria-label="랜딩 메뉴" className="hidden gap-1 text-[15px] text-muted-foreground md:flex">
             <a className="px-3 py-2 hover:text-foreground" href="#features">기능</a>
-            <a className="px-3 py-2 hover:text-foreground" href="#flow">진행 방식</a>
             <Link className="px-3 py-2 hover:text-foreground" href={ROUTES.listings}>매물 찾기</Link>
           </nav>
           <Link href={ROUTES.listings} className="ml-auto hidden text-sm text-muted-foreground hover:text-foreground sm:block">매물 둘러보기</Link>
@@ -181,7 +158,7 @@ export function Landing() {
       <section id="features" className="dotgrid border-b bg-background">
         <div className="mx-auto max-w-6xl px-4 pt-20 md:px-6">
           <p className="font-mono text-xs font-medium uppercase tracking-[.2em] text-primary">How it works</p>
-          <h2 className="mt-3 text-3xl font-bold tracking-tight md:text-4xl">한 번 넣은 자료가 끝까지 이어져요</h2>
+          <h2 className="mt-3 text-3xl font-bold tracking-tight md:text-4xl">모은 자료를 보고서와 매물에 연결해요</h2>
         </div>
 
         <div className="mx-auto grid max-w-6xl gap-10 px-4 pb-24 md:px-6 lg:grid-cols-[1fr_1.15fr]">
@@ -268,88 +245,10 @@ export function Landing() {
                       </div>
                     </div>
 
-                    {/* 화면 4: 인수인계 */}
-                    <div className={cn('screen p-6', step === 3 && 'on')}>
-                      <div className="flex items-end justify-between"><p className="text-[13px] font-semibold">인수인계 진행률</p><p className="text-2xl font-bold tabular-nums text-primary">{pct}%</p></div>
-                      <div className="mt-2 h-2 bg-muted"><div className="h-full bg-primary transition-[width] duration-500" style={{ width: `${pct}%` }} /></div>
-                      <p className="mt-4 text-[12px] font-semibold">지금 할 일</p>
-                      <ul className="mt-2 divide-y border-y text-[13px]">
-                        {TODO.map(([task, who], i) => (
-                          <li key={task}>
-                            <label className="flex items-center gap-3 py-2.5">
-                              <input type="checkbox" checked={done[i]} onChange={() => setDone((d) => d.map((x, k) => (k === i ? !x : x)))} className="size-4 accent-[#0E4832]" />
-                              {task} <span className="ml-auto text-[11px] text-muted-foreground">{who}</span>
-                            </label>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
                   </div>
                 </div>
               </div>
             </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ③ 한눈에 보는 흐름: 빈 종이가 채워져 전해짐 (스크롤 연동) */}
-      <section id="flow" ref={flowRef} className="ledger relative h-[320vh] bg-muted">
-        <div className="sticky top-16 flex h-[calc(100vh-4rem)] flex-col overflow-hidden">
-          <div className="mx-auto w-full max-w-6xl px-4 pt-10 md:px-6">
-            <p className="font-mono text-xs font-medium uppercase tracking-[.2em] text-primary">One sheet, start to finish</p>
-            <h2 className="mt-3 text-3xl font-bold tracking-tight md:text-4xl">빈 종이 한 장이, <span className="text-primary">믿을 수 있는 인수 자료</span>가 되기까지</h2>
-            <p className="mt-3 h-6 text-neutral-700">
-              {flowP < 0.3 ? '판매자에게는 설명할 자료가 없어요.' : flowP < 0.62 ? 'ExitOS가 자료를 맞춰 보고 한 칸씩 채워요.' : '인수자는 출처가 붙은 자료를 믿고 받아요.'}
-            </p>
-          </div>
-
-          <div ref={stageRef} className="relative mx-auto mt-6 w-full max-w-6xl flex-1 px-4 md:px-6">
-            <div className="absolute inset-x-6 bottom-[16%] border-t border-neutral-300" />
-
-            <figure className="absolute bottom-[16%] left-2 w-[100px] text-center md:left-10 md:w-[150px]">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/landing/peeps/peep-standing-16.svg" alt="" className="mx-auto h-[160px] w-auto md:h-[300px]" />
-              <figcaption className="mt-2 text-sm font-semibold">판매자 <span className="hidden font-normal text-muted-foreground md:inline">김사장님</span></figcaption>
-            </figure>
-
-            <div className="absolute bottom-[16%] left-1/2 w-[128px] -translate-x-1/2 text-center md:w-[200px]">
-              <div className={cn('mx-auto grid h-[104px] w-[128px] place-items-center md:h-[150px] md:w-[200px] border-2 border-primary transition-colors duration-300', inDesk ? 'bg-accent' : 'bg-white')}>
-                <div>
-                  <span className="mx-auto grid size-8 place-items-center bg-primary font-black text-white md:size-10 md:text-lg">E</span>
-                  <p className="mt-2 text-sm font-bold text-primary">ExitOS</p>
-                  <p className="mt-0.5 hidden text-[11px] text-muted-foreground md:block">자료 대조 · 정산 · 인수인계</p>
-                </div>
-              </div>
-              <p className="mt-2 text-xs font-semibold md:text-sm">중간에서 채워 넣는 곳</p>
-            </div>
-
-            <figure className="absolute bottom-[16%] right-2 w-[100px] text-center md:right-10 md:w-[150px]">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/landing/peeps/peep-standing-23.svg" alt="" className="mx-auto h-[160px] w-auto -scale-x-100 md:h-[300px]" />
-              <figcaption className="mt-2 text-sm font-semibold">인수자 <span className="hidden font-normal text-muted-foreground md:inline">예비 창업자</span></figcaption>
-            </figure>
-
-            {/* 종이 (스크롤에 따라 이동) */}
-            <div
-              className="absolute bottom-[calc(16%+196px)] left-0 border md:bottom-[34%] border-neutral-300 bg-white p-3 shadow-[0_10px_24px_-8px_rgba(0,0,0,.25)] will-change-transform"
-              style={{ width: paperW, transform: `translateX(${startX + (endX - startX) * flowP}px) rotate(${(-4 + 8 * flowP).toFixed(2)}deg)` }}
-            >
-              <p className="font-mono text-[10px] tracking-widest text-muted-foreground">인수 자료</p>
-              <ul className="mt-2 space-y-2 text-[11px]">
-                {PAPER_ROWS.map(([label, at]) => (
-                  <li key={label} className={cn('row flex items-center gap-2', flowP >= at && 'on')}>
-                    <span className="paper-line h-1.5 flex-1 bg-primary/80" />
-                    <span className="w-[78px] text-neutral-700">{label}</span>
-                    <span aria-hidden className="check text-primary">✓</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </div>
-
-          <div className="mx-auto mb-8 w-full max-w-6xl px-4 md:px-6">
-            <div className="h-1 bg-neutral-300"><div className="h-full bg-primary" style={{ width: `${flowP * 100}%` }} /></div>
-            <div className="mt-2 flex justify-between text-xs text-muted-foreground"><span>빈 종이</span><span>ExitOS가 채움</span><span>믿고 받는 자료</span></div>
           </div>
         </div>
       </section>

@@ -75,7 +75,6 @@ export default async function ListingPage({ params }: { params: Promise<{ id: st
   const ops = lockOf(f, ['openDays', 'openHours', 'staffCount', 'ownerWeeklyHours', 'staffRoles', 'customerSegments', 'channelMix']);
   const assets = lockOf(f, ['equipment', 'inventoryIncluded', 'leaseExpiry', 'renewalNeeded', 'franchiseTerms']);
   const ai = lockOf(f, ['scores', 'riskFactors', 'paybackScenarios', 'valuation']);
-  const handover = lockOf(f, ['handoverSupport', 'trainingWeeks', 'suppliers', 'digitalAccounts']);
   const trust = countProvenance(f);
   const similar = (await buildListingRows(viewer)).filter((r) => r.id !== listing.id);
   const photos = photosOf(listing.id, d.photos);
@@ -121,7 +120,7 @@ export default async function ListingPage({ params }: { params: Promise<{ id: st
               {!isLocked(f.floor) && <Fact label="층" value={`${f.floor.value}층`} />}
               {!isLocked(f.seats) && <Fact label="좌석" value={`${f.seats.value}석`} />}
               <Fact label="매각 사유" value={d.saleReason} />
-              <Fact label="희망 인계" value={d.desiredHandover.replace('-', '년 ') + '월'} />
+              <Fact label="희망 매각 시기" value={d.desiredHandover.replace('-', '년 ') + '월'} />
             </dl>
           </header>
 
@@ -295,20 +294,6 @@ export default async function ListingPage({ params }: { params: Promise<{ id: st
           </Section>
               ) },
 
-          // 인수인계 (구독)
-              { id: 'handover', label: '인수인계', locked: !!handover.lock, content: (
-          <Section id="handover" title="인수인계 지원" level="subscriber" lock={handover}>
-            {!isLocked(f.handoverSupport) && !isLocked(f.trainingWeeks) && !isLocked(f.suppliers) && !isLocked(f.digitalAccounts) && (
-              <div className="grid gap-6 sm:grid-cols-[200px_1fr]">
-                <Metric label="현장 교육 (주)" value={f.trainingWeeks.value} provenance={f.trainingWeeks.provenance} format="number" hint={f.handoverSupport} />
-                <div className="grid gap-4 sm:grid-cols-2">
-                  <TagList title="거래처" items={f.suppliers.map((s) => `${s.name} · ${s.item}`)} />
-                  <TagList title="이전할 계정" items={f.digitalAccounts.map((a) => a.platform)} />
-                </div>
-              </div>
-            )}
-          </Section>
-              ) },
             ]}
           />
 
@@ -484,17 +469,6 @@ function PremiumBar({ breakdown, provenance }: { breakdown: { facility: number; 
   );
 }
 
-function TagList({ title, items }: { title: string; items: string[] }) {
-  return (
-    <div>
-      <p className="mb-2 text-xs text-muted-foreground">{title}</p>
-      <ul className="flex flex-wrap gap-1.5">
-        {items.map((i) => <li key={i} className=" bg-muted px-2 py-1 text-sm">{i}</li>)}
-      </ul>
-    </div>
-  );
-}
-
 // 큰 사진 1장 + 작은 사진 4장. 사진이 없으면 빈 자리만 보여준다
 function Gallery({ photos, name }: { photos: string[]; name: string }) {
   if (photos.length === 0) {
@@ -534,4 +508,3 @@ function Gallery({ photos, name }: { photos: string[]; name: string }) {
     </>
   );
 }
-

@@ -12,7 +12,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "ExitOS",
-  description: "소상공인 매각 준비·인수인계 자동화",
+  description: "소상공인 매각 준비와 매장 가치 분석",
 };
 
 export default function RootLayout({

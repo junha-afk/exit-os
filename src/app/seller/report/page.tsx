@@ -4,7 +4,6 @@ import Link from 'next/link';
 import { AiEstimateNotice, Metric } from '@/components/common';
 import { ROUTES } from '@/components/common/routes';
 import { AnomalyList } from '@/components/report/AnomalyList';
-import { DealButton } from '@/components/report/DealButton';
 import { PaybackSimulator } from '@/components/report/PaybackSimulator';
 import { PaywallDialog } from '@/components/report/PaywallDialog';
 import { PrintHeader, PrintPayback } from '@/components/report/PrintLayout';
@@ -165,15 +164,6 @@ export default async function SellerReportPage({ searchParams }: { searchParams:
             <PublishForm storeId={storeId} defaults={defaults} publishedId={listing?.id} />
           </section>
 
-          {listing && (
-            <section aria-labelledby="deal-title" className="border-t pt-10 print:hidden">
-              <h2 id="deal-title" className="text-2xl font-bold">구매자와 계약하기로 했나요?</h2>
-              <p className="mt-1 mb-4 text-sm text-muted-foreground">
-                거래를 시작하면 이 보고서의 장비·거래처·직원·계정 정보로 인수인계 업무를 자동으로 만들어요.
-              </p>
-              <DealButton listingId={listing.id} />
-            </section>
-          )}
         </div>
 
         <aside className="hidden lg:sticky lg:top-24 lg:block lg:self-start print:hidden">{simulator}</aside>
