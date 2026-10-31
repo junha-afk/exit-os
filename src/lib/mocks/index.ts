@@ -10,6 +10,9 @@ import listingDetail from './listing-detail.json';
 import listings from './listings.json';
 import storeFacts from './store-facts.json';
 import uploadResults from './upload-results.json';
+import sellerReport from './seller-report.json';
+import riskReport from './risk-report.json';
+import type { BuyerRiskReport, SellerReport } from '../report/types';
 
 export const MOCK_STORE_ID = 'mock-store-mangwon';
 export const MOCK_LISTING_ID = 'mock-listing-1';
@@ -18,6 +21,8 @@ export const MOCK_DEAL_ID = 'mock-deal-1';
 export const mockAnalysis = analysis as AnalysisResult;
 export const mockFacts = storeFacts.facts as StoreFacts;
 export const mockUploadResults = uploadResults as Record<RecordKind, UploadResult>;
+export const mockSellerReport = sellerReport as SellerReport;
+export const mockRiskReport = riskReport as BuyerRiskReport;
 export const mockListings = listings.listings as ListingSummary[];
 export const mockListing = listingDetail as {
   id: string; storeId: string; premiumBreakdownLevel: 'public' | 'approved'; detail: ListingDetail;
