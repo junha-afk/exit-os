@@ -191,7 +191,7 @@ export interface HandoverTask {
 
 ## 5. 자료 받기와 재무 행
 
-**받을 자료는 고정하지 않는다.** A의 진단 엔진(LLM)이 판단해 `src/lib/documents/catalog.ts` 의 `DOC_KINDS` 중에서 하나씩 요청한다. **파일 형식은 제한하지 않는다**(엑셀·CSV·PDF·사진·텍스트). 올라온 파일은 A가 읽어 저장하고, B는 저장된 결과를 읽기만 한다.
+**받을 자료는 고정하지 않는다.** A의 진단 엔진(LLM)이 판단해 `src/lib/documents/catalog.ts` 의 `DOC_KINDS` 중에서 하나씩 요청한다. 업로드는 엑셀·CSV·PDF·Word·한글·사진·텍스트를 지원한다. 올라온 파일은 A가 읽어 저장하고, B는 저장된 결과를 읽기만 한다.
 
 | 파일 | 읽는 방법 (A) | 결과 |
 | --- | --- | --- |
