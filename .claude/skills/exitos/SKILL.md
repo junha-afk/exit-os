@@ -78,7 +78,7 @@ type Viewer = 'seller' | 'buyer' | 'buyer_subscribed' | 'buyer_approved';
 
 - 호출은 `src/lib/ai/llm.ts` 의 `chatJson()` 하나로만 한다(서버 전용, `fetch` 사용, 새 패키지 없음). 주소·키·모델은 `LABLUP_API_BASE_URL`, `LABLUP_API_KEY`, `LABLUP_MODEL`. 클라이언트에서 직접 호출 금지.
 - 항상 JSON으로 받는다 → `zod` 로 검증 → 실패 시 1회 재시도 → 그래도 실패하면 폴백(인터뷰는 기본 질문, 보고서는 폴백 문구).
-- 프롬프트 원문은 `docs/AI_PROMPTS.md` 와 코드(`src/lib/interview/prompts.ts`, `src/lib/report/prompts/*.ts`)를 동기화. 프롬프트 수정은 해당 섹션 담당자만(공통·§1·§2 = A, §3~§6 = B).
+- **시스템 프롬프트는 미리 작성해 둔다:** 작업별 시스템 프롬프트를 코드 파일(`src/lib/interview/prompts.ts`, `src/lib/report/prompts/*.ts`)에 상수로 적어 두고, 지시·규칙은 시스템 프롬프트에만, user 메시지에는 데이터 JSON만 넣는다. 공통 머리말은 `chatJson()` 이 자동으로 붙이므로 다시 쓰지 않는다. 원문 기준은 코드 파일이고 `docs/AI_PROMPTS.md` 는 구조·이유를 맞춰 둔다. 프롬프트 수정은 해당 섹션 담당자만(공통·§1·§2 = A, §3~§6 = B).
 - **질문 엔진 패턴 (진단·노하우 공용, 담당 A):**
   1. 입력: 지금까지의 facts + 남은 필수 슬롯 목록 + 업로드된 재무 자료 종류
   2. 출력: `{ next_slot, question, options? }` — 다음에 물을 슬롯 1개, 질문 문장, 업종별 선택지

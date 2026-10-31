@@ -24,7 +24,7 @@
 | `number` | 숫자 칸 + 단위 표시 | 보증금 `5,000` 만원, 좌석 `22` 석 |
 | `money` | 숫자 칸(만원) → 코드가 원으로 변환 | 희망 권리금 `16,000` 만원 → 160,000,000 |
 | `month` | 연·월 선택 | 개업 `2022-09`, 임대차 만료 `2027-06` |
-| `choice` | 버튼 중 하나 | 업종: 카페 / 음식점 / 베이커리 / 주점 / 분식 / 기타 |
+| `choice` | 버튼 중 하나 | 업종(F&B만): 카페 / 베이커리·디저트 / 음식점 / 분식·간편식 / 주점·바 / 기타 외식업 (`FNB_INDUSTRIES`) |
 | `multi` | 체크 여러 개 | 영업 요일, 디지털 계정(배민·쿠팡이츠·토스플레이스…) |
 | `boolean` | 예 / 아니오 (/ 모름) | 익명 공개, 갱신 협의 필요 |
 | `percent_split` | 합 100%가 되는 숫자 칸들 | 판매 채널: 홀 60 / 포장 25 / 배달 15 |
@@ -43,6 +43,14 @@
 4. **노하우 산출물 문장:** 점주가 고른 항목으로 역할 매뉴얼·교육 체크리스트·운영 부담 요약·공급망 인계 목록 문장 생성(P2).
 
 **LLM이 실패해도 인터뷰는 멈추지 않는다:** `slots.ts` 의 기본 순서·기본 질문 문구·기본 선택지로 바로 넘어간다.
+
+### 프롬프트 방식: 미리 작성한 시스템 프롬프트
+
+- 작업별 **시스템 프롬프트를 `src/lib/interview/prompts.ts` 에 미리 적어 둔다** (`DIAGNOSIS_SYSTEM_PROMPT`, `KNOWHOW_OPTIONS_SYSTEM_PROMPT`, `KNOWHOW_ARTIFACTS_SYSTEM_PROMPT`). 실행 중에 프롬프트 문장을 조립하지 않는다.
+- **지시·규칙은 시스템 프롬프트에만**, user 메시지에는 이번 턴의 데이터 JSON만 넣는다 (`buildDiagnosisUserMessage()`).
+- 공통 머리말(존댓말·JSON만 출력·숫자 변경 금지·법률 판단 금지)은 `llm.ts` 의 `COMMON_SYSTEM_PROMPT` 로, `chatJson()` 이 모든 호출의 시스템 프롬프트 앞에 자동으로 붙인다. B의 보고서 프롬프트에도 똑같이 붙는다.
+- 응답 모양은 `src/lib/interview/schemas.ts` 의 zod 스키마와 프롬프트의 "출력 형식"을 같게 유지한다.
+- 프롬프트 원문의 기준은 코드 파일이다. `docs/AI_PROMPTS.md` 에는 입력·출력 구조와 설계 이유를 적는다.
 
 ### 슬롯별 입력 방식 (진단)
 
@@ -83,8 +91,8 @@
 
 | 경로 | 내용 |
 | --- | --- |
-| `src/lib/ai/llm.ts` | 래블업 API 클라이언트 `chatJson()` (B도 import만 함) |
-| `src/lib/interview/**` | `types.ts`(`InputSpec`, `Question`), `slots.ts`(슬롯별 입력 방식·zod·기본 질문·기본 선택지·순서), `prompts.ts`, `schemas.ts`, `next.ts`(다음 질문 결정 + 폴백), `progress.ts`, `fixtures/*.json` |
+| `src/lib/ai/llm.ts` | 래블업 API 클라이언트 `chatJson()` + 공통 머리말 `COMMON_SYSTEM_PROMPT` (B도 import만 함) |
+| `src/lib/interview/**` | `types.ts`(`InputSpec`, `Question`), `slots.ts`(슬롯별 입력 방식·zod·기본 질문·기본 선택지·순서), `prompts.ts`(**미리 작성한 시스템 프롬프트** + user 메시지 빌더), `schemas.ts`(LLM 응답 zod), `next.ts`(다음 질문 결정 + 폴백), `progress.ts`, `fixtures/*.json` |
 | `src/lib/facts/**` | `repo.ts` — `getFacts` / `setFact` / `createStore`, `importEquipmentCsv.ts` |
 | `src/app/api/ai/interview/route.ts` | 인터뷰 1턴 API |
 | `src/app/api/stores/route.ts` | 매장 생성 (기존 목업 → A가 인수) |
@@ -167,7 +175,7 @@
 
 | 함수 / 컴포넌트 | 위치(소유) | 쓰는 사람 | 시그니처 |
 | --- | --- | --- | --- |
-| `chatJson` | `src/lib/ai/llm.ts` (A) | A, B | `chatJson<T>(opts: { system: string; user: string; schema: z.ZodType<T>; fixture?: T; temperature?: number }): Promise<T>` · `DEMO_MODE=true` 이고 `fixture` 가 있으면 그대로 반환 · zod 실패 시 1회 재시도 후 `throw new Error('AI_SCHEMA_FAIL')` |
+| `chatJson` | `src/lib/ai/llm.ts` (A) | A, B | `chatJson<T>(opts: { system: string; user: string; schema: z.ZodType<T>; fixture?: T; temperature?: number; thinking?: boolean; maxTokens?: number; timeoutMs?: number }): Promise<T>` · `system` = 미리 작성한 작업별 시스템 프롬프트(앞에 `COMMON_SYSTEM_PROMPT` 자동 추가), `user` = 데이터 JSON만 · `thinking` 기본 false(빠름), 보고서처럼 긴 서술은 true · `DEMO_MODE=true` 이고 `fixture` 가 있으면 그대로 반환 · 실패 시 1회 재시도 후 `LlmError`(`code: 'AI_CONFIG_MISSING' \| 'AI_SCHEMA_FAIL'`) |
 | `getFacts` | `src/lib/facts/repo.ts` (A) | B | `getFacts(storeId: string): Promise<StoreFacts>` · PR-0 구현은 `mockFacts` 반환 |
 | `getUploadedKinds` | `src/lib/analysis/repo.ts` (B) | A | `getUploadedKinds(storeId: string): Promise<RecordKind[]>` · PR-0 구현은 `[]` 반환 |
 | `<UploadPanel>` | `src/components/upload/UploadPanel.tsx` (B) | A | `{ storeId: string; highlight?: RecordKind; onUploaded?: (kind: RecordKind, r: UploadResult) => void }` · PR-0은 6종 파일 선택 버튼만 있는 껍데기 |
@@ -349,4 +357,6 @@ PR-0 이후 `types.ts` 변경이 필요하면: 채널 공지 → B가 반영 →
 - 2026-10-31 · 전원 · 역할 재편: A(정보 수집) / B(분석·보고서) / F(플랫폼 프론트, 기존 A). 이전 C 작업은 B가 인수
 - 2026-10-31 · 전원 · LLM: Gemini → 래블업 API, `src/lib/ai/llm.ts` 단일 클라이언트
 - 2026-10-31 · 전원 · 정보 수집은 자연어 답변 없이 숫자·선택·파일 입력만. LLM은 질문 순서·문구·선택지만 담당, 값 검증은 코드
+- 2026-10-31 · A · 래블업 API 실호출 확인: `https://api.console.lablup.ai/v1`, 모델 `DeepSeek-V4.1-Flash-B300`, `response_format: json_object` 동작. 모델이 답 전에 추론을 하므로 `max_tokens` 가 작으면 답이 빔 → `chatJson` 의 `thinking`·`maxTokens` 옵션으로 조절
+- 2026-10-31 · A · 정보 수집 LLM은 미리 작성한 시스템 프롬프트(`src/lib/interview/prompts.ts`) + 데이터만 담은 user 메시지로 호출. 공통 머리말은 `chatJson` 이 자동으로 붙임
 - (미정) 저장소: Supabase vs 서버 메모리 — Vercel 배포 시 메모리 저장은 요청 간 유지가 안 됨
