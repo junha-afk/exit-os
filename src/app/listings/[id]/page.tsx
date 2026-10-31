@@ -2,10 +2,9 @@
 import { headers } from 'next/headers';
 import { notFound } from 'next/navigation';
 import type { ReactNode } from 'react';
-import Link from 'next/link';
 import Image from 'next/image';
-import { CalendarClock, ChevronLeft, ImageIcon, Lock, MapPin, Store } from 'lucide-react';
-import { AiEstimateNotice, LockedSection, Metric, ProvenanceBadge, RoleSwitcher } from '@/components/common';
+import { CalendarClock, ImageIcon, Lock, MapPin, Store } from 'lucide-react';
+import { AiEstimateNotice, LockedSection, Metric, ProvenanceBadge, SiteFooter, SiteHeader } from '@/components/common';
 import { buildListingRows } from '@/components/common/listing-rows';
 import { photosOf } from '@/components/common/store-photos';
 import { formatKRW, formatKRWRange, formatMonths, formatPercent } from '@/lib/format';
@@ -70,14 +69,9 @@ export default async function ListingPage({ params }: { params: Promise<{ id: st
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="sticky top-0 z-20 border-b bg-background">
-        <div className="mx-auto flex h-14 max-w-6xl items-center justify-between gap-3 px-6">
-          <Link href="/" className="-ml-1 inline-flex min-h-11 items-center gap-1 text-sm"><ChevronLeft aria-hidden className="size-4" /><b className="text-[17px] tracking-tight">ExitOS</b><span className="ml-1 text-muted-foreground">매물 목록</span></Link>
-          <RoleSwitcher current={viewer} />
-        </div>
-      </div>
+      <SiteHeader viewer={viewer} active="listings" backHref="/" />
 
-      <main className="mx-auto grid max-w-6xl gap-10 px-6 py-8 lg:grid-cols-[1fr_320px]">
+      <main className="mx-auto grid max-w-6xl gap-10 px-4 pb-28 pt-0 md:px-6 md:pt-8 lg:grid-cols-[1fr_320px] lg:pb-10">
         <div className="flex min-w-0 flex-col gap-10">
           {/* 히어로: 사진 갤러리 → 이름 → 핵심 숫자 줄 (부동산 매물 상세의 익숙한 순서) */}
           <header>
@@ -311,7 +305,7 @@ export default async function ListingPage({ params }: { params: Promise<{ id: st
         </div>
 
         {/* 오른쪽 고정 영역 */}
-        <aside className="lg:sticky lg:top-6 lg:self-start">
+        <aside className="hidden lg:sticky lg:top-24 lg:block lg:self-start">
           <div className="space-y-5 border bg-background p-5">
             <div>
               <p className="text-xs text-muted-foreground">희망 권리금</p>
@@ -338,6 +332,19 @@ export default async function ListingPage({ params }: { params: Promise<{ id: st
           </div>
         </aside>
       </main>
+
+      {/* 모바일 하단 고정: 가격 + 다음 행동 (오른쪽 패널 대신) */}
+      <div className="fixed inset-x-0 bottom-0 z-20 flex items-center gap-3 border-t bg-background px-4 pb-[calc(env(safe-area-inset-bottom)+12px)] pt-3 lg:hidden">
+        <div className="min-w-0">
+          <p className="text-[11px] text-muted-foreground">희망 권리금</p>
+          <p className="truncate text-lg font-bold tabular-nums">{!isLocked(f.premiumAsk) && formatKRW(f.premiumAsk.value)}</p>
+        </div>
+        <div className="ml-auto w-[56%] shrink-0">
+          <ViewerAction viewer={viewer} listingId={listing.id} compact />
+        </div>
+      </div>
+
+      <SiteFooter />
     </div>
   );
 }
@@ -370,7 +377,7 @@ function Section({
 
 function KeyCell({ label, value, lock }: { label: string; value: string | null; lock: Locked | null }) {
   return (
-    <div className="border-r px-5 py-4 first:pl-0 last:border-r-0 [&:nth-child(2)]:border-r-0 sm:[&:nth-child(2)]:border-r">
+    <div className="border-r px-4 py-4 first:pl-0 last:border-r-0 [&:nth-child(2)]:border-r-0 max-sm:[&:nth-child(3)]:pl-0 sm:px-5 sm:[&:nth-child(2)]:border-r">
       <dt className="text-xs text-muted-foreground">{label}</dt>
       <dd className="mt-1">
         {lock ? (
@@ -484,7 +491,18 @@ function Gallery({ photos, name }: { photos: string[]; name: string }) {
   }
   const [main, ...rest] = photos;
   return (
-    <div className="grid aspect-[16/7] grid-cols-4 grid-rows-2 gap-1">
+    <>
+      <div className="-mx-4 md:hidden">
+        <ul className="no-scrollbar flex snap-x snap-mandatory overflow-x-auto">
+          {photos.map((src, i) => (
+            <li key={src} className="relative aspect-[4/3] w-full shrink-0 snap-start bg-muted">
+              <Image src={src} alt={`${name} 매장 사진 ${i + 1}`} fill priority={i === 0} sizes="(max-width: 767px) 100vw, 1px" className="object-cover" />
+              <span className="absolute bottom-3 right-3 bg-black/60 px-2 py-0.5 text-xs tabular-nums text-white">{i + 1} / {photos.length}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+    <div className="hidden aspect-[16/7] grid-cols-4 grid-rows-2 gap-1 md:grid">
       <div className="relative col-span-2 row-span-2 bg-muted">
         <Image src={main} alt={`${name} 매장 사진 1`} fill priority sizes="(min-width: 1024px) 400px, 50vw" className="object-cover" />
       </div>
@@ -497,6 +515,7 @@ function Gallery({ photos, name }: { photos: string[]; name: string }) {
         </div>
       ))}
     </div>
+    </>
   );
 }
 

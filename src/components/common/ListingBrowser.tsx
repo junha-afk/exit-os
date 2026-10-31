@@ -2,10 +2,13 @@
 // 매물 목록 (소유: A). 세로 스크롤 목록 + ☰ 메뉴(정렬·필터). 필터는 받은 목록 안에서만 거른다.
 import Image from 'next/image';
 import Link from 'next/link';
-import { Lock, Menu, Search, X } from 'lucide-react';
+import { Lock, SlidersHorizontal, X } from 'lucide-react';
 import { useMemo, useState, type ReactNode } from 'react';
 import { formatKRW } from '@/lib/format';
-import type { Sourced } from '@/lib/types';
+import type { Sourced, Viewer } from '@/lib/types';
+import { MobileTabBar } from './MobileTabBar';
+import { SiteFooter } from './SiteFooter';
+import { SiteHeader } from './SiteHeader';
 import { ProvenanceBadge } from './ProvenanceBadge';
 import { cn } from '@/lib/utils';
 
@@ -39,7 +42,7 @@ const SORTS: { key: SortKey; label: string }[] = [
 
 const verifiedRatio = (r: ListingRow) => r.trust.verified / (r.trust.verified + r.trust.user_input + r.trust.needs_check || 1);
 
-export function ListingBrowser({ rows, header }: { rows: ListingRow[]; header: ReactNode }) {
+export function ListingBrowser({ rows, viewer }: { rows: ListingRow[]; viewer: Viewer }) {
   const [open, setOpen] = useState(false);
   const [sort, setSort] = useState<SortKey>('latest');
   const [industries, setIndustries] = useState<string[]>([]);
@@ -79,43 +82,96 @@ export function ListingBrowser({ rows, header }: { rows: ListingRow[]; header: R
     setNoCheck(false);
   }
 
+  const avg = (f: (r: ListingRow) => number) => (shown.length ? shown.reduce((a, r) => a + f(r), 0) / shown.length : 0);
+
   return (
     <>
-      <header className="sticky top-0 z-20 border-b bg-background">
-        <div className="mx-auto flex h-14 max-w-5xl items-center gap-3 px-4">
-          <button type="button" aria-label="정렬·필터 열기" onClick={() => setOpen(true)} className="-ml-2 grid size-11 place-items-center">
-            <Menu aria-hidden className="size-5" />
-          </button>
-          <span className="text-[17px] font-bold">ExitOS</span>
-          <div className="ml-2 flex h-9 flex-1 items-center gap-2 bg-muted px-3 text-sm text-muted-foreground">
-            <Search aria-hidden className="size-4" />
-            동네나 역 이름
-          </div>
-          {header}
-        </div>
-        <div className="mx-auto flex max-w-3xl items-center justify-between gap-4 px-4 pb-2.5 text-[13px]">
-          <p className="truncate text-muted-foreground">
-            {summary.join(' · ')} · <span className="text-foreground">{SORTS.find((s) => s.key === sort)?.label}</span>
-          </p>
-          <p className="shrink-0 text-muted-foreground"><b className="tabular-nums text-foreground">{shown.length}</b>개</p>
-        </div>
-      </header>
+      <SiteHeader viewer={viewer} active="listings" onMenuClick={() => setOpen(true)} />
 
-      <main className="mx-auto max-w-3xl px-4">
-        <ul className="divide-y">
-          {shown.map((r) => (
-            <li key={r.id}>
-              <Row row={r} />
-            </li>
-          ))}
-        </ul>
-        {shown.length === 0 && (
-          <div className="py-16 text-center text-sm text-muted-foreground">
-            조건에 맞는 매물이 없어요.{' '}
-            <button type="button" onClick={reset} className="font-medium text-foreground underline underline-offset-4">조건 초기화</button>
+      {/* 페이지 머리: 연한 회녹 띠 + 업종 빠른 선택 */}
+      <div className="border-b bg-accent">
+        <div className="mx-auto max-w-6xl px-4 pb-4 pt-5 md:px-6 md:pb-5 md:pt-8">
+          <h1 className="text-xl font-bold tracking-tight md:text-[26px]">매물 찾기</h1>
+          <p className="mt-1 text-sm text-accent-foreground/80">숫자마다 출처가 붙은 매장 양도 매물이에요.</p>
+          <div className="no-scrollbar -mx-4 mt-4 flex gap-2 overflow-x-auto px-4 md:mx-0 md:px-0">
+            {[null, ...allIndustries].map((ind) => {
+              const on = ind === null ? industries.length === 0 : industries.length === 1 && industries[0] === ind;
+              return (
+                <button
+                  key={ind ?? 'all'}
+                  type="button"
+                  onClick={() => setIndustries(ind ? [ind] : [])}
+                  className={cn(
+                    'h-9 shrink-0 border px-3.5 text-sm transition-colors',
+                    on ? 'border-primary bg-primary font-semibold text-primary-foreground' : 'border-border bg-background hover:border-foreground/40',
+                  )}
+                >
+                  {ind ?? '전체'}
+                </button>
+              );
+            })}
+            <button type="button" onClick={() => setOpen(true)} className="inline-flex h-9 shrink-0 items-center gap-1.5 border border-border bg-background px-3.5 text-sm">
+              <SlidersHorizontal aria-hidden className="size-4" />
+              필터
+            </button>
           </div>
-        )}
-      </main>
+        </div>
+      </div>
+
+      <div className="mx-auto grid max-w-6xl gap-10 px-4 md:px-6 lg:grid-cols-[1fr_300px]">
+        <main className="min-w-0">
+          <div className="flex items-center justify-between gap-3 border-b py-3 text-[13px]">
+            <p className="truncate text-muted-foreground">
+              <b className="tabular-nums text-foreground">{shown.length}</b>개 · {summary.join(' · ')}
+            </p>
+            <label className="flex shrink-0 items-center gap-1 text-muted-foreground">
+              <span className="sr-only">정렬</span>
+              <select value={sort} onChange={(e) => setSort(e.target.value as SortKey)} className="h-9 bg-transparent pr-1 text-foreground">
+                {SORTS.map((s) => (
+                  <option key={s.key} value={s.key}>{s.label}</option>
+                ))}
+              </select>
+            </label>
+          </div>
+          <ul className="divide-y">
+            {shown.map((r) => (
+              <li key={r.id}>
+                <Row row={r} />
+              </li>
+            ))}
+          </ul>
+          {shown.length === 0 && (
+            <div className="py-16 text-center text-sm text-muted-foreground">
+              조건에 맞는 매물이 없어요.{' '}
+              <button type="button" onClick={reset} className="font-medium text-foreground underline underline-offset-4">조건 초기화</button>
+            </div>
+          )}
+        </main>
+
+        {/* 데스크톱 오른쪽: 판매자 진입 + 지금 조건의 요약 */}
+        <aside className="hidden space-y-6 self-start py-6 lg:sticky lg:top-24 lg:block">
+          <div className="bg-primary p-6 text-primary-foreground">
+            <p className="text-xs font-medium opacity-80">가게를 내놓을 계획이라면</p>
+            <p className="mt-2 text-xl font-bold leading-snug">내 가게, 얼마에<br />넘길 수 있을까요?</p>
+            <p className="mt-2 text-sm leading-relaxed opacity-85">POS·카드·배달 자료를 올리면 권리금 범위와 확인할 점을 정리해 드려요.</p>
+            <Link href="/seller/diagnose" className="mt-5 flex h-11 items-center justify-center bg-background text-sm font-semibold text-primary hover:bg-accent">
+              가치 진단 시작
+            </Link>
+          </div>
+          <div className="border p-5">
+            <p className="text-sm font-semibold">지금 조건의 매물</p>
+            <dl className="mt-3 space-y-2 text-sm">
+              <SummaryRow label="평균 권리금" value={formatKRW(avg((r) => r.premiumAsk))} />
+              <SummaryRow label="평균 월세" value={formatKRW(avg((r) => r.monthlyRent))} />
+              <SummaryRow label="평균 증빙 비율" value={`${Math.round(avg(verifiedRatio) * 100)}%`} />
+            </dl>
+            <p className="mt-3 text-xs text-muted-foreground">목록에 보이는 {shown.length}개 매물 기준</p>
+          </div>
+        </aside>
+      </div>
+
+      <SiteFooter />
+      <MobileTabBar active="listings" />
 
       {open && (
         <div className="fixed inset-0 z-30" role="dialog" aria-modal="true" aria-label="정렬과 필터">
@@ -193,9 +249,9 @@ export function ListingBrowser({ rows, header }: { rows: ListingRow[]; header: R
 function Row({ row: r }: { row: ListingRow }) {
   const body = (
     <div className={cn('flex gap-4 py-5', r.hasDetail && 'group')}>
-      <div className="relative h-[124px] w-[164px] shrink-0 overflow-hidden bg-muted">
+      <div className="relative h-[92px] w-[112px] shrink-0 overflow-hidden bg-muted md:h-[124px] md:w-[164px]">
         {r.photo ? (
-          <Image src={r.photo} alt={`${r.displayName} 매장 사진`} fill sizes="164px" className="object-cover transition-transform duration-300 group-hover:scale-[1.03]" />
+          <Image src={r.photo} alt={`${r.displayName} 매장 사진`} fill sizes="(min-width: 768px) 164px, 112px" className="object-cover transition-transform duration-300 group-hover:scale-[1.03]" />
         ) : (
           <span className="absolute inset-0 grid place-items-center text-xs text-muted-foreground">사진 준비 중</span>
         )}
@@ -227,6 +283,15 @@ function Row({ row: r }: { row: ListingRow }) {
     </div>
   );
   return r.hasDetail ? <Link href={`/listings/${r.id}`} className="block focus-visible:outline-2 focus-visible:outline-ring">{body}</Link> : body;
+}
+
+function SummaryRow({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="flex items-center justify-between">
+      <dt className="text-muted-foreground">{label}</dt>
+      <dd className="font-semibold tabular-nums">{value}</dd>
+    </div>
+  );
 }
 
 function Dot({ className, label, warn }: { className: string; label: string; warn?: boolean }) {

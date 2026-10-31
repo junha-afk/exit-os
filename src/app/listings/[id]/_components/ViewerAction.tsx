@@ -1,9 +1,7 @@
 'use client';
-// 역할별 다음 행동 버튼 (소유: A). 시연에서는 누르면 다음 역할로 쿠키를 바꿔 블러가 풀리는 걸 보여준다.
+// 다음 행동 버튼 (소유: A). 구독 → 열람 승인 요청 → 리스크 보고서 순서로 바뀐다. 역할을 고르는 화면은 없다.
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { useTransition } from 'react';
-import { DEMO_ROLE_COOKIE } from '@/components/common';
+import { useMembership } from '@/components/common';
 import type { Viewer } from '@/lib/types';
 
 const NEXT: Partial<Record<Viewer, { label: string; hint: string; to: Viewer }>> = {
@@ -16,37 +14,28 @@ const NEXT: Partial<Record<Viewer, { label: string; hint: string; to: Viewer }>>
 };
 
 const BTN =
-  'flex min-h-11 w-full items-center justify-center bg-primary px-4 text-sm font-medium text-primary-foreground transition-opacity hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring disabled:opacity-60';
+  'flex min-h-12 w-full items-center justify-center bg-primary px-4 text-[15px] font-semibold text-primary-foreground transition-opacity hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring disabled:opacity-60';
 
-export function ViewerAction({ viewer, listingId }: { viewer: Viewer; listingId: string }) {
-  const router = useRouter();
-  const [pending, startTransition] = useTransition();
+export function ViewerAction({ viewer, listingId, compact }: { viewer: Viewer; listingId: string; compact?: boolean }) {
+  const { pending, set } = useMembership();
   const next = NEXT[viewer];
 
   if (!next) {
     return viewer === 'seller' ? (
-      <p className="text-sm text-muted-foreground">판매자 화면이에요. 구매자에게는 공개 범위에 따라 일부가 가려져 보여요.</p>
+      <p className="text-sm text-muted-foreground">내가 올린 매물이에요.</p>
     ) : (
       <Link href={`/listings/${listingId}/risk`} className={BTN}>
-        구매자용 리스크 보고서 보기
+        리스크 보고서 보기
       </Link>
     );
   }
 
   return (
     <div className="space-y-2">
-      <button
-        type="button"
-        disabled={pending}
-        className={BTN}
-        onClick={() => {
-          document.cookie = `${DEMO_ROLE_COOKIE}=${next.to}; path=/; max-age=${60 * 60 * 24}; samesite=lax`;
-          startTransition(() => router.refresh());
-        }}
-      >
+      <button type="button" disabled={pending} className={BTN} onClick={() => set(next.to)}>
         {next.label}
       </button>
-      <p className="text-xs text-muted-foreground">{next.hint}</p>
+      {!compact && <p className="text-xs text-muted-foreground">{next.hint}</p>}
     </div>
   );
 }

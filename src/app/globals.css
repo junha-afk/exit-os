@@ -55,18 +55,18 @@
   --card-foreground: oklch(0.145 0 0);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
+  --primary: oklch(0.36 0.07 163); /* 딥그린: 버튼·강조 (A) */
   --primary-foreground: oklch(0.985 0 0);
   --secondary: oklch(0.97 0 0);
   --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
+  --muted: oklch(0.968 0.003 163);
   --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
+  --accent: oklch(0.965 0.014 163); /* 연한 회녹: 섹션 띠·선택 배경 */
+  --accent-foreground: oklch(0.3 0.06 163);
   --destructive: oklch(0.577 0.245 27.325);
   --border: oklch(0.922 0 0);
   --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
+  --ring: oklch(0.55 0.09 163);
   --chart-1: oklch(0.87 0 0);
   --chart-2: oklch(0.556 0 0);
   --chart-3: oklch(0.439 0 0);
@@ -133,3 +133,7 @@
 .scroll-strip::-webkit-scrollbar { height: 4px; }
 .scroll-strip::-webkit-scrollbar-track { background: var(--muted); }
 .scroll-strip::-webkit-scrollbar-thumb { background: var(--foreground); }
+
+/* 옆으로 넘기는 칩·사진 줄은 막대를 숨긴다 (A) */
+.no-scrollbar { scrollbar-width: none; }
+.no-scrollbar::-webkit-scrollbar { display: none; }
