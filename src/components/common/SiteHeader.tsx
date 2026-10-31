@@ -1,8 +1,9 @@
 'use client';
-// 사이트 머리글 (소유: A). 데스크톱: 로고·주 메뉴·검색·관심·내 정보 / 모바일: 로고·검색·내 정보 (메뉴는 하단 탭바).
+// 사이트 머리글 (소유: A). ☰ = 사이트 메뉴(왼쪽 서랍). 데스크톱: 로고·주 메뉴·검색·관심·내 정보 / 모바일: ☰·로고·검색·내 정보.
 import Link from 'next/link';
-import { ChevronDown, ChevronLeft, Heart, Menu, Search, UserRound } from 'lucide-react';
+import { ChevronDown, ChevronLeft, ClipboardList, Heart, Menu, Search, Store, Tag, UserRound, X } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import type { Viewer } from '@/lib/types';
 import { cn } from '@/lib/utils';
 import { useMembership } from './RoleSwitcher';
@@ -19,27 +20,32 @@ export const NAV: { key: NavKey; label: string; href: string }[] = [
 export function SiteHeader({
   viewer,
   active,
-  onMenuClick,
   backHref,
+  hideSearch,
   children,
 }: {
   viewer: Viewer;
   active?: NavKey;
-  /** 있으면 왼쪽에 ☰ (매물 목록의 정렬·필터) */
-  onMenuClick?: () => void;
-  /** 모바일에서 왼쪽에 뒤로 가기 */
+  /** 모바일에서 ☰ 대신 왼쪽에 뒤로 가기 */
   backHref?: string;
+  /** 페이지 안에 검색이 따로 있으면 머리글 검색을 숨긴다 (매물 찾기) */
+  hideSearch?: boolean;
   /** 머리글 아래 줄 (현재 조건 등) */
   children?: React.ReactNode;
 }) {
+  const [menuOpen, setMenuOpen] = useState(false);
   return (
     <header className="sticky top-0 z-20 border-b bg-background/95 backdrop-blur">
-      <div className="mx-auto flex h-14 max-w-6xl items-center gap-2 px-4 md:h-16 md:gap-6 md:px-6">
-        {onMenuClick && (
-          <button type="button" aria-label="정렬·필터 열기" onClick={onMenuClick} className="-ml-2 grid size-11 place-items-center">
-            <Menu aria-hidden className="size-5" />
-          </button>
-        )}
+      <div className="mx-auto flex h-14 max-w-6xl items-center gap-2 px-4 md:h-16 md:gap-5 md:px-6">
+        <button
+          type="button"
+          aria-label="사이트 메뉴 열기"
+          aria-expanded={menuOpen}
+          onClick={() => setMenuOpen(true)}
+          className={cn('-ml-2 grid size-11 place-items-center', backHref && 'hidden md:grid')}
+        >
+          <Menu aria-hidden className="size-5" />
+        </button>
         {backHref && (
           <Link href={backHref} aria-label="매물 목록으로" className="-ml-2 grid size-11 place-items-center md:hidden">
             <ChevronLeft aria-hidden className="size-5" />
@@ -66,13 +72,18 @@ export function SiteHeader({
           ))}
         </nav>
 
-        <div className="ml-auto hidden h-10 w-64 items-center gap-2 border bg-background px-3 text-sm text-muted-foreground lg:flex">
-          <Search aria-hidden className="size-4" />
-          동네나 역 이름
-        </div>
-        <button type="button" aria-label="검색" className="ml-auto grid size-11 place-items-center lg:hidden">
-          <Search aria-hidden className="size-5" />
-        </button>
+        <div className="ml-auto" />
+        {!hideSearch && (
+          <>
+            <Link href={ROUTES.listings} className="hidden h-10 w-64 items-center gap-2 border bg-background px-3 text-sm text-muted-foreground lg:flex">
+              <Search aria-hidden className="size-4" />
+              동네나 역 이름
+            </Link>
+            <Link href={ROUTES.listings} aria-label="매물 검색" className="grid size-11 place-items-center lg:hidden">
+              <Search aria-hidden className="size-5" />
+            </Link>
+          </>
+        )}
         <Link href="/" className="hidden items-center gap-1.5 px-2 text-sm text-muted-foreground hover:text-foreground md:flex">
           <Heart aria-hidden className="size-4" />
           관심 매물
@@ -80,7 +91,71 @@ export function SiteHeader({
         <AccountMenu viewer={viewer} />
       </div>
       {children}
+      {/* 머리글의 backdrop-blur 가 fixed 기준을 가두므로 body 로 띄운다 */}
+      {menuOpen && createPortal(<SiteMenu active={active} onClose={() => setMenuOpen(false)} />, document.body)}
     </header>
+  );
+}
+
+const MENU_ICON: Record<NavKey, typeof Store> = { listings: Store, sell: Tag, handover: ClipboardList };
+
+// ☰ 사이트 메뉴: 주 메뉴 + 관심 매물 + 안내
+function SiteMenu({ active, onClose }: { active?: NavKey; onClose: () => void }) {
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && onClose();
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+  }, [onClose]);
+
+  return (
+    <div className="fixed inset-0 z-40" role="dialog" aria-modal="true" aria-label="사이트 메뉴">
+      <button type="button" aria-label="닫기" onClick={onClose} className="absolute inset-0 bg-black/40" />
+      <aside className="absolute inset-y-0 left-0 flex w-[min(320px,85vw)] flex-col bg-background">
+        <div className="flex h-14 items-center justify-between border-b px-5 md:h-16">
+          <span className="flex items-center gap-1.5 text-lg font-extrabold tracking-tight text-primary">
+            <span aria-hidden className="grid size-6 place-items-center bg-primary text-[13px] font-black text-primary-foreground">E</span>
+            ExitOS
+          </span>
+          <button type="button" aria-label="닫기" onClick={onClose} className="-mr-2 grid size-11 place-items-center text-muted-foreground">
+            <X aria-hidden className="size-5" />
+          </button>
+        </div>
+        <nav aria-label="사이트 메뉴" className="flex-1 overflow-y-auto py-2">
+          {NAV.map((n) => {
+            const Icon = MENU_ICON[n.key];
+            const on = active === n.key;
+            return (
+              <Link
+                key={n.key}
+                href={n.href}
+                onClick={onClose}
+                aria-current={on ? 'page' : undefined}
+                className={cn('flex min-h-12 items-center gap-3 px-5 text-[15px]', on ? 'bg-accent font-bold text-accent-foreground' : 'hover:bg-muted')}
+              >
+                <Icon aria-hidden className="size-5" />
+                {n.label}
+              </Link>
+            );
+          })}
+          <Link href={ROUTES.listings} onClick={onClose} className="flex min-h-12 items-center gap-3 px-5 text-[15px] hover:bg-muted">
+            <Heart aria-hidden className="size-5" />
+            관심 매물
+          </Link>
+          <div className="mx-5 my-3 border-t" />
+          <p className="px-5 pb-1 text-xs font-medium text-muted-foreground">안내</p>
+          {['출처 배지 보는 법', '권리금 이해하기', '고객센터'].map((label) => (
+            <Link key={label} href={ROUTES.listings} onClick={onClose} className="flex min-h-11 items-center px-5 text-sm text-muted-foreground hover:bg-muted hover:text-foreground">
+              {label}
+            </Link>
+          ))}
+        </nav>
+        <div className="border-t p-4">
+          <Link href={ROUTES.sell} onClick={onClose} className="flex h-12 items-center justify-center bg-primary text-sm font-semibold text-primary-foreground">
+            내 가게 가치 진단 시작
+          </Link>
+        </div>
+      </aside>
+    </div>
   );
 }
 
