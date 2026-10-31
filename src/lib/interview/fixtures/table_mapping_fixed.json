@@ -1,0 +1,10 @@
+{
+  "detected_kind": "fixed",
+  "column_map": { "date": "month", "item": "item", "amount": "amount" },
+  "date_parts": null,
+  "amount_unit": "won",
+  "channel_values": {},
+  "skip_row_hint": ["합계", "소계"],
+  "summary": "임대료·관리비·공과금 내역입니다.",
+  "notes": []
+}

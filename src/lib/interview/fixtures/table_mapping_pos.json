@@ -1,0 +1,10 @@
+{
+  "detected_kind": "pos",
+  "column_map": { "date": "month", "channel": "channel", "amount": "amount" },
+  "date_parts": null,
+  "amount_unit": "won",
+  "channel_values": { "card": "card", "cash": "cash" },
+  "skip_row_hint": ["합계", "소계"],
+  "summary": "POS 매출 내역입니다.",
+  "notes": []
+}

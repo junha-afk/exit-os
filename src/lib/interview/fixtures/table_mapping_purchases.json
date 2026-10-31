@@ -1,0 +1,10 @@
+{
+  "detected_kind": "purchases",
+  "column_map": { "date": "month", "vendor": "vendor", "category": "category", "amount": "amount" },
+  "date_parts": null,
+  "amount_unit": "won",
+  "channel_values": {},
+  "skip_row_hint": ["합계", "소계"],
+  "summary": "원재료 매입 내역입니다.",
+  "notes": []
+}

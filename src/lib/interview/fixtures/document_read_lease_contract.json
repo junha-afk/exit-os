@@ -1,0 +1,15 @@
+{
+  "detected_kind": "lease_contract",
+  "summary": "합성 임대차계약서 자료입니다. 임대 조건과 매장 면적·층 정보가 적혀 있습니다.",
+  "facts": [
+    { "key": "deposit", "value": 50000000, "unit": null, "evidence": "임대보증금: 5,000만원" },
+    { "key": "monthly_rent", "value": 3000000, "unit": null, "evidence": "월차임: 300만원" },
+    { "key": "maintenance_fee", "value": 350000, "unit": null, "evidence": "관리비: 35만원" },
+    { "key": "lease_expiry", "value": "2027-06", "unit": null, "evidence": "임대차 종료일: 2027년 6월" },
+    { "key": "area_m2", "value": 15, "unit": "평", "evidence": "임대면적: 15평" },
+    { "key": "floor", "value": 1, "unit": null, "evidence": "지상 1층" }
+  ],
+  "records": [],
+  "unreadable": false,
+  "notes": []
+}

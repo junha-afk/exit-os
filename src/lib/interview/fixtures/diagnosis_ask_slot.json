@@ -1,0 +1,8 @@
+{
+  "action": "ask_slot",
+  "next_slot": null,
+  "doc_kind": null,
+  "question": "",
+  "reason": "",
+  "options": []
+}

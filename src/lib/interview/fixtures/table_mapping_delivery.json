@@ -1,0 +1,18 @@
+{
+  "detected_kind": "delivery",
+  "column_map": {
+    "date": "month",
+    "platform": "platform",
+    "gross_sales": "gross_sales",
+    "fees": "fees",
+    "net_payout": "net_payout",
+    "orders": "orders",
+    "included_in_pos": "included_in_pos"
+  },
+  "date_parts": null,
+  "amount_unit": "won",
+  "channel_values": {},
+  "skip_row_hint": ["합계", "소계"],
+  "summary": "배달앱 정산 내역입니다.",
+  "notes": []
+}

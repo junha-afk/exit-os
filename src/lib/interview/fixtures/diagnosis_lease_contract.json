@@ -1,0 +1,8 @@
+{
+  "action": "request_document",
+  "next_slot": null,
+  "doc_kind": "lease_contract",
+  "question": "임대차계약서를 올려주시겠어요?",
+  "reason": "보증금·월세·만료일을 한 번에 채울 수 있어요.",
+  "options": []
+}

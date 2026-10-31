@@ -11,6 +11,13 @@ import { getDocument } from 'pdfjs-dist/legacy/build/pdf.mjs';
 import WordExtractor from 'word-extractor';
 import { chatJson } from '@/lib/ai/llm';
 import { setFactFromDocument } from '@/lib/facts/repo';
+import tableMappingCardSettlementFixture from '@/lib/interview/fixtures/table_mapping_card_settlement.json';
+import tableMappingDeliveryFixture from '@/lib/interview/fixtures/table_mapping_delivery.json';
+import tableMappingFixedFixture from '@/lib/interview/fixtures/table_mapping_fixed.json';
+import tableMappingPayrollFixture from '@/lib/interview/fixtures/table_mapping_payroll.json';
+import tableMappingPurchasesFixture from '@/lib/interview/fixtures/table_mapping_purchases.json';
+import documentReadLeaseFixture from '@/lib/interview/fixtures/document_read_lease_contract.json';
+import tableMappingPosFixture from '@/lib/interview/fixtures/table_mapping_pos.json';
 import { DOCUMENT_READ_SYSTEM_PROMPT, TABLE_MAPPING_SYSTEM_PROMPT, buildDocumentReadUserMessage, buildTableMappingUserMessage } from '@/lib/interview/prompts';
 import { DocumentReadSchema, TableMappingSchema, type DocumentRead, type TableMapping } from '@/lib/interview/schemas';
 import { SLOTS, SLOT_BY_KEY, parseSlotStored } from '@/lib/interview/slots';
@@ -51,6 +58,17 @@ const CATALOG_FOR_READ = DOC_KINDS.map((d) => ({
 const RECORD_KINDS_FOR_MAP = (DOC_KINDS as readonly DocKindSpec[])
   .filter((d) => d.produces === 'records')
   .map((d) => ({ kind: d.kind as DocKind, label: d.label, targetFields: d.targetFields ?? [] }));
+const TABLE_MAPPING_FIXTURES: Partial<Record<DocKind, TableMapping>> = {
+  pos: TableMappingSchema.parse(tableMappingPosFixture),
+  card_settlement: TableMappingSchema.parse(tableMappingCardSettlementFixture),
+  delivery: TableMappingSchema.parse(tableMappingDeliveryFixture),
+  purchases: TableMappingSchema.parse(tableMappingPurchasesFixture),
+  fixed: TableMappingSchema.parse(tableMappingFixedFixture),
+  payroll: TableMappingSchema.parse(tableMappingPayrollFixture),
+};
+const DOCUMENT_READ_FIXTURES: Partial<Record<DocKind, DocumentRead>> = {
+  lease_contract: DocumentReadSchema.parse(documentReadLeaseFixture),
+};
 
 export async function readUploadedFile(storeId: string, requestedKind: DocKind, file: File): Promise<ReadResult> {
   const kind = fileKindOf(file.name, file.type);
@@ -68,6 +86,9 @@ export async function readUploadedFile(storeId: string, requestedKind: DocKind, 
           sample_rows: table.rows.slice(0, 20), doc_catalog: RECORD_KINDS_FOR_MAP,
         }),
         schema: TableMappingSchema,
+        fixture: process.env.DEMO_MODE === 'true'
+          ? TABLE_MAPPING_FIXTURES[requestedKind]
+          : undefined,
       });
       const spec = getDocKind(mapping.detected_kind);
       if (spec?.produces === 'records') {
@@ -190,6 +211,9 @@ async function readAsDocument(
     }),
     images: content.images,
     schema: DocumentReadSchema,
+    fixture: process.env.DEMO_MODE === 'true'
+      ? DOCUMENT_READ_FIXTURES[requestedKind]
+      : undefined,
     thinking: true,
   });
 

@@ -5,6 +5,9 @@ import { DOC_KINDS, MAX_DOCUMENT_REQUESTS, getDocKind, type DocKind } from '@/li
 import { getDocumentStates, markRequested } from '@/lib/documents/repo';
 import { getFacts } from '@/lib/facts/repo';
 import type { StoreFacts } from '@/lib/types';
+import diagnosisAskSlotFixture from './fixtures/diagnosis_ask_slot.json';
+import diagnosisDoneFixture from './fixtures/diagnosis_done.json';
+import diagnosisLeaseFixture from './fixtures/diagnosis_lease_contract.json';
 import { DIAGNOSIS_SYSTEM_PROMPT, buildDiagnosisUserMessage } from './prompts';
 import { DiagnosisNextSchema, type DiagnosisNext } from './schemas';
 import { SLOTS, SLOT_BY_KEY, type SlotDef } from './slots';
@@ -17,6 +20,9 @@ const CATALOG_FOR_PROMPT = DOC_KINDS.map((d) => ({
   why: d.why,
   fills: 'factKeys' in d ? [...d.factKeys] : [d.recordKind],
 }));
+const DIAGNOSIS_ASK_SLOT_FIXTURE = DiagnosisNextSchema.parse(diagnosisAskSlotFixture);
+const DIAGNOSIS_DONE_FIXTURE = DiagnosisNextSchema.parse(diagnosisDoneFixture);
+const DIAGNOSIS_LEASE_FIXTURE = DiagnosisNextSchema.parse(diagnosisLeaseFixture);
 
 export function missingSlots(facts: StoreFacts): SlotDef[] {
   return SLOTS.filter((s) => facts[s.key] === undefined);
@@ -77,6 +83,14 @@ async function decideNext(
   const states = await getDocumentStates(storeId);
   const handled = new Set(states.map((s) => s.kind));
   const requestsLeft = Math.max(0, MAX_DOCUMENT_REQUESTS - requestsMade);
+  const demoFixture = process.env.DEMO_MODE === 'true'
+    ? missing.length === 0
+      ? DIAGNOSIS_DONE_FIXTURE
+      : missing.some((slot) => ['deposit', 'monthly_rent', 'maintenance_fee', 'lease_expiry', 'area_m2', 'floor'].includes(slot.key))
+        && !handled.has('lease_contract') && requestsLeft > 0
+        ? DIAGNOSIS_LEASE_FIXTURE
+        : DIAGNOSIS_ASK_SLOT_FIXTURE
+    : undefined;
 
   let llm: DiagnosisNext | null = null;
   try {
@@ -91,6 +105,7 @@ async function decideNext(
         turn,
       }),
       schema: DiagnosisNextSchema,
+      fixture: demoFixture,
     });
   } catch {
     llm = null; // 폴백

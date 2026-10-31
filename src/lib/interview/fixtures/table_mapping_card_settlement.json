@@ -1,0 +1,10 @@
+{
+  "detected_kind": "card_settlement",
+  "column_map": { "date": "month", "card_company": "card_company", "amount": "amount" },
+  "date_parts": null,
+  "amount_unit": "won",
+  "channel_values": {},
+  "skip_row_hint": ["합계", "소계"],
+  "summary": "카드사 정산 내역입니다.",
+  "notes": []
+}

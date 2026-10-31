@@ -1,0 +1,10 @@
+{
+  "detected_kind": "payroll",
+  "column_map": { "date": "month", "role": "role", "hours": "hours", "pay": "pay" },
+  "date_parts": null,
+  "amount_unit": "won",
+  "channel_values": {},
+  "skip_row_hint": ["합계", "소계"],
+  "summary": "직원 급여와 근무시간 내역입니다.",
+  "notes": []
+}
