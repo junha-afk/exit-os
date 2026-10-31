@@ -1,5 +1,6 @@
 'use client';
 // 매물 목록 (소유: A). 세로 스크롤 목록 + ☰ 메뉴(정렬·필터). 필터는 받은 목록 안에서만 거른다.
+import Image from 'next/image';
 import Link from 'next/link';
 import { Lock, Menu, Search, X } from 'lucide-react';
 import { useMemo, useState, type ReactNode } from 'react';
@@ -11,6 +12,7 @@ import { cn } from '@/lib/utils';
 export interface ListingRow {
   id: string;
   hasDetail: boolean;            // 상세 데이터가 있는 매물만 링크
+  photo?: string;
   displayName: string;
   industry: string;
   district: string;              // '마포구'
@@ -191,8 +193,12 @@ export function ListingBrowser({ rows, header }: { rows: ListingRow[]; header: R
 function Row({ row: r }: { row: ListingRow }) {
   const body = (
     <div className={cn('flex gap-4 py-5', r.hasDetail && 'group')}>
-      <div className="relative h-[118px] w-[150px] shrink-0 bg-stone-200 bg-[repeating-linear-gradient(135deg,transparent_0_9px,rgba(0,0,0,.035)_9px_10px)]">
-        <span className="absolute bottom-1.5 left-1.5 bg-black/55 px-1.5 py-0.5 text-[11px] text-white">사진 준비 중</span>
+      <div className="relative h-[124px] w-[164px] shrink-0 overflow-hidden bg-muted">
+        {r.photo ? (
+          <Image src={r.photo} alt={`${r.displayName} 매장 사진`} fill sizes="164px" className="object-cover transition-transform duration-300 group-hover:scale-[1.03]" />
+        ) : (
+          <span className="absolute inset-0 grid place-items-center text-xs text-muted-foreground">사진 준비 중</span>
+        )}
       </div>
       <div className="min-w-0 flex-1">
         <p className="text-[13px] text-muted-foreground">{r.industry} · {r.district} · {r.near} · 개업 {r.openedYears}년</p>

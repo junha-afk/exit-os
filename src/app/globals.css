@@ -128,3 +128,8 @@
     @apply font-sans;
   }
 }
+/* 가로 목록 아래 스크롤 막대 (A). 얇은 네모 막대로 항상 보이게 한다 */
+.scroll-strip { scrollbar-width: thin; scrollbar-color: var(--foreground) var(--muted); }
+.scroll-strip::-webkit-scrollbar { height: 4px; }
+.scroll-strip::-webkit-scrollbar-track { background: var(--muted); }
+.scroll-strip::-webkit-scrollbar-thumb { background: var(--foreground); }

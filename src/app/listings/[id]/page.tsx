@@ -3,15 +3,19 @@ import { headers } from 'next/headers';
 import { notFound } from 'next/navigation';
 import type { ReactNode } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { CalendarClock, ChevronLeft, ImageIcon, Lock, MapPin, Store } from 'lucide-react';
 import { AiEstimateNotice, LockedSection, Metric, ProvenanceBadge, RoleSwitcher } from '@/components/common';
+import { buildListingRows } from '@/components/common/listing-rows';
+import { photosOf } from '@/components/common/store-photos';
 import { formatKRW, formatKRWRange, formatMonths, formatPercent } from '@/lib/format';
-import { mockListing, mockListings } from '@/lib/mocks';
+import { mockListing } from '@/lib/mocks';
 import { isLocked, type Anomaly, type ListingField, type ListingView, type Locked, type Provenance, type Sourced } from '@/lib/types';
 import { filterListingForViewer, getViewer } from '@/lib/visibility';
 import { cn } from '@/lib/utils';
 import { RevenueTrend } from './_components/RevenueTrend';
 import { ListingTabs } from './_components/ListingTabs';
+import { SimilarListings } from './_components/SimilarListings';
 import { ViewerAction } from './_components/ViewerAction';
 
 type Fields = ListingView['fields'];
@@ -61,41 +65,33 @@ export default async function ListingPage({ params }: { params: Promise<{ id: st
   const ai = lockOf(f, ['scores', 'riskFactors', 'paybackScenarios', 'valuation']);
   const handover = lockOf(f, ['handoverSupport', 'trainingWeeks', 'suppliers', 'digitalAccounts']);
   const trust = countProvenance(f);
-  const similar = mockListings.filter((l) => l.id !== listing.id);
+  const similar = buildListingRows(viewer).filter((r) => r.id !== listing.id);
+  const photos = photosOf(listing.id, d.photos);
 
   return (
-    <div className="min-h-screen bg-muted/40">
-      <div className="border-b bg-background">
-        <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-6 py-3">
-          <Link href="/" className="-ml-1 inline-flex min-h-11 items-center gap-1 text-sm"><ChevronLeft aria-hidden className="size-4" /><b className="tracking-tight">ExitOS</b><span className="text-muted-foreground">매물 목록</span></Link>
+    <div className="min-h-screen bg-background">
+      <div className="sticky top-0 z-20 border-b bg-background">
+        <div className="mx-auto flex h-14 max-w-6xl items-center justify-between gap-3 px-6">
+          <Link href="/" className="-ml-1 inline-flex min-h-11 items-center gap-1 text-sm"><ChevronLeft aria-hidden className="size-4" /><b className="text-[17px] tracking-tight">ExitOS</b><span className="ml-1 text-muted-foreground">매물 목록</span></Link>
           <RoleSwitcher current={viewer} />
         </div>
       </div>
 
-      <main className="mx-auto grid max-w-6xl gap-6 px-6 py-8 lg:grid-cols-[1fr_320px]">
-        <div className="flex min-w-0 flex-col gap-6">
-          {/* 히어로: 사진 + 핵심 숫자 4칸 (레퍼런스: Empire Flippers 상단 요약, 점포라인 손익 요약) */}
-          <header className="overflow-hidden border bg-background">
-            <div className="grid sm:grid-cols-[260px_1fr]">
-              <div className="flex aspect-[4/3] items-center justify-center bg-gradient-to-br from-slate-100 to-slate-200 text-slate-500 sm:aspect-auto">
-                <div className="text-center">
-                  <ImageIcon aria-hidden className="mx-auto size-8" />
-                  <p className="mt-2 text-xs">매장 사진 준비 중</p>
-                </div>
-              </div>
-              <div className="p-6">
-                <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
-                  <span className="inline-flex items-center gap-1"><Store aria-hidden className="size-4" />{d.industry}</span>
-                  <span aria-hidden>·</span>
-                  <span className="inline-flex items-center gap-1"><MapPin aria-hidden className="size-4" />{d.region}</span>
-                  <span aria-hidden>·</span>
-                  <span>{d.openedAt.replace('-', '년 ')}월 개업</span>
-                </div>
-                <h1 className="mt-2 text-3xl font-bold tracking-tight">{d.displayName}</h1>
-                <p className="mt-2 leading-relaxed text-foreground/80">{d.intro}</p>
-              </div>
+      <main className="mx-auto grid max-w-6xl gap-10 px-6 py-8 lg:grid-cols-[1fr_320px]">
+        <div className="flex min-w-0 flex-col gap-10">
+          {/* 히어로: 사진 갤러리 → 이름 → 핵심 숫자 줄 (부동산 매물 상세의 익숙한 순서) */}
+          <header>
+            <Gallery photos={photos} name={d.displayName} />
+            <div className="mt-6 flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
+              <span className="inline-flex items-center gap-1"><Store aria-hidden className="size-4" />{d.industry}</span>
+              <span aria-hidden>·</span>
+              <span className="inline-flex items-center gap-1"><MapPin aria-hidden className="size-4" />{d.region}</span>
+              <span aria-hidden>·</span>
+              <span>{d.openedAt.replace('-', '년 ')}월 개업</span>
             </div>
-            <dl className="grid grid-cols-2 border-t sm:grid-cols-4">
+            <h1 className="mt-1.5 text-[32px] font-bold leading-tight tracking-tight">{d.displayName}</h1>
+            <p className="mt-2 leading-relaxed text-foreground/80">{d.intro}</p>
+            <dl className="mt-6 grid grid-cols-2 border-y sm:grid-cols-4">
               <KeyCell label="희망 권리금" value={isLocked(f.premiumAsk) ? null : formatKRW(f.premiumAsk.value)} lock={isLocked(f.premiumAsk) ? f.premiumAsk : null} />
               <KeyCell
                 label="보증금 / 월세"
@@ -113,7 +109,7 @@ export default async function ListingPage({ params }: { params: Promise<{ id: st
                 lock={isLocked(f.paybackScenarios) ? f.paybackScenarios : null}
               />
             </dl>
-            <dl className="flex flex-wrap gap-x-8 gap-y-2 border-t px-6 py-4 text-sm">
+            <dl className="flex flex-wrap gap-x-8 gap-y-2 border-b py-4 text-sm">
               {!isLocked(f.areaM2) && <Fact label="면적" value={`${f.areaM2.value}㎡ (약 ${Math.round(f.areaM2.value / 3.3058)}평)`} />}
               {!isLocked(f.floor) && <Fact label="층" value={`${f.floor.value}층`} />}
               {!isLocked(f.seats) && <Fact label="좌석" value={`${f.seats.value}석`} />}
@@ -311,21 +307,7 @@ export default async function ListingPage({ params }: { params: Promise<{ id: st
             숫자는 판매자가 입력하거나 올린 자료에서 나왔어요. 매출 증빙과 대조된 숫자에만 &lsquo;증빙 확인&rsquo; 배지가 붙고, 맞지 않는 부분은
             &lsquo;확인 필요&rsquo;로 표시돼요. 권리금 계약 전 원본 자료를 꼭 확인하세요.
           </p>
-          <section aria-labelledby="similar-title">
-            <h2 id="similar-title" className="mb-3 text-lg font-semibold">비슷한 매물</h2>
-            <ul className="grid gap-3 sm:grid-cols-2">
-              {similar.map((s) => (
-                <li key={s.id} className=" border bg-background p-4">
-                  <p className="text-xs text-muted-foreground">{s.industry} · {s.region}</p>
-                  <p className="mt-1 font-semibold">{s.displayName}</p>
-                  <p className="mt-2 text-sm">
-                    권리금 <b className="tabular-nums">{formatKRW(s.premiumAsk.value)}</b>
-                    <span className="text-muted-foreground"> · 보증금 {formatKRW(s.deposit.value, { unit: false })} / 월세 {formatKRW(s.monthlyRent.value)}</span>
-                  </p>
-                </li>
-              ))}
-            </ul>
-          </section>
+          <SimilarListings rows={similar} />
         </div>
 
         {/* 오른쪽 고정 영역 */}
@@ -388,7 +370,7 @@ function Section({
 
 function KeyCell({ label, value, lock }: { label: string; value: string | null; lock: Locked | null }) {
   return (
-    <div className="border-r px-6 py-4 last:border-r-0 [&:nth-child(2)]:border-r-0 sm:[&:nth-child(2)]:border-r">
+    <div className="border-r px-5 py-4 first:pl-0 last:border-r-0 [&:nth-child(2)]:border-r-0 sm:[&:nth-child(2)]:border-r">
       <dt className="text-xs text-muted-foreground">{label}</dt>
       <dd className="mt-1">
         {lock ? (
@@ -489,3 +471,32 @@ function TagList({ title, items }: { title: string; items: string[] }) {
     </div>
   );
 }
+
+// 큰 사진 1장 + 작은 사진 4장. 사진이 없으면 빈 자리만 보여준다
+function Gallery({ photos, name }: { photos: string[]; name: string }) {
+  if (photos.length === 0) {
+    return (
+      <div className="flex aspect-[16/7] items-center justify-center bg-muted text-muted-foreground">
+        <ImageIcon aria-hidden className="size-8" />
+        <span className="ml-2 text-sm">매장 사진 준비 중</span>
+      </div>
+    );
+  }
+  const [main, ...rest] = photos;
+  return (
+    <div className="grid aspect-[16/7] grid-cols-4 grid-rows-2 gap-1">
+      <div className="relative col-span-2 row-span-2 bg-muted">
+        <Image src={main} alt={`${name} 매장 사진 1`} fill priority sizes="(min-width: 1024px) 400px, 50vw" className="object-cover" />
+      </div>
+      {rest.slice(0, 4).map((src, i) => (
+        <div key={src} className="relative bg-muted">
+          <Image src={src} alt={`${name} 매장 사진 ${i + 2}`} fill sizes="(min-width: 1024px) 200px, 25vw" className="object-cover" />
+          {i === 3 && photos.length > 5 && (
+            <span className="absolute inset-0 grid place-items-center bg-black/45 text-sm font-medium text-white">+{photos.length - 5}</span>
+          )}
+        </div>
+      ))}
+    </div>
+  );
+}
+
