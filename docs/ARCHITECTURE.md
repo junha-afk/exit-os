@@ -10,7 +10,7 @@
 | UI | Tailwind + shadcn/ui + Recharts + lucide-react | |
 | DB/Storage | Supabase (Postgres + Storage) | 해커톤: Auth·RLS 미사용, 서버에서 service role 키로만 접근 |
 | AI | 래블업 LLM API (`src/lib/ai/llm.ts`, `fetch`) | JSON 응답 + zod 검증. 정보 수집 답변은 LLM이 해석하지 않음 |
-| 파싱 | papaparse | CSV만 지원 |
+| 파싱 | papaparse, `@e965/xlsx`, `pdfjs-dist`, `word-extractor`, `@ssabrojs/hwpxjs` | CSV·엑셀·PDF·Word·한글·사진·텍스트 |
 | 검증 | zod | API 입력·LLM 출력 모두 |
 | 배포 | Vercel | 환경변수는 `.env.example` 참고 |
 
@@ -195,11 +195,11 @@ export interface HandoverTask {
 
 | 파일 | 읽는 방법 (A) | 결과 |
 | --- | --- | --- |
-| 엑셀·CSV | 코드가 열 이름·앞 20행 추출 → LLM이 열 매핑(`TABLE_MAPPING_SYSTEM_PROMPT`) → 코드가 모든 행을 읽음 | `FinancialRow[]` (`readBy: 'code_table'`) |
-| PDF·텍스트 | 코드가 텍스트 추출 → LLM이 적힌 값을 옮겨 적음(`DOCUMENT_READ_SYSTEM_PROMPT`) | facts(🟠 + 근거 원문) + 재무 표면 `FinancialRow[]` (`readBy: 'llm_document'`) |
+| 엑셀(.xls·.xlsx)·CSV | 첫 시트/표의 열 이름·앞 20행 추출 → LLM이 열 매핑(`TABLE_MAPPING_SYSTEM_PROMPT`) → 코드가 모든 행을 읽음 | `FinancialRow[]` (`readBy: 'code_table'`) |
+| PDF·Word(.doc·.docx)·한글(.hwp·.hwpx)·텍스트 | 코드가 문서 텍스트 추출 → LLM이 적힌 값을 옮겨 적음(`DOCUMENT_READ_SYSTEM_PROMPT`) | facts(🟠 + 근거 원문) + 재무 표면 `FinancialRow[]` (`readBy: 'llm_document'`) |
 | 사진·스캔 | 이미지를 LLM에 그대로 전달 → 같은 프롬프트 | 위와 같음 |
 
-- 텍스트가 없는 스캔 PDF는 "사진으로 다시 올려주세요"로 안내한다(해커톤 범위).
+- 텍스트가 없는 스캔 PDF는 "사진으로 다시 올려주세요"로 안내한다(해커톤 범위). PDF는 최대 50쪽까지 읽는다.
 - LLM은 계산·합산·단위 환산을 하지 않는다. 금액의 만원·천원 → 원만 바꾸고, 그 외 단위(평 등)는 숫자와 단위를 그대로 넘겨 코드가 환산한다.
 - 모든 자료는 LLM이 쓴 1~2문장 요약(`UploadedDocument.summary`, 사실만)을 남긴다.
 

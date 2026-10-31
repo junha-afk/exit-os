@@ -321,7 +321,7 @@ PR-0 이후 `types.ts` 변경이 필요하면: 채널 공지 → B가 반영 →
 | A-2 | P0 | 진단 엔진 | `src/lib/interview/{next,prompts,schemas,progress}.ts`, `api/ai/interview/route.ts` | 한 턴: 답 검증 → 저장(🔵) → 다음 할 일(질문 / 자료 요청 / 끝). LLM 결과는 코드가 검사(목록에 있는 슬롯·자료인지, 이미 다룬 자료가 아닌지, 요청 상한). 실패 시 기본 순서로 진행 |
 | A-3 | P0 | 입력 도구 8종 | `components/interview/inputs/**` | 숫자·금액(만원↔원)·월·선택·다중·예/아니오·비율·표, 잘못된 값은 칸 아래 오류 |
 | A-4 | P0 | 진단 화면 | `seller/diagnose/**`, `QuestionBubble`, `FactsPanel` | 질문·입력 좌 / 채워진 정보 패널 우(같은 입력 도구로 수정 → PATCH, 자료에서 읽은 값은 🟠 + 근거 + "맞아요"), 자료 요청 턴에 `DocumentDrop`, 완료 시 "보고서 만들기" → `/seller/report` |
-| A-5 | P0 | 자료 업로드·읽기 | `documents/{extract,read,repo}.ts`, `api/stores/[id]/upload`, `api/stores/[id]/documents/**`, `components/upload/DocumentDrop.tsx` | 엑셀·CSV(열 매핑 → 코드가 전체 행), PDF·텍스트(텍스트 → 옮겨 적기), 사진(이미지 → 옮겨 적기) 모두 처리. 데모: 샘플 재무 CSV 6종 → 재무 행 저장, 임대차계약서(PDF·사진) → 보증금·월세·관리비·만료일·면적 🟠로 채워짐. "없어요" 처리 |
+| A-5 | P0 | 자료 업로드·읽기 | `documents/{extract,read,repo}.ts`, `api/stores/[id]/upload`, `api/stores/[id]/documents/**`, `components/upload/DocumentDrop.tsx` | 엑셀(.xls·.xlsx)·CSV(열 매핑 → 코드가 전체 행), 텍스트 PDF·Word(.doc·.docx)·한글(.hwp·.hwpx)(텍스트 → 옮겨 적기), 사진(이미지 → 옮겨 적기) 처리. 스캔 PDF는 사진으로 안내. 데모: 샘플 재무 CSV 6종 → 재무 행 저장, 임대차계약서(PDF·사진) → 보증금·월세·관리비·만료일·면적 🟠로 채워짐. "없어요" 처리 |
 | A-6 | P0 | 저장소 | `src/lib/facts/repo.ts` | 새로고침해도 facts 유지 (저장 방식은 결정 로그) |
 | A-7 | P0 | 데모 fixture | `src/lib/interview/fixtures/*.json`, `data/demo-docs/**` | `DEMO_MODE=true` 로 진단·자료 읽기 시연 가능 (데모 자료별 읽기 결과 녹화) |
 | A-8 | P2 | 노하우 | `seller/knowhow/**`, 노하우 슬롯·프롬프트 | 역할별 직무·교육 항목을 LLM 보기에서 체크 → 산출물 미리보기·수정 → `knowhow_artifacts` 저장 |

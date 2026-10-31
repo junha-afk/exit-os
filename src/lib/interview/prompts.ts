@@ -107,7 +107,7 @@ export function buildDiagnosisUserMessage(input: DiagnosisTurnInput): string {
   return JSON.stringify(input);
 }
 
-// ── 2-1. 자료 읽기: 문서·사진 (PDF 텍스트, 이미지, 텍스트 파일) ────────
+// ── 2-1. 자료 읽기: 문서·사진 (PDF·Word·한글 텍스트, 이미지, 텍스트 파일) ─
 
 export const DOCUMENT_READ_SYSTEM_PROMPT = `## 역할
 너는 ExitOS의 자료 판독 담당이다. 외식업 점주가 올린 자료(문서 텍스트 또는 사진)를 읽고,

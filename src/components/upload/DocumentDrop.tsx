@@ -79,11 +79,17 @@ export function DocumentDrop({
           <>
             <FileUp aria-hidden className="size-6 text-primary" />
             <span className="font-medium">{label} 올리기</span>
-            <span className="text-sm text-muted-foreground">눌러서 고르거나 끌어다 놓으세요 · 사진·CSV·텍스트 (10MB까지)</span>
+            <span className="text-sm text-muted-foreground">눌러서 고르거나 끌어다 놓으세요 · PDF·Word·한글·엑셀·CSV·사진·텍스트 (10MB까지)</span>
           </>
         )}
       </button>
-      <input ref={inputRef} type="file" className="hidden" onChange={(e) => { const f = e.target.files?.[0]; e.target.value = ''; if (f) upload(f); }} />
+      <input
+        ref={inputRef}
+        type="file"
+        accept=".pdf,.doc,.docx,.hwp,.hwpx,.xls,.xlsx,.csv,.txt,.md,.json,.tsv,image/*"
+        className="hidden"
+        onChange={(e) => { const f = e.target.files?.[0]; e.target.value = ''; if (f) upload(f); }}
+      />
       <div className="flex items-center justify-between gap-3">
         {error ? <p role="alert" className="text-sm text-destructive">{error}</p> : <span />}
         <button type="button" disabled={!!busy} onClick={decline} className="min-h-11 shrink-0 border px-4 text-sm disabled:opacity-60">
