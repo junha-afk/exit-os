@@ -2,7 +2,7 @@
 
 작성: 2026-10-31 · 담당: **A (PM·디자인·구매자 화면)** · 작업 브랜치: 로컬 `feat/A-frontend-skeleton` → 원격 `sihu`
 
-이 문서만 읽고 이어서 작업할 수 있게 정리했다. 먼저 `CLAUDE.md`, `.claude/skills/exitos/SKILL.md`, `docs/TEAM_PLAN.md`, `docs/DEMO_SCRIPT.md` 를 읽을 것.
+이 문서만 읽고 이어서 작업할 수 있게 정리했다. 먼저 `CLAUDE.md`, `.claude/skills/exitos/SKILL.md`, `docs/TEAM_PLAN.md`, `docs/DEMO_SCRIPT.md` 를 읽을 것. 화면을 만들 때는 루트의 **`DESIGN.md`**(폰트·색·모양·레이아웃 규칙)를 따른다.
 
 ---
 
