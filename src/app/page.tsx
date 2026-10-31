@@ -1,10 +1,6 @@
-// 메인 = 매물 목록 (소유: A). 랜딩은 따로 만든다.
-import { headers } from 'next/headers';
-import { ListingBrowser } from '@/components/common';
-import { buildListingRows } from '@/components/common/listing-rows';
-import { getViewer } from '@/lib/visibility';
+// 첫 화면 = 랜딩 (소유: A). "매물 확인하기" → /listings, "가게 가치 진단" → /seller/diagnose
+import { Landing } from '@/components/common/landing/Landing';
 
-export default async function Home() {
-  const viewer = getViewer(new Request('http://local', { headers: await headers() }));
-  return <ListingBrowser rows={await buildListingRows(viewer)} viewer={viewer} />;
+export default function Home() {
+  return <Landing />;
 }

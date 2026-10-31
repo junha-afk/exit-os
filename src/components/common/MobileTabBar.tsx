@@ -6,8 +6,8 @@ import type { NavKey } from './SiteHeader';
 import { ROUTES } from './routes';
 
 const TABS: { key: NavKey | 'saved'; label: string; href: string; Icon: typeof Store }[] = [
-  { key: 'listings', label: '매물', href: '/', Icon: Store },
-  { key: 'saved', label: '관심', href: '/', Icon: Heart },
+  { key: 'listings', label: '매물', href: ROUTES.listings, Icon: Store },
+  { key: 'saved', label: '관심', href: ROUTES.listings, Icon: Heart },
   { key: 'sell', label: '내 가게 팔기', href: ROUTES.sell, Icon: Tag },
   { key: 'handover', label: '인수인계', href: ROUTES.handover, Icon: ClipboardList },
 ];

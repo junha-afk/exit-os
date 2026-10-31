@@ -12,7 +12,7 @@ export function SiteFooter() {
             가게의 숫자를 증빙과 맞춰 보여주고, 거래가 끝나면 인수인계까지 이어 주는 매장 양도 서비스
           </p>
         </div>
-        <FooterCol title="서비스" links={[['매물 찾기', '/'], ['내 가게 팔기', ROUTES.sell], ['인수인계', ROUTES.handover]]} />
+        <FooterCol title="서비스" links={[['매물 찾기', ROUTES.listings], ['내 가게 팔기', ROUTES.sell], ['인수인계', ROUTES.handover]]} />
         <FooterCol title="안내" links={[['출처 배지 보는 법', '/'], ['이용약관', '/'], ['개인정보처리방침', '/']]} />
       </div>
       <div className="border-t">

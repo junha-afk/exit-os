@@ -5,6 +5,7 @@ import type { ReactNode } from 'react';
 import Image from 'next/image';
 import { CalendarClock, ImageIcon, Lock, MapPin, Store } from 'lucide-react';
 import { AiEstimateNotice, LockedSection, Metric, ProvenanceBadge, SiteFooter, SiteHeader } from '@/components/common';
+import { ROUTES } from '@/components/common/routes';
 import { buildListingRows } from '@/components/common/listing-rows';
 import { getListingView } from '@/components/common/listing-source';
 import { photosOf } from '@/components/common/store-photos';
@@ -81,7 +82,7 @@ export default async function ListingPage({ params }: { params: Promise<{ id: st
 
   return (
     <div className="min-h-screen bg-background">
-      <SiteHeader viewer={viewer} active="listings" backHref="/" />
+      <SiteHeader viewer={viewer} active="listings" backHref={ROUTES.listings} />
 
       <main className="mx-auto grid max-w-6xl gap-10 px-4 pb-28 pt-0 md:px-6 md:pt-8 lg:grid-cols-[1fr_320px] lg:pb-10">
         <div className="flex min-w-0 flex-col gap-10">

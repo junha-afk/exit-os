@@ -51,7 +51,7 @@ export function SiteHeader({
             <ChevronLeft aria-hidden className="size-5" />
           </Link>
         )}
-        <Link href="/" className="flex items-center gap-1.5 text-lg font-extrabold tracking-tight text-primary">
+        <Link href={ROUTES.home} className="flex items-center gap-1.5 text-lg font-extrabold tracking-tight text-primary">
           <span aria-hidden className="grid size-6 place-items-center bg-primary text-[13px] font-black text-primary-foreground">E</span>
           ExitOS
         </Link>
@@ -84,7 +84,7 @@ export function SiteHeader({
             </Link>
           </>
         )}
-        <Link href="/" className="hidden items-center gap-1.5 px-2 text-sm text-muted-foreground hover:text-foreground md:flex">
+        <Link href={ROUTES.listings} className="hidden items-center gap-1.5 px-2 text-sm text-muted-foreground hover:text-foreground md:flex">
           <Heart aria-hidden className="size-4" />
           관심 매물
         </Link>
@@ -215,7 +215,7 @@ function AccountMenu({ viewer }: { viewer: Viewer }) {
           </div>
           <div className="flex flex-col py-1 text-sm">
             <MenuLink href={ROUTES.sell}>내 가게 팔기 · 가치 진단</MenuLink>
-            <MenuLink href="/">관심 매물</MenuLink>
+            <MenuLink href={ROUTES.listings}>관심 매물</MenuLink>
             <MenuLink href={ROUTES.handover}>인수인계 진행 상황</MenuLink>
           </div>
         </div>

@@ -1,4 +1,6 @@
 @import "tailwindcss";
+/* docs 의 목업 HTML 은 앱 스타일에 섞이지 않게 스캔에서 뺀다 */
+@source not "../../docs";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 

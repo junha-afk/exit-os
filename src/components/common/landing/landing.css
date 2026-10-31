@@ -1,0 +1,60 @@
+/* 랜딩 전용 스타일 (소유: A). .landing 안에서만 적용된다. */
+.landing { letter-spacing: -0.01em; word-break: keep-all; }
+.landing h1, .landing h2 { text-wrap: balance; }
+/* Geist Mono 에 한글이 없어 한글만 Pretendard 로 */
+.landing .font-mono { font-family: var(--font-geist-mono), 'Pretendard Variable', Pretendard, ui-monospace, monospace; }
+
+/* ── 1. 영수증 ── */
+.landing .receipt {
+  --tooth: 12px;
+  -webkit-mask: linear-gradient(#000 0 0) top / 100% calc(100% - var(--tooth)) no-repeat,
+    conic-gradient(from -45deg at bottom, #0000, #000 1deg 89deg, #0000 90deg) bottom / calc(var(--tooth) * 2) var(--tooth) repeat-x;
+  mask: linear-gradient(#000 0 0) top / 100% calc(100% - var(--tooth)) no-repeat,
+    conic-gradient(from -45deg at bottom, #0000, #000 1deg 89deg, #0000 90deg) bottom / calc(var(--tooth) * 2) var(--tooth) repeat-x;
+}
+/* 감열지 질감: 구겨진 종이 사진(Unsplash) + 섬유 종이를 옅게 겹친다 */
+.landing .paper {
+  background:
+    linear-gradient(rgba(255, 255, 255, 0.28), rgba(255, 255, 255, 0.28)),
+    url('/landing/paper-crumpled.jpg') center / cover,
+    url('/landing/paper-fiber.jpg') center / 600px;
+  background-blend-mode: normal, multiply, normal;
+}
+/* 마스크가 그림자를 잘라내므로 그림자는 바깥 래퍼에 */
+.landing .paper-shadow { filter: drop-shadow(0 2px 1px rgba(0, 0, 0, 0.2)) drop-shadow(0 24px 26px rgba(30, 18, 6, 0.5)); }
+.landing .printer { background: linear-gradient(#1d1d1d, #0b0b0b); box-shadow: 0 10px 24px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.12); }
+.landing .printer .mouth { height: 6px; background: #000; box-shadow: inset 0 2px 3px rgba(255, 255, 255, 0.08); }
+.landing .dots { flex: 1; border-bottom: 1px dotted #a3a3a3; transform: translateY(-4px); margin: 0 8px; }
+
+/* 출력 애니메이션: 영수증이 출력구에서 내려오고 줄이 차례로 찍힌다 */
+.landing .print { animation: lp-print 1.6s cubic-bezier(0.2, 0.7, 0.2, 1) both; }
+@keyframes lp-print { from { transform: translateY(-62%); } to { transform: translateY(0); } }
+.landing .line-in { opacity: 0; animation: lp-line-in 0.35s ease-out forwards; }
+@keyframes lp-line-in { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+.landing .seal { animation: lp-seal 0.45s cubic-bezier(0.2, 1.6, 0.4, 1) 2.7s both; }
+@keyframes lp-seal { from { opacity: 0; transform: rotate(-12deg) scale(1.8); } to { opacity: 0.92; transform: rotate(-12deg) scale(1); } }
+.landing .hero-in { opacity: 0; animation: lp-line-in 0.6s ease-out forwards; }
+
+/* 배경 */
+.landing .ledger { background-image: repeating-linear-gradient(to bottom, transparent 0 35px, rgba(14, 72, 50, 0.075) 35px 36px); }
+.landing .dotgrid { background-image: radial-gradient(rgba(10, 10, 10, 0.07) 1px, transparent 1px); background-size: 22px 22px; }
+
+/* ── 2. 기능 스크롤 ── */
+.landing .marker { position: absolute; left: -41px; top: 2px; width: 18px; height: 18px; border: 2px solid #c8d6cf; background: #fff; transition: background 0.3s, border-color 0.3s; }
+.landing .step { opacity: 0.35; transition: opacity 0.3s ease; }
+.landing .step.on { opacity: 1; }
+.landing .step.on .marker { background: var(--primary); border-color: var(--primary); }
+.landing .screen { position: absolute; inset: 0; opacity: 0; transform: translateY(12px); transition: opacity 0.45s ease, transform 0.45s ease; pointer-events: none; }
+.landing .screen.on { opacity: 1; transform: none; pointer-events: auto; }
+
+/* ── 3. 흐름 ── */
+.landing .paper-line { transform-origin: left; transform: scaleX(0); transition: transform 0.35s ease-out; }
+.landing .row.on .paper-line { transform: scaleX(1); }
+.landing .check { opacity: 0; transition: opacity 0.2s ease 0.25s; }
+.landing .row.on .check { opacity: 1; }
+
+@media (prefers-reduced-motion: reduce) {
+  .landing .print, .landing .line-in, .landing .hero-in { animation: none !important; opacity: 1 !important; transform: none !important; }
+  .landing .seal { animation: none !important; transform: rotate(-12deg) !important; opacity: 0.92 !important; }
+  .landing .screen, .landing .step, .landing .paper-line, .landing .check { transition: none !important; }
+}
