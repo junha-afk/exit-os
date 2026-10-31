@@ -4,6 +4,7 @@ import { RECORD_KINDS, type UploadResult } from '@/lib/types';
 import { isIncludedInPos } from '@/lib/analysis/dedupe';
 import { parseFinancialCsv } from '@/lib/analysis/parse';
 import { replaceRecords } from '@/lib/analysis/repo';
+import { clearSellerReport } from '@/lib/report/repo';
 
 const Kind = z.enum(RECORD_KINDS);
 const MAX_BYTES = 2 * 1024 * 1024;
@@ -23,6 +24,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
   if (!parsed.ok) return NextResponse.json({ error: parsed.error }, { status: 400 });
 
   await replaceRecords(id, kind.data, parsed.records);
+  await clearSellerReport(id);
   const inPos = parsed.records.filter(isIncludedInPos);
   const warnings = [...parsed.warnings];
   if (inPos.length) {
