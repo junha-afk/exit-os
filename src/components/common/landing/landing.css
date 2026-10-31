@@ -41,8 +41,11 @@
 
 /* ── 2. 기능 스크롤 ── */
 .landing .marker { position: absolute; left: -41px; top: 2px; width: 18px; height: 18px; border: 2px solid #c8d6cf; background: #fff; transition: background 0.3s, border-color 0.3s; }
-.landing .step { opacity: 0.35; transition: opacity 0.3s ease; }
-.landing .step.on { opacity: 1; }
+/* 오른쪽 화면이 있는 데스크톱에서만 지금 단계를 강조한다 (모바일은 모두 읽혀야 함) */
+@media (min-width: 1024px) {
+  .landing .step { opacity: 0.35; transition: opacity 0.3s ease; }
+  .landing .step.on { opacity: 1; }
+}
 .landing .step.on .marker { background: var(--primary); border-color: var(--primary); }
 .landing .screen { position: absolute; inset: 0; opacity: 0; transform: translateY(12px); transition: opacity 0.45s ease, transform 0.45s ease; pointer-events: none; }
 .landing .screen.on { opacity: 1; transform: none; pointer-events: auto; }

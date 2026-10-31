@@ -30,7 +30,6 @@ const TODO = [
 ];
 
 const PAPER_ROWS: [string, number][] = [['매출 증빙', 0.36], ['시설 목록', 0.42], ['권리금 정산', 0.48], ['인수인계 12단계', 0.54]];
-const PAPER_W = 170;
 
 const ramp = (p: number, a: number, b: number) => Math.min(1, Math.max(0, (p - a) / (b - a)));
 const progress = (el: HTMLElement) => Math.min(1, Math.max(0, -el.getBoundingClientRect().top / (el.offsetHeight - innerHeight)));
@@ -78,10 +77,12 @@ export function Landing() {
 
   const out = ramp(heroP, 0.1, 0.4);
   const inn = ramp(heroP, 0.4, 0.7);
-  const startX = 175;
-  const endX = Math.max(startX, stageW - PAPER_W - 175); // 두 사람 손 앞에서 시작·끝 (얼굴을 가리지 않게)
+  const narrow = stageW > 0 && stageW < 640; // 모바일은 종이를 머리 위로 띄워 좌우 끝까지 보낸다
+  const paperW = narrow ? 150 : 170;
+  const startX = narrow ? 16 : 175;
+  const endX = Math.max(startX, stageW - paperW - startX); // 두 사람 손 앞에서 시작·끝 (얼굴을 가리지 않게)
   const inDesk = flowP > 0.3 && flowP < 0.62;
-  const pct = 42 + done.filter(Boolean).length * 6;
+  const pct = Math.round(((5 + done.filter(Boolean).length) / 12) * 100); // 12단계 중 5단계 완료에서 시작
 
   return (
     <div className="landing bg-background text-foreground">
@@ -96,8 +97,8 @@ export function Landing() {
             <a className="px-3 py-2 hover:text-foreground" href="#flow">진행 방식</a>
             <Link className="px-3 py-2 hover:text-foreground" href={ROUTES.listings}>매물 찾기</Link>
           </nav>
-          <Link href={ROUTES.listings} className="ml-auto hidden text-sm text-muted-foreground hover:text-foreground sm:block">매물 둘러보기</Link>
-          <Link href={ROUTES.sell} className="ml-auto flex h-10 items-center bg-primary px-4 text-sm font-semibold text-primary-foreground sm:ml-0">가치 진단 시작</Link>
+          <Link href={ROUTES.listings} className="ml-auto hidden text-sm text-muted-foreground hover:text-foreground sm:block md:hidden">매물 둘러보기</Link>
+          <Link href={ROUTES.sell} className="ml-auto flex h-10 items-center bg-primary px-4 text-sm font-semibold text-primary-foreground sm:ml-0 md:ml-auto">가치 진단 시작</Link>
         </div>
       </header>
 
@@ -109,18 +110,18 @@ export function Landing() {
           <img src="/landing/table-cappuccino.jpg" alt="" className="absolute inset-0 size-full object-cover object-[50%_60%]" />
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_35%,rgba(20,14,8,.45))]" />
 
-          <div className="printer relative z-20 mt-6 w-full max-w-[520px] px-6 pb-2 pt-3">
+          <div className="printer relative z-20 mt-4 w-full max-w-[520px] px-6 pb-2 pt-3">
             <p className="mb-2 text-center font-mono text-[10px] tracking-[.3em] text-white/50">EXITOS · SETTLEMENT PRINTER</p>
             <div className="mouth" />
           </div>
           <div className="relative w-full max-w-[508px] overflow-hidden px-6 pb-10">
             <div className="paper-shadow">
-              <article className="receipt paper print relative px-6 pb-12 pt-9 text-center font-mono text-neutral-800 md:px-8" aria-label="ExitOS 가치 정산서">
+              <article className="receipt paper print relative px-6 pb-10 pt-7 text-center font-mono text-neutral-800 md:px-8" aria-label="ExitOS 가치 정산서">
                 <p className="text-[12px] font-bold tracking-[.25em]">EXITOS 가치 정산서</p>
                 <p className="mt-1 text-[10px] text-muted-foreground">No. 2026-1031-0042 · 2026.10.31 14:20</p>
-                <div className="my-6 border-t border-dashed border-neutral-300" />
+                <div className="my-4 border-t border-dashed border-neutral-400" />
 
-                <div className="relative h-[210px] overflow-hidden md:h-[230px]">
+                <div className="relative h-[200px] overflow-hidden md:h-[210px]">
                   <h1
                     className="absolute inset-x-0 top-1/2 font-sans text-[38px] font-extrabold leading-[1.18] tracking-tight text-neutral-900 md:text-[50px]"
                     style={{ opacity: 1 - out, transform: `translateY(calc(-50% - ${out * 90}px))` }}
@@ -144,23 +145,23 @@ export function Landing() {
                   </div>
                 </div>
 
-                <div className="my-6 border-t border-dashed border-neutral-300" />
+                <div className="my-4 border-t border-dashed border-neutral-400" />
                 <div className="line-in space-y-1.5 text-left text-[12px]" style={{ animationDelay: '2.3s' }}>
                   {['시설권리금', '바닥권리금', '영업권리금'].map((k) => (
                     <p key={k} className="flex items-end"><span className="font-sans">{k}</span><span className="dots" /><span className="tabular-nums">₩ ?</span></p>
                   ))}
                 </div>
-                <div className="my-5 border-t-2 border-neutral-800" />
+                <div className="my-4 border-t-2 border-neutral-800" />
                 <p className="line-in flex items-end justify-between" style={{ animationDelay: '2.6s' }}>
                   <span className="font-sans text-[13px] font-bold">합계</span>
                   <span className="text-[20px] font-bold tabular-nums text-primary">₩ ———,———,———</span>
                 </p>
 
-                <div className="seal pointer-events-none absolute bottom-6 left-5 grid size-[72px] place-items-center border-[3px] border-primary font-sans text-primary">
+                <div className="seal pointer-events-none absolute bottom-5 left-5 grid size-[72px] place-items-center border-[3px] border-primary font-sans text-primary">
                   <div className="leading-tight"><p className="text-[10px] font-semibold tracking-widest">EXITOS</p><p className="text-[14px] font-black">정산 대기</p></div>
                 </div>
-                <div className="mt-7 text-right">
-                  <div className="ml-auto h-8 w-44 bg-[repeating-linear-gradient(90deg,#222_0_2px,transparent_2px_4px,#222_4px_5px,transparent_5px_8px)]" />
+                <div className="mt-5 text-right">
+                  <div className="ml-auto h-8 w-36 md:w-44 bg-[repeating-linear-gradient(90deg,#222_0_2px,transparent_2px_4px,#222_4px_5px,transparent_5px_8px)]" />
                   <p className="mt-1 text-[10px] tracking-[.3em] text-muted-foreground">EXIT·OS·0042</p>
                 </div>
               </article>
@@ -168,10 +169,10 @@ export function Landing() {
           </div>
 
           <p
-            className="hero-in absolute bottom-6 z-30 flex items-center gap-2 bg-black/40 px-3 py-1.5 text-sm text-white"
+            className="hero-in absolute bottom-4 z-30 flex items-center gap-2 bg-black/40 px-3 py-1.5 text-sm text-white"
             style={{ animationDelay: '2.9s', visibility: heroP > 0.05 ? 'hidden' : 'visible' }} /* 애니메이션 opacity 를 덮지 못하므로 visibility 로 숨긴다 */
           >
-            <span aria-hidden className="inline-block h-px w-8 bg-white/70" /> 스크롤해서 금액을 확인해 보세요
+            <span aria-hidden className="inline-block h-px w-8 bg-white/70" /> 스크롤하면 바로 진단을 시작할 수 있어요
           </p>
         </div>
       </section>
@@ -184,9 +185,9 @@ export function Landing() {
         </div>
 
         <div className="mx-auto grid max-w-6xl gap-10 px-4 pb-24 md:px-6 lg:grid-cols-[1fr_1.15fr]">
-          <ol className="relative ml-10 border-l-2 border-[#c8d6cf] pl-8">
+          <ol className="relative ml-10 mt-8 border-l-2 border-[#c8d6cf] pl-8 lg:mt-0">
             {STEPS.map((s, i) => (
-              <li key={s.label} data-step={i} className={cn('step flex min-h-[78vh] flex-col justify-center', step === i && 'on')}>
+              <li key={s.label} data-step={i} className={cn('step flex flex-col justify-center py-8 lg:min-h-[78vh] lg:py-0', step === i && 'on')}>
                 <p className="relative font-mono text-sm text-primary"><span className="marker" />{s.label}</p>
                 <h3 className="mt-2 text-2xl font-bold">{s.title}</h3>
                 <p className="mt-3 max-w-md leading-relaxed text-neutral-700">{s.body}</p>
@@ -236,10 +237,11 @@ export function Landing() {
                           />
                         ))}
                       </div>
+                      <div className="mt-1 flex justify-between border-t pt-1 font-mono text-[10px] tabular-nums text-muted-foreground"><span>{MONTHS[0]}</span><span className="flex items-center gap-1 font-sans"><i className="size-2 bg-amber-400" />확인 필요 <i className="ml-2 size-2 bg-slate-300" />정상</span><span>{MONTHS[MONTHS.length - 1]}</span></div>
                       <p className="mt-2 h-10 text-[12px] text-muted-foreground">{barNote}</p>
                       <p className="mt-2 text-[12px] font-semibold">권리금 구성</p>
                       <div className="mt-1.5 flex h-3"><div className="w-[25%] bg-primary" /><div className="w-[22%] bg-[#378262]" /><div className="w-[53%] bg-[#9cc9b4]" /></div>
-                      <div className="mt-1.5 flex gap-4 text-[11px] text-muted-foreground"><span>시설 4,000만</span><span>바닥 3,500만</span><span>영업 8,500만</span></div>
+                      <div className="mt-1.5 flex text-[11px] tabular-nums text-muted-foreground"><span className="w-[25%]">시설 4,000만</span><span className="w-[22%]">바닥 3,500만</span><span className="w-[53%]">영업 8,500만</span></div>
                     </div>
 
                     {/* 화면 3: 판매 페이지 (구독 토글) */}
@@ -305,33 +307,33 @@ export function Landing() {
           <div ref={stageRef} className="relative mx-auto mt-6 w-full max-w-6xl flex-1 px-4 md:px-6">
             <div className="absolute inset-x-6 bottom-[16%] border-t border-neutral-300" />
 
-            <figure className="absolute bottom-[16%] left-6 w-[150px] text-center md:left-10">
+            <figure className="absolute bottom-[16%] left-2 w-[100px] text-center md:left-10 md:w-[150px]">
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/landing/peeps/peep-standing-16.svg" alt="" className="mx-auto h-[300px] w-auto" />
-              <figcaption className="mt-2 text-sm font-semibold">판매자 <span className="font-normal text-muted-foreground">김사장님</span></figcaption>
+              <img src="/landing/peeps/peep-standing-16.svg" alt="" className="mx-auto h-[160px] w-auto md:h-[300px]" />
+              <figcaption className="mt-2 text-sm font-semibold">판매자 <span className="hidden font-normal text-muted-foreground md:inline">김사장님</span></figcaption>
             </figure>
 
-            <div className="absolute bottom-[16%] left-1/2 w-[200px] -translate-x-1/2 text-center">
-              <div className={cn('mx-auto grid h-[150px] w-[200px] place-items-center border-2 border-primary transition-colors duration-300', inDesk ? 'bg-accent' : 'bg-white')}>
+            <div className="absolute bottom-[16%] left-1/2 w-[128px] -translate-x-1/2 text-center md:w-[200px]">
+              <div className={cn('mx-auto grid h-[104px] w-[128px] place-items-center md:h-[150px] md:w-[200px] border-2 border-primary transition-colors duration-300', inDesk ? 'bg-accent' : 'bg-white')}>
                 <div>
-                  <span className="mx-auto grid size-10 place-items-center bg-primary text-lg font-black text-white">E</span>
+                  <span className="mx-auto grid size-8 place-items-center bg-primary font-black text-white md:size-10 md:text-lg">E</span>
                   <p className="mt-2 text-sm font-bold text-primary">ExitOS</p>
-                  <p className="mt-0.5 text-[11px] text-muted-foreground">자료 대조 · 정산 · 인수인계</p>
+                  <p className="mt-0.5 hidden text-[11px] text-muted-foreground md:block">자료 대조 · 정산 · 인수인계</p>
                 </div>
               </div>
-              <p className="mt-2 text-sm font-semibold">중간에서 채워 넣는 곳</p>
+              <p className="mt-2 text-xs font-semibold md:text-sm">중간에서 채워 넣는 곳</p>
             </div>
 
-            <figure className="absolute bottom-[16%] right-6 w-[150px] text-center md:right-10">
+            <figure className="absolute bottom-[16%] right-2 w-[100px] text-center md:right-10 md:w-[150px]">
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/landing/peeps/peep-standing-23.svg" alt="" className="mx-auto h-[300px] w-auto -scale-x-100" />
-              <figcaption className="mt-2 text-sm font-semibold">인수자 <span className="font-normal text-muted-foreground">예비 창업자</span></figcaption>
+              <img src="/landing/peeps/peep-standing-23.svg" alt="" className="mx-auto h-[160px] w-auto -scale-x-100 md:h-[300px]" />
+              <figcaption className="mt-2 text-sm font-semibold">인수자 <span className="hidden font-normal text-muted-foreground md:inline">예비 창업자</span></figcaption>
             </figure>
 
             {/* 종이 (스크롤에 따라 이동) */}
             <div
-              className="absolute bottom-[34%] left-0 border border-neutral-300 bg-white p-3 shadow-[0_10px_24px_-8px_rgba(0,0,0,.25)] will-change-transform"
-              style={{ width: PAPER_W, transform: `translateX(${startX + (endX - startX) * flowP}px) rotate(${(-4 + 8 * flowP).toFixed(2)}deg)` }}
+              className="absolute bottom-[calc(16%+196px)] left-0 border md:bottom-[34%] border-neutral-300 bg-white p-3 shadow-[0_10px_24px_-8px_rgba(0,0,0,.25)] will-change-transform"
+              style={{ width: paperW, transform: `translateX(${startX + (endX - startX) * flowP}px) rotate(${(-4 + 8 * flowP).toFixed(2)}deg)` }}
             >
               <p className="font-mono text-[10px] tracking-widest text-muted-foreground">인수 자료</p>
               <ul className="mt-2 space-y-2 text-[11px]">
