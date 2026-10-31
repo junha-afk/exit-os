@@ -1,13 +1,12 @@
 // 매장 정성 정보 저장소 (소유: A). facts 쓰기는 이 파일을 통해서만 한다. 서버에서만 호출.
 // B는 getFacts 만 import 한다 (docs/TEAM_PLAN.md §4).
-// 목업 매장의 초기 facts는 Supabase에 한 번만 복사하고 이후 저장·확인은 DB를 기준으로 한다.
-import { MOCK_STORE_ID, mockFacts } from '@/lib/mocks';
+// 판매자 진단 facts는 빈 상태에서 시작하고 Supabase만 기준으로 한다.
+import { MOCK_STORE_ID } from '@/lib/mocks';
 import type { FactKey, Provenance, StoreFacts } from '@/lib/types';
 import { ensureStoreExists, getSupabase, saveStoreMetadata } from '@/lib/supabase';
 
 export async function getFacts(storeId: string): Promise<StoreFacts> {
-  const isNewStore = await ensureStoreExists(storeId, { name: defaultStoreName(storeId) });
-  if (isNewStore && storeId === MOCK_STORE_ID) await writeFacts(storeId, mockFacts);
+  await ensureStoreExists(storeId, { name: storeId === MOCK_STORE_ID ? '망원 브루랩' : storeId });
 
   const { data, error } = await getSupabase()
     .from('store_facts')
@@ -71,28 +70,8 @@ export async function resetFacts(storeId: string): Promise<void> {
 
 // 데모 매장은 단일 고정 ID를 사용한다.
 export async function createStore(input: { name: string; industry: string }): Promise<string> {
-  const isNewStore = await ensureStoreExists(MOCK_STORE_ID, input);
-  if (isNewStore) await writeFacts(MOCK_STORE_ID, mockFacts);
   await saveStoreMetadata({ id: MOCK_STORE_ID, name: input.name, industry: input.industry });
   await setFact(MOCK_STORE_ID, 'store_name', input.name);
   await setFact(MOCK_STORE_ID, 'industry', input.industry);
   return MOCK_STORE_ID;
-}
-
-async function writeFacts(storeId: string, facts: StoreFacts): Promise<void> {
-  const rows = Object.entries(facts).flatMap(([key, fact]) => fact ? [{
-    store_id: storeId,
-    key,
-    value: fact.value,
-    provenance: fact.provenance,
-    note: fact.note ?? null,
-  }] : []);
-  if (!rows.length) return;
-  const { error } = await getSupabase().from('store_facts').upsert(rows, { onConflict: 'store_id,key' });
-  if (error) throw new Error(`SUPABASE_MOCK_FACTS_SEED_FAILED: ${error.message}`);
-}
-
-function defaultStoreName(storeId: string): string {
-  const mockName = mockFacts.store_name?.value;
-  return storeId === MOCK_STORE_ID && typeof mockName === 'string' ? mockName : storeId;
 }
