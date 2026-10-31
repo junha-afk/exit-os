@@ -6,6 +6,8 @@ import { ROUTES } from '@/components/common/routes';
 import { AnomalyList } from '@/components/report/AnomalyList';
 import { DealButton } from '@/components/report/DealButton';
 import { PaybackSimulator } from '@/components/report/PaybackSimulator';
+import { PaywallDialog } from '@/components/report/PaywallDialog';
+import { PrintHeader, PrintPayback } from '@/components/report/PrintLayout';
 import { PublishForm, type PublishDefaults } from '@/components/report/PublishForm';
 import { RevenueChart } from '@/components/report/RevenueChart';
 import { ScoreRow } from '@/components/report/ScoreRow';
@@ -69,14 +71,18 @@ export default async function SellerReportPage({ searchParams }: { searchParams:
   );
 
   return (
-    <main className="mx-auto max-w-6xl px-4 pb-16 md:px-6">
+    <main className="mx-auto max-w-6xl px-4 pb-16 md:px-6 print:max-w-none print:p-0">
+      <PrintHeader storeName={v.storeName} />
       <header className="border-b py-8">
-        <p className="text-sm text-muted-foreground">{v.storeName} · 매각 준비 보고서</p>
+        <div className="flex items-start justify-between gap-4">
+          <p className="text-sm text-muted-foreground">{v.storeName} · 매각 준비 보고서</p>
+          <PaywallDialog />
+        </div>
         <h1 className="mt-2 text-xl font-bold tracking-tight md:text-[32px] md:leading-tight">{report.headline}</h1>
         <p className="mt-3 max-w-3xl text-[15px] leading-relaxed">{report.summary}</p>
       </header>
 
-      <div className="mt-8 grid gap-10 lg:grid-cols-[1fr_320px]">
+      <div className="mt-8 grid gap-10 lg:grid-cols-[1fr_320px] print:block">
         <div className="flex min-w-0 flex-col gap-10">
           <section aria-labelledby="pnl-title">
             <h2 id="pnl-title" className="text-2xl font-bold">손익</h2>
@@ -106,20 +112,22 @@ export default async function SellerReportPage({ searchParams }: { searchParams:
             <div className="mt-4"><AnomalyList anomalies={analysis.anomalies} /></div>
           </section>
 
-          <section aria-labelledby="score-title">
+          <section aria-labelledby="score-title" className="print:break-inside-avoid">
             <h2 id="score-title" className="text-2xl font-bold">AI 점수</h2>
             <div className="mt-4"><ScoreRow scores={analysis.scores} /></div>
             <AiEstimateNotice className="mt-3" />
           </section>
 
-          <section aria-labelledby="value-title">
+          <section aria-labelledby="value-title" className="print:break-inside-avoid">
             <h2 id="value-title" className="text-2xl font-bold">매장 가치 추정</h2>
             <div className="mt-4 border-t pt-5">
               <ValuationRange valuation={analysis.valuation} premiumAsk={defaults.premiumAsk || undefined} profitProvenance={profitProv} />
             </div>
             {/* 모바일: 시뮬레이터를 가치 추정 바로 아래에 (데스크톱은 오른쪽 고정 패널) */}
-            <div className="mt-8 border-t pt-6 lg:hidden">{simulator}</div>
+            <div className="mt-8 border-t pt-6 lg:hidden print:hidden">{simulator}</div>
           </section>
+
+          <PrintPayback valuation={analysis.valuation} premium={defaults.premiumAsk} initialCost={defaults.estInitialCost} />
 
           <section aria-labelledby="detail-title">
             <h2 id="detail-title" className="text-2xl font-bold">보고서</h2>
@@ -152,12 +160,12 @@ export default async function SellerReportPage({ searchParams }: { searchParams:
             </ol>
           </section>
 
-          <section id="publish" className="border-t pt-10">
+          <section id="publish" className="border-t pt-10 print:hidden">
             <PublishForm storeId={storeId} defaults={defaults} publishedId={listing?.id} />
           </section>
 
           {listing && (
-            <section aria-labelledby="deal-title" className="border-t pt-10">
+            <section aria-labelledby="deal-title" className="border-t pt-10 print:hidden">
               <h2 id="deal-title" className="text-2xl font-bold">구매자와 계약하기로 했나요?</h2>
               <p className="mt-1 mb-4 text-sm text-muted-foreground">
                 거래를 시작하면 이 보고서의 장비·거래처·직원·계정 정보로 인수인계 업무를 자동으로 만들어요.
@@ -167,7 +175,7 @@ export default async function SellerReportPage({ searchParams }: { searchParams:
           )}
         </div>
 
-        <aside className="hidden lg:sticky lg:top-24 lg:block lg:self-start">{simulator}</aside>
+        <aside className="hidden lg:sticky lg:top-24 lg:block lg:self-start print:hidden">{simulator}</aside>
       </div>
     </main>
   );
