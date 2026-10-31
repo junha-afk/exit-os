@@ -30,7 +30,7 @@ export function anomalyUserPrompt(anomalies: Anomaly[], months: MonthlyMetric[])
   return JSON.stringify({ anomalies: anomalies.map((a, index) => ({ index, ...a, nearby: near(a.month) })) });
 }
 
-const EVIDENCE: Record<Anomaly['kind'], string> = {
+export const EVIDENCE: Record<Anomaly['kind'], string> = {
   cash_ratio: '현금영수증 발행 내역이나 통장 입금 내역',
   revenue_spike: '해당 월 POS 일별 매출 내역',
   revenue_drop: '해당 월 휴무·공사 등 영업 일정 기록',
