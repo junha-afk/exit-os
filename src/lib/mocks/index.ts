@@ -1,4 +1,4 @@
-// 목업 응답 (소유: C). API 실연동 전까지 라우트가 이 값을 내려준다.
+// 목업 응답 (소유: B). API 실연동 전까지 라우트가 이 값을 내려준다.
 // JSON 은 data/sample CSV 를 SKILL.md §2 공식으로 계산해 만든 값 — 실제 구현 후 교체.
 import type {
   AnalysisResult, DealTasksResponse, HandoverTask, ListingDetail, ListingSummary,

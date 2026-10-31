@@ -1,4 +1,4 @@
-// 공개 범위 맵 + 서버 필터 (소유: C). 원본: PRD §4-E
+// 공개 범위 맵 + 서버 필터 (소유: B). 원본: PRD §4-E
 // 매물 응답은 반드시 filterListingForViewer 를 거친다. 클라이언트에서 숨기기만 하는 방식 금지.
 import type { AccessLevel, ListingDetail, ListingField, ListingView, Viewer } from './types';
 
@@ -63,7 +63,7 @@ export function filterListingForViewer(
 
 const VIEWERS: Viewer[] = ['seller', 'buyer', 'buyer_subscribed', 'buyer_approved'];
 
-// viewer = 쿠키 demo_role (없으면 x-demo-role 헤더, 그것도 없으면 buyer)
+// viewer = 쿠키 demo_role (화면의 구독·열람 승인 버튼이 바꿈). 없으면 x-demo-role 헤더(테스트용), 그것도 없으면 buyer
 export function getViewer(req: Request): Viewer {
   const cookie = req.headers.get('cookie')?.match(/(?:^|;\s*)demo_role=([^;]+)/)?.[1];
   const role = cookie ?? req.headers.get('x-demo-role');

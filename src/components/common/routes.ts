@@ -4,6 +4,8 @@ export const ROUTES = {
   listings: '/',
   listing: (id: string) => `/listings/${id}`,
   risk: (id: string) => `/listings/${id}/risk`,
-  sell: '/seller/diagnose', // B 담당 화면
+  sell: '/seller/diagnose', // A 담당 화면 (진단)
+  sellReport: '/seller/report', // B 담당 화면 (매각 보고서)
+  knowhow: '/seller/knowhow', // A 담당 화면 (노하우, P2)
   handover: '/handover/mock-deal-1', // 데모 거래 (C 목업 MOCK_DEAL_ID)
 } as const;

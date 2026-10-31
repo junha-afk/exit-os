@@ -1,5 +1,13 @@
 {
   "facts": {
+    "store_name": {
+      "value": "망원 브루랩",
+      "provenance": "user_input"
+    },
+    "is_anonymous": {
+      "value": true,
+      "provenance": "user_input"
+    },
     "industry": {
       "value": "카페",
       "provenance": "user_input"
@@ -32,12 +40,32 @@
       "value": 22,
       "provenance": "user_input"
     },
+    "premium_ask": {
+      "value": 160000000,
+      "provenance": "user_input"
+    },
+    "est_initial_cost": {
+      "value": 15000000,
+      "provenance": "user_input"
+    },
+    "deposit": {
+      "value": 50000000,
+      "provenance": "user_input"
+    },
+    "monthly_rent": {
+      "value": 3000000,
+      "provenance": "user_input"
+    },
+    "maintenance_fee": {
+      "value": 350000,
+      "provenance": "user_input"
+    },
     "open_days": {
-      "value": "매일 (명절 당일 휴무)",
+      "value": ["월", "화", "수", "목", "금", "토", "일"],
       "provenance": "user_input"
     },
     "open_hours": {
-      "value": "08:00–22:00",
+      "value": { "open": "08:00", "close": "22:00" },
       "provenance": "user_input"
     },
     "staff_count": {
@@ -46,8 +74,7 @@
     },
     "owner_weekly_hours": {
       "value": 60,
-      "provenance": "user_input",
-      "note": "원두 로스팅·발주·SNS 점주 전담"
+      "provenance": "user_input"
     },
     "staff_roles": {
       "value": [
@@ -81,12 +108,16 @@
       ],
       "provenance": "user_input"
     },
+    "owner_tasks": {
+      "value": ["원두 로스팅", "발주", "SNS 운영"],
+      "provenance": "user_input"
+    },
     "customer_segments": {
-      "value": "20~30대 직장인·인근 주민, 주말 방문객",
+      "value": ["20~30대 직장인", "인근 주민", "주말 방문객"],
       "provenance": "user_input"
     },
     "channel_mix": {
-      "value": "매장 82% · 배달 18%",
+      "value": { "hall": 82, "takeout": 0, "delivery": 18 },
       "provenance": "user_input"
     },
     "equipment": {
@@ -133,7 +164,7 @@
       "provenance": "user_input"
     },
     "inventory_included": {
-      "value": "원두·소모품 재고 일체 포함",
+      "value": ["원두 재고", "소모품 재고"],
       "provenance": "user_input"
     },
     "lease_expiry": {
@@ -145,11 +176,11 @@
       "provenance": "user_input"
     },
     "franchise_terms": {
-      "value": "개인 매장 (가맹 없음)",
+      "value": { "type": "independent" },
       "provenance": "user_input"
     },
     "handover_support": {
-      "value": "인수 후 4주 현장 교육, 로스팅 레시피 전달",
+      "value": true,
       "provenance": "user_input"
     },
     "training_weeks": {
@@ -160,15 +191,18 @@
       "value": [
         {
           "name": "망원커피상사",
-          "item": "원두"
+          "item": "원두",
+          "orderCycle": "주 1회"
         },
         {
           "name": "서울우유대리점",
-          "item": "유제품"
+          "item": "유제품",
+          "orderCycle": "주 3회"
         },
         {
           "name": "베이크마켓",
-          "item": "베이커리 재료"
+          "item": "베이커리 재료",
+          "orderCycle": "주 1회"
         }
       ],
       "provenance": "user_input"

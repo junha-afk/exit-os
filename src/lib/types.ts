@@ -1,4 +1,4 @@
-// 공용 타입 — 팀원 간 계약서. 변경 시 팀 채널에 먼저 공지 (소유: C)
+// 공용 타입 — 팀원 간 계약서. 변경 시 팀 채널에 먼저 공지 (소유: B)
 // 원본: docs/ARCHITECTURE.md §3
 
 export type Provenance = 'verified' | 'user_input' | 'needs_check';
@@ -13,16 +13,31 @@ export const isLocked = (v: unknown): v is Locked =>
   typeof v === 'object' && v !== null && (v as Locked).locked === true;
 
 // ── 매장 정성 정보 (store_facts) ────────────────────────────────
+// A(정보 수집)가 숫자·선택·파일 입력으로만 채운다. 값은 항상 구조화된 형태 (docs/TEAM_PLAN.md §7).
+// 금액 = 원, 월 = 'YYYY-MM'.
 
 export const FACT_KEYS = [
-  'industry', 'region', 'opened_at', 'sale_reason', 'desired_handover',
-  'area_m2', 'floor', 'seats', 'open_days', 'open_hours',
-  'staff_count', 'owner_weekly_hours', 'staff_roles',
+  // 기본 정보
+  'store_name', 'is_anonymous', 'industry', 'region', 'opened_at', 'sale_reason', 'desired_handover',
+  'area_m2', 'floor', 'seats',
+  // 매각 가격·임대 조건
+  'premium_ask', 'est_initial_cost', 'deposit', 'monthly_rent', 'maintenance_fee',
+  // 운영
+  'open_days', 'open_hours',
+  'staff_count', 'owner_weekly_hours', 'staff_roles', 'owner_tasks',
   'customer_segments', 'channel_mix', 'equipment', 'inventory_included',
+  // 계약
   'lease_expiry', 'renewal_needed', 'franchise_terms',
+  // 인수인계·노하우
   'handover_support', 'training_weeks', 'suppliers', 'digital_accounts',
+  'training_items', 'knowhow_artifacts',
 ] as const;
 export type FactKey = (typeof FACT_KEYS)[number];
+
+export type Weekday = '월' | '화' | '수' | '목' | '금' | '토' | '일';
+export interface OpenHours { open: string; close: string }            // 'HH:mm'
+export interface ChannelMix { hall: number; takeout: number; delivery: number }  // 합 100 (%)
+export interface FranchiseTerms { type: 'independent' | 'franchise'; monthlyRoyalty?: number }
 
 export interface StaffRole { role: string; count: number; weeklyHours?: number; duties?: string[] }
 export interface Equipment {
@@ -30,8 +45,16 @@ export interface Equipment {
   condition?: string; repairs?: string[];
   purchasePrice?: number;      // 원. 시설권리금(정액법 5년) 계산용
 }
-export interface Supplier { name: string; item: string }
+export interface Supplier { name: string; item: string; orderCycle?: string }
 export interface DigitalAccount { platform: string; kind: 'delivery' | 'pos' | 'sns' | 'map' | 'other' }
+
+// 노하우 산출물 (P2). 점주가 고른 항목으로 LLM이 문장을 만들고 점주가 확인한다.
+export interface KnowhowArtifacts {
+  roleManual: { role: string; duties: string[] }[];
+  trainingChecklist: string[];
+  ownerBurdenSummary: string;
+  supplierHandover: { name: string; item: string; orderCycle?: string }[];
+}
 
 export type StoreFacts = Partial<Record<FactKey, Sourced<unknown>>>;
 
@@ -54,7 +77,7 @@ export interface Anomaly {
   kind: 'revenue_spike' | 'revenue_drop' | 'cash_ratio' | 'settlement_mismatch' | 'cogs_ratio' | 'missing';
   severity: 'low' | 'medium' | 'high';
   detail: string;             // 코드가 만든 사실 문장
-  aiExplanation?: string;     // Gemini가 덧붙인 설명
+  aiExplanation?: string;     // LLM이 덧붙인 설명
 }
 
 export interface Scores { revenueStability: number; dataCompleteness: number; ownerDependency: number }

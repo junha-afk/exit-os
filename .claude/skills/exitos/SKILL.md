@@ -1,16 +1,16 @@
 ---
 name: exitos
-description: ExitOS(소상공인 매각 준비·인수인계 SaaS) 도메인 규칙과 구현 컨벤션. ExitOS 코드에서 화면·API·DB·Gemini 프롬프트를 만들거나 고칠 때, 권리금·매출·출처 라벨·공개 범위·인수인계 업무를 다룰 때 반드시 먼저 읽는다.
+description: ExitOS(소상공인 매각 준비·인수인계 SaaS) 도메인 규칙과 구현 컨벤션. ExitOS 코드에서 화면·API·DB·LLM 프롬프트를 만들거나 고칠 때, 권리금·매출·출처 라벨·공개 범위·인수인계 업무를 다룰 때 반드시 먼저 읽는다.
 ---
 
 # ExitOS 개발 스킬
 
-팀원 4명이 각자 Claude Code로 작업해도 **같은 규칙으로 코드를 만들기 위한** 공통 컨텍스트다.
+팀원(A 정보 수집 · B 분석·보고서 · F 플랫폼 프론트)이 각자 Claude Code로 작업해도 **같은 규칙으로 코드를 만들기 위한** 공통 컨텍스트다.
 제품 요구사항은 `PRD.md`, 구조·계약은 `docs/ARCHITECTURE.md`, 프롬프트는 `docs/AI_PROMPTS.md`.
 
 ## 0. 작업 시작 전 체크
 
-1. 내가 수정하려는 파일이 **내 담당 폴더**인가? (`docs/TEAM_PLAN.md` 의 소유권 표) 아니면 담당자에게 요청하거나 새 파일을 만든다.
+1. 내가 수정하려는 파일이 **내 담당 폴더**인가? (`docs/TEAM_PLAN.md` §2 소유권 표) 아니면 담당자에게 요청하거나 새 파일을 만든다.
 2. 공용 타입(`src/lib/types.ts`)·공개 범위 맵(`src/lib/visibility.ts`)을 바꿔야 하면 **팀 채널에 먼저 공지**.
 3. 7시간 해커톤이다. 데모 시나리오(`docs/DEMO_SCRIPT.md`)에 안 나오는 기능은 만들지 않는다.
 
@@ -37,7 +37,8 @@ type Viewer = 'seller' | 'buyer' | 'buyer_subscribed' | 'buyer_approved';
 
 ### 1-3. 돈 계산은 코드, 말은 LLM
 - 매출·이익·이익률·회수기간·가치 범위 = `src/lib/analysis/*` 의 순수 함수. 단위 테스트 1개씩만이라도.
-- Gemini는 **질문 생성, 자유 텍스트 → 구조화 추출, 이상치 사유 서술, 보고서 문장, 리스크 서술, 인수인계 업무 문구**만 담당.
+- LLM은 **질문 순서·문구·업종별 선택지, 이상치 사유 서술, 보고서 문장, 리스크 서술, 인수인계 업무 문구**만 담당.
+- 점주의 답은 숫자·선택·파일로만 받고 코드(zod)가 검증한다. LLM이 점주 답변을 읽고 값을 추출하지 않는다.
 - LLM에 숫자를 넘길 땐 이미 계산된 값을 주고 "이 숫자를 바꾸지 말 것"을 명시.
 
 ### 1-4. 추정은 추정이라고 말한다
@@ -59,7 +60,7 @@ type Viewer = 'seller' | 'buyer' | 'buyer_subscribed' | 'buyer_approved';
 
 **AI 점수 (0~100, 코드 계산 + LLM은 설명만)**
 - 매출 안정성: `100 − 변동계수(CV)×200` 를 0~100 클램프
-- 자료 완성도: (12개월 × 5종 자료 중 존재하는 셀 비율) × 0.7 + verified 비율 × 0.3
+- 자료 완성도: (12개월 × 재무 자료 6종(`RECORD_KINDS`) 중 존재하는 셀 비율) × 0.7 + verified 비율 × 0.3
 - 운영 의존도(높을수록 위험): 점주 주 근무시간/60 × 60 + 점주 전담 업무 비율 × 40
 
 **이상치 규칙 (`needs_check` 부여)**
@@ -73,17 +74,18 @@ type Viewer = 'seller' | 'buyer' | 'buyer_subscribed' | 'buyer_approved';
 - `dedupe_key = sha1(source_group | month | channel | amount)` — 같은 키는 1건만.
 - 배달 정산 행의 `included_in_pos = 'Y'` 인 달은 배달 매출을 월매출 합산에서 빼고 "중복 제거됨"으로 기록.
 
-## 3. Gemini 사용 규칙
+## 3. LLM(래블업 API) 사용 규칙
 
-- SDK: `@google/genai`, 서버 전용(`src/lib/ai/gemini.ts`). API 키는 `GEMINI_API_KEY`, 모델은 `GEMINI_MODEL` (기본: Flash 계열 최신). 클라이언트에서 직접 호출 금지.
-- 항상 `responseMimeType: 'application/json'` + `responseSchema` 로 구조화 출력 → `zod` 로 재검증 → 실패 시 1회 재시도 → 그래도 실패하면 폴백 문구.
-- 프롬프트 원문은 `docs/AI_PROMPTS.md` 와 `src/lib/ai/prompts/*.ts` 를 동기화. 프롬프트 수정은 AI 담당자(D)만.
-- **인터뷰 엔진 패턴 (진단·노하우 공용):**
-  1. 입력: 지금까지의 `extracted` 상태 + 남은 필수 슬롯 목록 + 마지막 사용자 답변
-  2. 출력: `{ extracted_patch, next_question, quick_replies[], done }`
-  3. 서버가 patch 를 병합(사용자 입력 → `user_input` 라벨) → 우측 패널 즉시 갱신 → 사용자가 패널에서 직접 수정 가능
-  4. 한 번에 질문 1개, 존댓말, 40자 내외, 가능하면 선택지(quick_replies) 제공
-- 데모 안정성: `DEMO_MODE=true` 이면 `src/lib/ai/fixtures/*.json` 의 녹화된 응답을 사용할 수 있게 한다(네트워크 장애 대비).
+- 호출은 `src/lib/ai/llm.ts` 의 `chatJson()` 하나로만 한다(서버 전용, `fetch` 사용, 새 패키지 없음). 주소·키·모델은 `LABLUP_API_BASE_URL`, `LABLUP_API_KEY`, `LABLUP_MODEL`. 클라이언트에서 직접 호출 금지.
+- 항상 JSON으로 받는다 → `zod` 로 검증 → 실패 시 1회 재시도 → 그래도 실패하면 폴백(인터뷰는 기본 질문, 보고서는 폴백 문구).
+- 프롬프트 원문은 `docs/AI_PROMPTS.md` 와 코드(`src/lib/interview/prompts.ts`, `src/lib/report/prompts/*.ts`)를 동기화. 프롬프트 수정은 해당 섹션 담당자만(공통·§1·§2 = A, §3~§6 = B).
+- **질문 엔진 패턴 (진단·노하우 공용, 담당 A):**
+  1. 입력: 지금까지의 facts + 남은 필수 슬롯 목록 + 업로드된 재무 자료 종류
+  2. 출력: `{ next_slot, question, options? }` — 다음에 물을 슬롯 1개, 질문 문장, 업종별 선택지
+  3. 화면은 슬롯의 입력 도구(숫자·금액·월·선택·다중 선택·예/아니오·비율·표·파일)를 띄운다. 자유 입력 채팅창은 없다.
+  4. 서버는 답 `{ slot, value }` 를 슬롯별 zod(`src/lib/interview/slots.ts`)로 검증 → `user_input` 라벨로 저장 → 우측 패널 갱신 → 점주가 패널에서 같은 입력 도구로 수정 가능
+  5. 한 번에 질문 1개, 존댓말, 40자 내외. LLM이 실패하면 `slots.ts` 의 기본 순서·문구·선택지로 진행
+- 데모 안정성: `DEMO_MODE=true` 이면 녹화된 응답(`src/lib/interview/fixtures/`, `src/lib/report/fixtures/`)을 사용한다(네트워크 장애 대비).
 
 ## 4. UI 컨벤션
 
@@ -91,7 +93,8 @@ type Viewer = 'seller' | 'buyer' | 'buyer_subscribed' | 'buyer_approved';
 - 색: 🟢 `emerald`, 🔵 `sky`, 🟠 `amber`. 잠금 섹션: `blur-sm` + 자물쇠 + CTA.
 - 차트는 Recharts. 월별 추이 라인차트에서 `needs_check` 월은 주황 점 + 툴팁 사유.
 - 판매자 화면은 "해야 할 일 중심", 구매자 화면은 "리스크 중심".
-- 상단 고정 `RoleSwitcher` 로 viewer 변경 → 쿠키 `demo_role` → 서버가 읽음.
+- 역할 전환 토글 UI는 없다. 구독(내 정보 메뉴)·열람 승인 요청(매물 상세) 버튼이 `useMembership()` 으로 쿠키 `demo_role` 을 바꾸고 서버가 읽는다.
+- 화면 디자인(폰트·색·모서리·레이아웃)은 루트 `DESIGN.md` 를 따른다.
 
 ## 5. 인수인계 업무 생성 규칙
 
@@ -111,6 +114,6 @@ type Viewer = 'seller' | 'buyer' | 'buyer_subscribed' | 'buyer_approved';
 - [ ] 새 숫자에 출처 라벨이 붙었나?
 - [ ] 새 매물 필드를 `VISIBILITY` 에 등록했나? (등록 안 된 필드는 기본 `subscriber`)
 - [ ] AI 추정 화면에 고지 문구가 있나?
-- [ ] Gemini 응답을 zod 로 검증하나? 실패 폴백이 있나?
+- [ ] LLM 응답을 zod 로 검증하나? 실패 폴백이 있나?
 - [ ] 담당 폴더 밖 파일을 건드렸다면 공지했나?
 - [ ] `npm run build` 통과?

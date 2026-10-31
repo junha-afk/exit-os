@@ -8,11 +8,13 @@
 
 ## 1. 지켜야 할 규칙
 
-**역할·소유권 (TEAM_PLAN)**
-- A가 고칠 수 있는 곳: `src/app/page.tsx`, `src/app/listings/**`, `src/app/handover/**`, `src/components/common/**`, `src/lib/format.ts`, `docs/DEMO_SCRIPT.md`, 앱 셸 `src/app/layout.tsx`·`src/app/globals.css`.
-- **C 소유라 수정 금지**: `src/app/api/**`, `src/lib/{types,visibility,supabase}.ts`, `src/lib/{analysis,handover}/**`, `src/lib/mocks/*.json`, `package.json`·lockfile·`next.config`·`components.json`, `supabase/**`, `data/**`. 필요하면 변경 제안만 적어 C에게 요청.
-- `npm i`, `npx shadcn add` 는 C만 실행한다. 새 패키지가 필요하면 요청.
-- B 소유: `/seller/**` (진단·보고서). D 소유: `src/app/api/ai/**`, `src/lib/ai/**`.
+**역할·소유권 (TEAM_PLAN v2 §2)**
+> 팀 플랜 v2에서 역할 이름이 바뀌었다. 이 문서의 **A = 지금의 F(플랫폼 프론트)**. 새 A는 정보 수집, 새 B는 분석·보고서 담당이다. 이전 C·D 작업은 A·B가 나눠 이어받았다.
+- F(이 문서 담당)가 고칠 수 있는 곳: `src/app/page.tsx`, `src/app/listings/**`(리스크 보고서 페이지 포함), `src/app/handover/**`, `src/components/common/**`, `src/lib/format.ts`, `public/stores/**`, `DESIGN.md`, `docs/DEMO_SCRIPT.md`, 이 문서, 앱 셸 `src/app/layout.tsx`·`src/app/globals.css`.
+- **A 소유라 수정 금지**: `src/lib/ai/llm.ts`, `src/lib/{interview,facts}/**`, `src/app/api/ai/interview/**`, `src/app/api/stores/route.ts`, `src/app/api/stores/[id]/facts/**`, `src/app/seller/{layout.tsx,diagnose,knowhow}/**`, `src/components/interview/**`, `public/templates/**`, `.env.example`.
+- **B 소유라 수정 금지**: `src/lib/{types,visibility,supabase}.ts`, `src/lib/{mocks,analysis,report,listing,handover}/**`, `src/app/api/stores/[id]/{upload,analyze}/**`, `src/app/api/ai/{report,risk}/**`, `src/app/api/{listings,deals,tasks}/**`, `src/app/seller/report/**`, `src/components/{report,upload}/**`, `package.json`·lockfile·`next.config`·`components.json`, `supabase/**`, `data/**`. 필요하면 변경 제안만 적어 해당 담당자에게 요청.
+- `npm i`, `npx shadcn add` 는 B만 실행한다. 새 패키지가 필요하면 B에게 요청.
+- 아래 본문에 나오는 "C에게 요청"은 B에게, "D(AI)"는 B(리스크 보고서)에게 요청하는 것으로 읽는다.
 
 **Git·보안 (사용자 전역 규칙)**
 - main 직접 커밋·푸시 금지. force push, `git reset --hard`, 히스토리 재작성 금지.
