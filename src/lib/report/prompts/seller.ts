@@ -1,5 +1,6 @@
 // 매각 보고서 문장 (소유: B). docs/AI_PROMPTS.md §4. 숫자는 AnalysisResult 확정값만 인용한다
 import { z } from 'zod';
+import { chatJson } from '@/lib/ai/llm';
 import { formatKRW, formatPercent } from '@/lib/format';
 import type { AnalysisResult, StoreFacts } from '@/lib/types';
 import {
@@ -25,7 +26,6 @@ export const SELLER_REPORT_SYSTEM = [
   'seller_todo 는 "확인 필요"를 "증빙 확인"으로 바꾸는 구체적 행동으로 쓰세요.',
   '법률 판단("불법", "무효")이나 가공 매출 단정은 금지합니다. "확인이 필요한 항목"으로 표현하세요.',
   'headline 은 30자 이내 한 줄 매력 포인트, summary 는 3문장. headline·summary 는 판매 페이지 매장 소개로도 쓰입니다.',
-  '존댓말, 한국어. JSON 만 출력.',
 ].join('\n');
 
 export function sellerReportUserPrompt(analysis: AnalysisResult, facts: StoreFacts): string {
@@ -111,9 +111,12 @@ export function fallbackSellerReport(analysis: AnalysisResult, facts: StoreFacts
   };
 }
 
-// TODO(B-4): A의 chatJson(src/lib/ai/llm.ts, PR-0A) 머지 후 아래로 교체. fixture = src/lib/report/fixtures/report_seller.json
-//   return chatJson({ system: SELLER_REPORT_SYSTEM, user: sellerReportUserPrompt(analysis, facts),
-//     schema: sellerReportSchema, fixture }).catch(() => fallbackSellerReport(analysis, facts));
+// 긴 서술이라 thinking 사용. 화면이 이 호출을 기다리므로 제한 시간을 짧게 두고, 실패하면 코드 폴백
+// DEMO_MODE 에서는 코드 폴백을 그대로 쓴다 (숫자가 지금 분석 결과와 항상 같게)
 export async function generateSellerReport(analysis: AnalysisResult, facts: StoreFacts): Promise<SellerReport> {
-  return fallbackSellerReport(analysis, facts);
+  const fallback = fallbackSellerReport(analysis, facts);
+  return chatJson({
+    system: SELLER_REPORT_SYSTEM, user: sellerReportUserPrompt(analysis, facts), schema: sellerReportSchema,
+    fixture: fallback, thinking: true, maxTokens: 4000, timeoutMs: 30_000,
+  }).catch(() => fallback);
 }

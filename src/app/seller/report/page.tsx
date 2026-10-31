@@ -40,10 +40,11 @@ export default async function SellerReportPage({ searchParams }: { searchParams:
     );
   }
 
-  let report = await getSellerReport(storeId);
+  // 자료·facts 가 바뀌면 analysis 가 새 객체라 보고서도 새로 만든다
+  let report = await getSellerReport(analysis);
   if (!report) {
     report = await generateSellerReport(analysis, facts);
-    await saveSellerReport(storeId, report);
+    await saveSellerReport(analysis, report);
   }
   const v = factsView(facts);
   const listing = await getListingByStore(storeId);

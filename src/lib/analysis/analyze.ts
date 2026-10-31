@@ -1,7 +1,7 @@
 // 재무 자료 + facts → AnalysisResult (소유: B). 순수 함수 — 저장·LLM 호출은 라우트가 한다
 import type { AnalysisResult, Equipment, MonthlyMetric, Provenance, RecordKind, StoreFacts } from '@/lib/types';
 import { detectAnomalies, REQUIRED_KINDS } from './anomalies';
-import { analysisMonths, mean, monthlyBase } from './metrics';
+import { analysisMonths, mean, monthlyBase, type MonthBase } from './metrics';
 import type { FinancialRecord } from './parse';
 import { crossCheck, lowest } from './provenance';
 import { dataCompleteness, ownerDependency, revenueStability } from './scores';
@@ -14,26 +14,33 @@ const factValue = <T,>(facts: StoreFacts, key: keyof StoreFacts) => facts[key]?.
 export function analyzeStore(input: {
   storeId: string;
   records: FinancialRecord[];
+  cashEvidence?: Map<string, number>;   // month → 현금영수증·통장 입금으로 확인된 현금 매출
   facts: StoreFacts;
   hourlyWage?: number;
 }): AnalysisResult | null {
   const { storeId, records, facts } = input;
+  const cashEvidence = input.cashEvidence ?? new Map<string, number>();
   const months = analysisMonths(records);
   if (!months.length) return null;   // 매출 자료(POS·배달)가 없으면 분석하지 않는다
 
   const uploaded = [...new Set(records.map((r) => r.kind))] as RecordKind[];
   const bases = monthlyBase(records, months);
-  const scan = detectAnomalies(bases, uploaded);
+  const cashCheck = (b: MonthBase) => crossCheck(b.posCash, cashEvidence.get(b.month) ?? null);
+  const cashVerified = new Set(bases.filter((b) => b.posCash > 0 && cashCheck(b) === 'verified').map((b) => b.month));
+  const scan = detectAnomalies(bases, uploaded, cashVerified);
+  // 문서·사진에서 LLM이 옮겨 적은 행이 있는 달은 증빙 확인으로 올리지 않는다 (SKILL.md §1-1)
+  const llmMonths = new Set(records.filter((r) => r.readByLlm).map((r) => r.month));
 
-  // 월별 출처: 카드는 카드사 정산과 대조, 현금은 대조 출처 없음(🔵), 배달은 플랫폼 정산서가 원본(🟢)
+  // 월별 출처: 카드는 카드사 정산과, 현금은 현금영수증·통장 입금과 대조(없으면 🔵), 배달은 플랫폼 정산서가 원본(🟢)
   const sourceLabels: Provenance[] = [];
   const metrics: MonthlyMetric[] = bases.map((b) => {
     const parts: Provenance[] = [];
     if (b.posCard > 0) parts.push(crossCheck(b.posCard, b.cardSettlement));
-    if (b.posCash > 0) parts.push('user_input');
+    if (b.posCash > 0) parts.push(cashCheck(b));
     if (b.delivery > 0) parts.push('verified');
     sourceLabels.push(...parts);
-    const reasons = scan.flagged.get(b.month);
+    const flagged = [...(scan.flagged.get(b.month) ?? []), ...(llmMonths.has(b.month) ? ['문서·사진에서 읽은 값 포함'] : [])];
+    const reasons = flagged.length ? flagged : undefined;
     const provenance: Provenance = reasons ? 'needs_check' : lowest(...parts);
     const note = reasons?.join(', ');
     return {

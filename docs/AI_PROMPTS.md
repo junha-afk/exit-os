@@ -202,6 +202,6 @@ LLM이 하는 일 (작업마다 시스템 프롬프트를 따로 둔다, `src/li
 
 `DEMO_MODE=true` 이면 `chatJson()` 이 호출부가 넘긴 `fixture` 를 그대로 돌려준다. 파일은 각 담당 폴더에 둔다.
 - A: `src/lib/interview/fixtures/` — `diagnosis_turn_{1..N}.json`, `document_read_{kind}.json`(데모 자료별 읽기 결과), `knowhow_*.json`
-- B: `src/lib/report/fixtures/` — `anomaly.json`, `report_seller.json`, `risk.json`, `handover_enrich.json`
+- B: 녹화 파일 없음. 보고서·리스크는 코드 폴백 결과를, 이상치 설명·인수인계 문구는 빈 결과(→ 코드 문구)를 `fixture` 로 넘긴다. 숫자가 지금 분석 결과와 항상 같고, 리스크 보고서는 viewer 별로 잘린 정보만 담기 때문
 
 리허설 때 실제 응답을 한 번 받아 저장해 두면 발표 중 네트워크·쿼터 문제를 피할 수 있다.

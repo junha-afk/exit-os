@@ -16,7 +16,8 @@ export interface AnomalyScan {
   flagged: Map<string, string[]>;     // month → 확인 필요 사유 (출처 라벨 note 로 쓴다)
 }
 
-export function detectAnomalies(months: MonthBase[], uploaded: RecordKind[]): AnomalyScan {
+// cashVerified = 현금영수증·통장 입금으로 현금 매출이 확인된 달 → 현금 비중 이상치에서 뺀다
+export function detectAnomalies(months: MonthBase[], uploaded: RecordKind[], cashVerified = new Set<string>()): AnomalyScan {
   const anomalies: Anomaly[] = [];
   const missing: string[] = [];
   const flagged = new Map<string, string[]>();
@@ -53,7 +54,7 @@ export function detectAnomalies(months: MonthBase[], uploaded: RecordKind[]): An
 
     // 현금 매출 비중: 다른 달 중앙값의 3배 이상 (판례의 가공 매출 패턴)
     const usual = quantile(months.filter((o) => o !== m).map(cashRatio), 0.5);
-    if (usual > 0 && cashRatio(m) >= usual * 3) {
+    if (usual > 0 && cashRatio(m) >= usual * 3 && !cashVerified.has(m.month)) {
       anomalies.push({
         month: m.month, kind: 'cash_ratio', severity: 'high',
         detail: `${m.month} 현금 매출 ${formatKRW(m.posCash)} (매출의 ${(cashRatio(m) * 100).toFixed(1)}%, 평소 ${(usual * 100).toFixed(1)}%). 현금영수증·통장 입금 내역 제출 시 증빙 전환 가능`,
