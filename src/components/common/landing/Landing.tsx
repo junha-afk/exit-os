@@ -2,13 +2,14 @@
 // 랜딩 (소유: A). ① 영수증 히어로 → ② 기능(브라우저 화면이 스크롤로 바뀜) → 마무리 CTA.
 // 원본 목업: docs/mockups/landing/index.html
 import Link from 'next/link';
+import { FileUp } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { cn } from '@/lib/utils';
 import { ROUTES } from '../routes';
 import './landing.css';
 
 const STEPS = [
-  { label: '01 · 진단', title: '묻는 대로 답하고, 자료를 올리면 끝', body: 'AI가 가게에 대해 하나씩 물어보고, POS·카드·배달 정산 파일을 올리면 겹치는 매출은 지우고 숫자마다 출처를 붙여요.', url: 'exitos.kr/seller/diagnose' },
+  { label: '01 · 진단', title: '묻는 대로 답하고, 자료를 올리면 끝', body: '질문에는 숫자·선택으로 답하고, AI가 요청하는 자료를 하나씩 올리면 정보 패널에 출처와 함께 정리돼요.', url: 'exitos.kr/seller/diagnose' },
   { label: '02 · 가치 정산서', title: '수상한 달은 먼저 잡아내요', body: '평소와 다른 달은 주황색으로 표시하고, 시설·영업 권리금을 나눠 범위로 보여줘요. 막대를 눌러 이유를 확인해 보세요.', url: 'exitos.kr/seller/report' },
   { label: '03 · 판매 페이지', title: '보여줄 만큼만, 단계적으로 공개', body: '누구나 보는 정보, 구독자가 보는 재무, 판매자가 승인해야 보는 권리금 구성까지 공개 범위를 나눠요.', url: 'exitos.kr/listings/mangwon-a' },
 ];
@@ -183,19 +184,75 @@ export function Landing() {
                   <div className="relative flex-1 overflow-hidden bg-white [zoom:.9]">
                     {/* 화면 1: 진단 */}
                     <div className={cn('screen grid grid-cols-[1.1fr_1fr]', step === 0 && 'on')}>
-                      <div className="space-y-3 border-r p-5 text-[13px]">
-                        <p className="w-fit max-w-[85%] bg-muted px-3 py-2">가게 문을 연 지 얼마나 됐나요?</p>
-                        <p className="ml-auto w-fit max-w-[85%] bg-primary px-3 py-2 text-white">2022년 9월이요, 4년 됐어요</p>
-                        <p className="w-fit max-w-[85%] bg-muted px-3 py-2">점주님이 직접 하시는 일은요?</p>
-                        <p className="ml-auto w-fit max-w-[85%] bg-primary px-3 py-2 text-white">원두 로스팅이랑 발주, SNS요</p>
-                        <div className="border border-dashed border-primary/40 bg-accent p-3 text-[12px] text-accent-foreground">파일을 끌어다 놓으세요 · 6종 중 <b>6종 완료</b></div>
+                      <div className="space-y-2.5 border-r p-5 text-[12px]">
+                        <div className="flex items-center gap-2 text-[10px] text-muted-foreground">
+                          <span className="h-1.5 flex-1 bg-muted"><span className="block h-full w-[28%] bg-primary" /></span>
+                          <span>진단 진행 중</span>
+                        </div>
+                        <p className="w-fit max-w-[90%] bg-muted px-3 py-2">언제 개업하셨나요?</p>
+                        <p className="ml-auto w-fit max-w-[90%] border border-primary/30 bg-accent px-3 py-2 text-accent-foreground">
+                          <span className="mr-2 text-[10px] text-muted-foreground">개업</span>2022년 9월
+                        </p>
+                        <p className="w-fit max-w-[90%] bg-muted px-3 py-2">임대차계약서를 올려주시겠어요?</p>
+                        <div className="ml-auto w-[90%] border px-3 py-2.5">
+                          <p className="font-semibold text-foreground">임대차계약서.jpg</p>
+                          <p className="mt-1 text-[11px] leading-relaxed text-muted-foreground">보증금·월세·만료일을 읽었어요.</p>
+                          <p className="mt-1 text-[11px] text-amber-700">오른쪽에서 확인해 주세요.</p>
+                        </div>
+                        <div className="border-t pt-2.5">
+                          <p className="text-[10px] font-medium text-primary">자료 요청 · POS·키오스크 매출 내역</p>
+                          <p className="mt-1 text-[13px] font-semibold">POS·키오스크 매출 내역을 올려주시겠어요?</p>
+                          <p className="mt-1 text-[11px] text-muted-foreground">월별 카드·현금 매출을 정리하는 데 필요해요.</p>
+                          <div className="mt-2 border border-dashed border-primary/40 bg-accent px-3 py-2.5 text-center text-accent-foreground">
+                            <FileUp aria-hidden className="mx-auto size-4" />
+                            <p className="mt-1 text-[11px] font-semibold">POS·키오스크 매출 내역 올리기</p>
+                            <p className="mt-1 text-[10px] leading-relaxed text-muted-foreground">눌러서 고르거나 끌어다 놓으세요 · CSV·엑셀·사진</p>
+                          </div>
+                          <span className="mt-1.5 inline-flex h-8 items-center border px-2.5 text-[10px]">이 자료는 없어요</span>
+                        </div>
                       </div>
-                      <div className="space-y-2 p-5 text-[12px]">
-                        <p className="text-[11px] font-semibold text-muted-foreground">정리된 매장 정보</p>
-                        <p className="flex justify-between border-b pb-1.5">개업 <span>2022.09 <em className="border border-sky-200 bg-sky-50 px-1 text-[10px] not-italic text-sky-800">입력</em></span></p>
-                        <p className="flex justify-between border-b pb-1.5">월평균 매출 <span>2,830만 <em className="border border-amber-300 bg-amber-50 px-1 text-[10px] not-italic text-amber-900">확인 필요</em></span></p>
-                        <p className="flex justify-between border-b pb-1.5">카드 매출 <span>2,310만 <em className="border border-emerald-200 bg-emerald-50 px-1 text-[10px] not-italic text-emerald-800">증빙</em></span></p>
-                        <p className="flex justify-between border-b pb-1.5">중복 제거 <span className="font-semibold text-primary">6건</span></p>
+                      <div className="space-y-3 p-5 text-[11px]">
+                        <div>
+                          <p className="font-semibold text-foreground">채워진 정보</p>
+                          <p className="mt-1 leading-relaxed text-muted-foreground">값을 누르면 고칠 수 있어요. 자료에서 읽은 값은 확인해 주세요.</p>
+                        </div>
+                        <section>
+                          <h4 className="border-b pb-1.5 font-semibold">기본 정보</h4>
+                          <div className="flex items-center justify-between gap-2 border-b py-2">
+                            <span className="text-muted-foreground">개업</span>
+                            <span className="flex items-center gap-1.5 font-medium">
+                              2022년 9월
+                              <em className="border border-sky-200 bg-sky-50 px-1 py-0.5 text-[9px] not-italic text-sky-800">사용자 입력</em>
+                            </span>
+                          </div>
+                        </section>
+                        <section>
+                          <h4 className="border-b pb-1.5 font-semibold">매각 가격·임대</h4>
+                          <div className="border-b py-2">
+                            <div className="flex items-center justify-between gap-2">
+                              <span className="text-muted-foreground">임대보증금</span>
+                              <span className="flex items-center gap-1.5 font-medium">
+                                5,000만 원
+                                <em className="border border-amber-300 bg-amber-50 px-1 py-0.5 text-[9px] not-italic text-amber-900">확인 필요</em>
+                              </span>
+                            </div>
+                            <p className="mt-1 text-[10px] text-amber-700">근거 · 임대차계약서에서 읽은 값</p>
+                          </div>
+                          <div className="flex items-center justify-between gap-2 border-b py-2">
+                            <span className="text-muted-foreground">월세</span>
+                            <span className="flex items-center gap-1.5 font-medium">
+                              300만 원
+                              <em className="border border-amber-300 bg-amber-50 px-1 py-0.5 text-[9px] not-italic text-amber-900">확인 필요</em>
+                            </span>
+                          </div>
+                          <div className="flex items-center justify-between gap-2 border-b py-2">
+                            <span className="text-muted-foreground">임대차 만료</span>
+                            <span className="flex items-center gap-1.5 font-medium">
+                              2027년 6월
+                              <em className="border border-amber-300 bg-amber-50 px-1 py-0.5 text-[9px] not-italic text-amber-900">확인 필요</em>
+                            </span>
+                          </div>
+                        </section>
                       </div>
                     </div>
 
