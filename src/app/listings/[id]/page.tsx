@@ -6,11 +6,11 @@ import Image from 'next/image';
 import { CalendarClock, ImageIcon, Lock, MapPin, Store } from 'lucide-react';
 import { AiEstimateNotice, LockedSection, Metric, ProvenanceBadge, SiteFooter, SiteHeader } from '@/components/common';
 import { buildListingRows } from '@/components/common/listing-rows';
+import { getListingView } from '@/components/common/listing-source';
 import { photosOf } from '@/components/common/store-photos';
 import { formatKRW, formatKRWRange, formatMonths, formatPercent } from '@/lib/format';
-import { mockListing } from '@/lib/mocks';
 import { isLocked, type Anomaly, type ListingField, type ListingView, type Locked, type Provenance, type Sourced } from '@/lib/types';
-import { filterListingForViewer, getViewer } from '@/lib/visibility';
+import { getViewer } from '@/lib/visibility';
 import { cn } from '@/lib/utils';
 import { RevenueTrend } from './_components/RevenueTrend';
 import { ListingTabs } from './_components/ListingTabs';
@@ -27,6 +27,8 @@ function countProvenance(fields: Fields): Record<Provenance, number> {
   }
   return count;
 }
+
+const text = (v: string | Locked) => (isLocked(v) ? '' : v);
 
 // 섹션이 잠겼는지는 섹션에 속한 필드 중 하나라도 잠겼는지로 판단한다
 function lockOf(fields: Fields, keys: ListingField[]): { lock: Locked | null; count: number } {
@@ -51,12 +53,22 @@ const SEVERITY: Record<Anomaly['severity'], string> = {
 
 export default async function ListingPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  if (id !== mockListing.id) notFound();
-
   const viewer = getViewer(new Request('http://local', { headers: await headers() }));
-  const listing = filterListingForViewer(mockListing, viewer);
+  // 데이터는 listing-source 로만 받고, 화면은 항상 C의 필터를 거친 값만 그린다
+  const listing = await getListingView(id, viewer);
+  if (!listing) notFound();
   const f = listing.fields;
-  const d = mockListing.detail; // 공개 필드(문자열)만 여기서 읽는다
+  // 기본 정보(전체 공개 문자열). 잠겨 있으면 빈 값
+  const d = {
+    displayName: text(f.displayName),
+    industry: text(f.industry),
+    region: text(f.region),
+    openedAt: text(f.openedAt),
+    intro: text(f.intro),
+    saleReason: text(f.saleReason),
+    desiredHandover: text(f.desiredHandover),
+    photos: isLocked(f.photos) ? [] : f.photos,
+  };
 
   const finance = lockOf(f, ['avgRevenue', 'avgOperatingProfit', 'margin', 'monthlyTrend']);
   const ops = lockOf(f, ['openDays', 'openHours', 'staffCount', 'ownerWeeklyHours', 'staffRoles', 'customerSegments', 'channelMix']);
@@ -64,7 +76,7 @@ export default async function ListingPage({ params }: { params: Promise<{ id: st
   const ai = lockOf(f, ['scores', 'riskFactors', 'paybackScenarios', 'valuation']);
   const handover = lockOf(f, ['handoverSupport', 'trainingWeeks', 'suppliers', 'digitalAccounts']);
   const trust = countProvenance(f);
-  const similar = buildListingRows(viewer).filter((r) => r.id !== listing.id);
+  const similar = (await buildListingRows(viewer)).filter((r) => r.id !== listing.id);
   const photos = photosOf(listing.id, d.photos);
 
   return (
@@ -268,7 +280,10 @@ export default async function ListingPage({ params }: { params: Promise<{ id: st
                     {f.riskFactors.map((r, i) => (
                       <li key={i} className="flex items-start gap-3 text-sm">
                         <span className={cn('shrink-0 px-1.5 py-0.5 text-xs ring-1 ring-inset', SEVERITY[r.severity])}>{ANOMALY_LABEL[r.kind]}</span>
-                        <span>{r.detail}</span>
+                        <span>
+                          {r.detail}
+                          {r.aiExplanation && <span className="mt-0.5 block text-muted-foreground">AI 설명 · {r.aiExplanation}</span>}
+                        </span>
                       </li>
                     ))}
                   </ul>

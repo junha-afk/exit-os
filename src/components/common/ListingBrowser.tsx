@@ -11,6 +11,7 @@ import { SiteFooter } from './SiteFooter';
 import { SiteHeader } from './SiteHeader';
 import { ProvenanceBadge } from './ProvenanceBadge';
 import { cn } from '@/lib/utils';
+import { ROUTES } from './routes';
 
 export interface ListingRow {
   id: string;
@@ -154,7 +155,7 @@ export function ListingBrowser({ rows, viewer }: { rows: ListingRow[]; viewer: V
             <p className="text-xs font-medium opacity-80">가게를 내놓을 계획이라면</p>
             <p className="mt-2 text-xl font-bold leading-snug">내 가게, 얼마에<br />넘길 수 있을까요?</p>
             <p className="mt-2 text-sm leading-relaxed opacity-85">POS·카드·배달 자료를 올리면 권리금 범위와 확인할 점을 정리해 드려요.</p>
-            <Link href="/seller/diagnose" className="mt-5 flex h-11 items-center justify-center bg-background text-sm font-semibold text-primary hover:bg-accent">
+            <Link href={ROUTES.sell} className="mt-5 flex h-11 items-center justify-center bg-background text-sm font-semibold text-primary hover:bg-accent">
               가치 진단 시작
             </Link>
           </div>
@@ -282,7 +283,7 @@ function Row({ row: r }: { row: ListingRow }) {
       </div>
     </div>
   );
-  return r.hasDetail ? <Link href={`/listings/${r.id}`} className="block focus-visible:outline-2 focus-visible:outline-ring">{body}</Link> : body;
+  return r.hasDetail ? <Link href={ROUTES.listing(r.id)} className="block focus-visible:outline-2 focus-visible:outline-ring">{body}</Link> : body;
 }
 
 function SummaryRow({ label, value }: { label: string; value: string }) {

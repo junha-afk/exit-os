@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useMembership } from '@/components/common';
 import type { Viewer } from '@/lib/types';
+import { ROUTES } from '@/components/common/routes';
 
 const NEXT: Partial<Record<Viewer, { label: string; hint: string; to: Viewer }>> = {
   buyer: { label: '구독하고 열람하기', hint: '재무·운영·AI 분석 등 잠긴 항목이 열려요.', to: 'buyer_subscribed' },
@@ -24,7 +25,7 @@ export function ViewerAction({ viewer, listingId, compact }: { viewer: Viewer; l
     return viewer === 'seller' ? (
       <p className="text-sm text-muted-foreground">내가 올린 매물이에요.</p>
     ) : (
-      <Link href={`/listings/${listingId}/risk`} className={BTN}>
+      <Link href={ROUTES.risk(listingId)} className={BTN}>
         리스크 보고서 보기
       </Link>
     );

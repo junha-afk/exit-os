@@ -6,5 +6,5 @@ import { getViewer } from '@/lib/visibility';
 
 export default async function Home() {
   const viewer = getViewer(new Request('http://local', { headers: await headers() }));
-  return <ListingBrowser rows={buildListingRows(viewer)} viewer={viewer} />;
+  return <ListingBrowser rows={await buildListingRows(viewer)} viewer={viewer} />;
 }

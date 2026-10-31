@@ -4,6 +4,7 @@ import Link from 'next/link';
 import type { ListingRow } from '@/components/common';
 import { formatKRW } from '@/lib/format';
 import { cn } from '@/lib/utils';
+import { ROUTES } from '@/components/common/routes';
 
 export function SimilarListings({ rows }: { rows: ListingRow[] }) {
   return (
@@ -15,7 +16,7 @@ export function SimilarListings({ rows }: { rows: ListingRow[] }) {
         {rows.map((r) => (
           <li key={r.id} className="w-[248px] shrink-0 snap-start">
             {r.hasDetail ? (
-              <Link href={`/listings/${r.id}`} className="group block focus-visible:outline-2 focus-visible:outline-ring">
+              <Link href={ROUTES.listing(r.id)} className="group block focus-visible:outline-2 focus-visible:outline-ring">
                 <Card row={r} />
               </Link>
             ) : (

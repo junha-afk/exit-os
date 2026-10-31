@@ -6,13 +6,14 @@ import { useEffect, useRef, useState } from 'react';
 import type { Viewer } from '@/lib/types';
 import { cn } from '@/lib/utils';
 import { useMembership } from './RoleSwitcher';
+import { ROUTES } from './routes';
 
 export type NavKey = 'listings' | 'sell' | 'handover';
 
 export const NAV: { key: NavKey; label: string; href: string }[] = [
-  { key: 'listings', label: '매물 찾기', href: '/' },
-  { key: 'sell', label: '내 가게 팔기', href: '/seller/diagnose' },
-  { key: 'handover', label: '인수인계', href: '/handover/mock-deal-1' },
+  { key: 'listings', label: '매물 찾기', href: ROUTES.listings },
+  { key: 'sell', label: '내 가게 팔기', href: ROUTES.sell },
+  { key: 'handover', label: '인수인계', href: ROUTES.handover },
 ];
 
 export function SiteHeader({
@@ -138,9 +139,9 @@ function AccountMenu({ viewer }: { viewer: Viewer }) {
             </button>
           </div>
           <div className="flex flex-col py-1 text-sm">
-            <MenuLink href="/seller/diagnose">내 가게 팔기 · 가치 진단</MenuLink>
+            <MenuLink href={ROUTES.sell}>내 가게 팔기 · 가치 진단</MenuLink>
             <MenuLink href="/">관심 매물</MenuLink>
-            <MenuLink href="/handover/mock-deal-1">인수인계 진행 상황</MenuLink>
+            <MenuLink href={ROUTES.handover}>인수인계 진행 상황</MenuLink>
           </div>
         </div>
       )}
