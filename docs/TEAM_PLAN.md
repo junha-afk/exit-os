@@ -14,7 +14,7 @@
 **공용 파일 담당 (충돌 방지):**
 - 앱 셸 `src/app/layout.tsx`, `src/app/globals.css` → **A**. 다른 사람은 내비·전역 스타일 변경을 A에게 요청한다.
 - 설정 `package.json`, `package-lock.json`, `next.config.*`, `tailwind.config.*`, `components.json` → **C**. 셋업 이후 `npm i` · `npx shadcn add` 는 C만 실행한다(lockfile 충돌 방지). 필요한 패키지·컴포넌트는 C에게 요청한다.
-- 목업 응답 `src/mocks/*.json` → **C**.
+- 목업 응답 `src/lib/mocks/*.json` → **C**.
 
 ## 타임라인
 
