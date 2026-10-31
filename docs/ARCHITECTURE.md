@@ -24,7 +24,7 @@ exitos/
 │  │  ├─ page.tsx                       # 매물 목록 (F)
 │  │  ├─ seller/
 │  │  │  ├─ layout.tsx                  # 판매자 공통 레이아웃 (A)
-│  │  │  ├─ diagnose/                   # 진단: 질문 + 숫자·선택·파일 입력 + 재무 CSV 업로드 (A)
+│  │  │  ├─ diagnose/                   # 진단: 질문(숫자·선택 입력) + LLM이 요청한 자료 올리기 (A)
 │  │  │  ├─ report/                     # 매각 보고서 + 시뮬레이터 + 게시 폼 + 거래 성사 (B)
 │  │  │  └─ knowhow/                    # 노하우 P2 (A)
 │  │  ├─ listings/[id]/                 # 판매 페이지(게이팅) (F)
@@ -32,8 +32,10 @@ exitos/
 │  │  ├─ handover/[dealId]/             # 인수인계 대시보드 (F)
 │  │  └─ api/
 │  │     ├─ stores/route.ts             # (A)
-│  │     ├─ stores/[id]/facts/**        # facts 조회·수정·장비 CSV (A)
-│  │     ├─ stores/[id]/upload|analyze  # 재무 업로드·분석 (B)
+│  │     ├─ stores/[id]/facts/**        # facts 조회·수정·확인 (A)
+│  │     ├─ stores/[id]/upload          # 자료 업로드 + LLM 읽기 (A)
+│  │     ├─ stores/[id]/documents/**    # 받은 자료 목록·"없어요" (A)
+│  │     ├─ stores/[id]/analyze         # 분석 (B)
 │  │     ├─ ai/interview/               # (A)
 │  │     ├─ ai/report/, ai/risk/        # (B)
 │  │     └─ listings/, deals/, tasks/   # (B)
@@ -41,7 +43,7 @@ exitos/
 │  │  ├─ ui/                            # shadcn 생성물 (추가는 B만)
 │  │  ├─ common/                        # Metric, ProvenanceBadge, AiEstimateNotice, LockedSection, SiteHeader, routes, listing-source (F)
 │  │  ├─ interview/                     # QuestionBubble, inputs/*, FactsPanel, ArtifactsPreview (A)
-│  │  ├─ upload/                        # UploadPanel — 재무 CSV 업로드 (B, A의 진단 화면에 삽입)
+│  │  ├─ upload/                        # DocumentDrop — 자료 올리기 칸, 아무 형식 (A)
 │  │  └─ report/                        # 차트, 시뮬레이터, 게시 폼, DealButton (B)
 │  └─ lib/
 │     ├─ types.ts                       # 공용 타입 — 변경 시 공지 (B)
@@ -50,17 +52,18 @@ exitos/
 │     ├─ supabase.ts                    # 서버 클라이언트 (B)
 │     ├─ mocks/                         # 목업 응답 (B)
 │     ├─ ai/llm.ts                      # 래블업 클라이언트 chatJson (A, B는 import만)
-│     ├─ interview/                     # 슬롯·질문 엔진·프롬프트·fixtures (A)
-│     ├─ facts/                         # facts 저장소·장비 CSV 가져오기 (A)
+│     ├─ interview/                     # 슬롯·진단 엔진·시스템 프롬프트·스키마·fixtures (A)
+│     ├─ facts/                         # facts 저장소 (A)
+│     ├─ documents/                     # 자료 종류 목록·파일 읽기·LLM 읽기·자료/재무 행 저장소 (A, B는 읽기만)
 │     ├─ analysis/                      # 순수 계산 함수 (B)
 │     ├─ report/                        # 보고서·리스크·이상치 설명 프롬프트·fixtures (B)
 │     ├─ listing/                       # ListingDetail 생성·매물 저장소 (B)
 │     └─ handover/                      # 업무 생성 규칙 (B)
 ├─ public/
-│  ├─ stores/                           # 시연용 매장 사진 (F)
-│  └─ templates/equipment.csv           # 장비 CSV 템플릿 (A)
+│  └─ stores/                           # 시연용 매장 사진 (F)
 ├─ supabase/schema.sql                  # (B)
 ├─ data/sample/*.csv                    # 재무 데모 데이터 (B)
+├─ data/demo-docs/                      # 데모용 자료: 임대차계약서 PDF·사진 등 (A)
 └─ docs/
 ```
 
@@ -166,9 +169,11 @@ export interface HandoverTask {
 | POST | `/api/stores` | A | `{ name, industry }` | `{ storeId }` |
 | GET | `/api/stores/:id/facts` | A | — | `{ facts: StoreFacts }` |
 | PATCH | `/api/stores/:id/facts` | A | `{ key, value }` (패널에서 수정, 슬롯별 zod 검증) | `{ ok }` 또는 `400 { error }` |
-| POST | `/api/stores/:id/facts/import` | A | multipart: `kind: 'equipment'`, `file` | `{ rows, warnings[] }` |
-| POST | `/api/ai/interview` | A | `{ storeId, mode: 'diagnosis'\|'knowhow', answer?: { slot, value } }` | `{ facts, question: { slot, text, input: InputSpec } \| null, ask_upload, done, progress, artifacts_preview? }` |
-| POST | `/api/stores/:id/upload` | B | multipart: `kind` (pos/card_settlement/delivery/purchases/fixed/payroll), `file` | `{ rows, dedupedRows, warnings[] }` |
+| POST | `/api/stores/:id/facts/confirm` | A | `{ key }` (자료에서 읽은 값 "맞아요") | `{ ok }` → 🟠 → 🔵 |
+| POST | `/api/ai/interview` | A | `{ storeId, mode: 'diagnosis'\|'knowhow', answer?: { slot, value } }` | `{ facts, step: { type: 'ask_slot', slot, text, input: InputSpec } \| { type: 'request_document', docKind, label, text, reason } \| null, done, progress, artifacts_preview? }` |
+| POST | `/api/stores/:id/upload` | A | multipart: `file` (아무 형식, 최대 10MB), `requestedKind` (`DocKind`) | `{ document: UploadedDocument, filledFacts: { key, value, evidence }[], recordCount }` |
+| GET | `/api/stores/:id/documents` | A | — | `{ documents: UploadedDocument[] }` |
+| POST | `/api/stores/:id/documents/decline` | A | `{ kind }` ("이 자료는 없어요") | `{ ok }` |
 | POST | `/api/stores/:id/analyze` | B | — | `AnalysisResult` (이상치 설명 포함) |
 | POST | `/api/ai/report` | B | `{ storeId }` | `SellerReport` (섹션별 문장) |
 | POST | `/api/ai/risk` | B | `{ listingId }` | `BuyerRiskReport` (viewer가 볼 수 있는 정보만 입력으로 사용) |
@@ -179,14 +184,43 @@ export interface HandoverTask {
 | GET | `/api/deals/:id/tasks` | B | — | `{ tasks: HandoverTask[], progress, byStage, nextUp: HandoverTask[] }` |
 | PATCH | `/api/tasks/:id` | B | `{ status }` | `{ ok }` |
 
-- 인터뷰: `answer.value` 가 슬롯 스키마에 안 맞으면 `400` + 한국어 오류, 질문은 유지. `progress` 는 코드가 계산(채운 필수 슬롯 ÷ 전체). `ask_upload` = `'none' | RecordKind`. `InputSpec` 정의는 `src/lib/interview/types.ts` ([TEAM_PLAN.md](TEAM_PLAN.md) §5).
-- A ↔ B 경계 함수(`chatJson`, `getFacts`, `getUploadedKinds`, `<UploadPanel>`)의 시그니처는 [TEAM_PLAN.md](TEAM_PLAN.md) §4.
+- 진단: `answer.value` 가 슬롯 스키마에 안 맞으면 `400` + 한국어 오류, 질문은 유지. `progress` 는 코드가 계산(채운 필수 슬롯 ÷ 전체). `InputSpec` 정의는 `src/lib/interview/types.ts` ([TEAM_PLAN.md](TEAM_PLAN.md) §5).
+- 데이터는 A → B 한 방향. B가 쓰는 A의 함수(`chatJson`, `getFacts`, `getFinancialRows`, `listDocuments`)와 타입의 시그니처는 [TEAM_PLAN.md](TEAM_PLAN.md) §4.
 
 **병렬 개발 규칙:** 화면은 API가 준비되기 전까지 `src/lib/mocks/*.json`·fixture 로 개발. 각 담당자는 자기 엔드포인트를 **목업 응답이라도** 먼저 열어 둔다.
 
-## 5. CSV 템플릿
+## 5. 자료 받기와 재무 행
 
-샘플: `data/sample/` (`node data/generate-sample.mjs` 로 재생성). 금액 단위 = 원, 월 = `YYYY-MM`.
+**받을 자료는 고정하지 않는다.** A의 진단 엔진(LLM)이 판단해 `src/lib/documents/catalog.ts` 의 `DOC_KINDS` 중에서 하나씩 요청한다. **파일 형식은 제한하지 않는다**(엑셀·CSV·PDF·사진·텍스트). 올라온 파일은 A가 읽어 저장하고, B는 저장된 결과를 읽기만 한다.
+
+| 파일 | 읽는 방법 (A) | 결과 |
+| --- | --- | --- |
+| 엑셀·CSV | 코드가 열 이름·앞 20행 추출 → LLM이 열 매핑(`TABLE_MAPPING_SYSTEM_PROMPT`) → 코드가 모든 행을 읽음 | `FinancialRow[]` (`readBy: 'code_table'`) |
+| PDF·텍스트 | 코드가 텍스트 추출 → LLM이 적힌 값을 옮겨 적음(`DOCUMENT_READ_SYSTEM_PROMPT`) | facts(🟠 + 근거 원문) + 재무 표면 `FinancialRow[]` (`readBy: 'llm_document'`) |
+| 사진·스캔 | 이미지를 LLM에 그대로 전달 → 같은 프롬프트 | 위와 같음 |
+
+- 텍스트가 없는 스캔 PDF는 "사진으로 다시 올려주세요"로 안내한다(해커톤 범위).
+- LLM은 계산·합산·단위 환산을 하지 않는다. 금액의 만원·천원 → 원만 바꾸고, 그 외 단위(평 등)는 숫자와 단위를 그대로 넘겨 코드가 환산한다.
+- 모든 자료는 LLM이 쓴 1~2문장 요약(`UploadedDocument.summary`, 사실만)을 남긴다.
+
+### 재무 행 (`FinancialRow`, A가 저장 → B가 읽음)
+
+자료 종류별 표준 칸(`DOC_KINDS[].targetFields`). 금액 = 원 단위 정수, `date` = `YYYY-MM-DD` 또는 `YYYY-MM`, `month` = `YYYY-MM`(코드가 만듦).
+
+| kind | 표준 칸 |
+| --- | --- |
+| `pos` | `date, channel(card/cash), amount` |
+| `card_settlement` | `date, card_company, amount` |
+| `delivery` | `date, platform, gross_sales, fees, net_payout, orders, included_in_pos` |
+| `purchases` | `date, vendor, category, amount` |
+| `fixed` | `date, item, amount` |
+| `payroll` | `date, role, hours, pay` |
+| `cash_receipt` | `date, amount` |
+| `bank_deposit` | `date, counterparty, amount` |
+
+### 데모 샘플
+
+`data/sample/` (`node data/generate-sample.mjs` 로 재생성, B 소유). 형식이 정해진 CSV라 열 매핑이 바로 맞는다. 금액 단위 = 원, 월 = `YYYY-MM`.
 
 | kind | 파일 | 컬럼 |
 | --- | --- | --- |
@@ -197,17 +231,15 @@ export interface HandoverTask {
 | `fixed` | fixed_costs.csv | `month,item,amount` |
 | `payroll` | payroll.csv | `month,role,hours,pay` |
 
-장비 목록 (A가 처리, 재무 자료와 별도 API):
+데모 문서 자료(A 소유 `data/demo-docs/`): 임대차계약서(PDF·사진), 장비 구입 영수증 등. 장비·임대 조건은 이 자료를 LLM이 읽어 채운다.
 
-| kind | 파일 | 컬럼 |
-| --- | --- | --- |
-| `equipment` | `public/templates/equipment.csv` | `name,qty,year,condition,repairs,purchase_price` (repairs는 `;` 로 구분, 금액 원) |
-
-출처 판정:
+출처 판정 (B의 `provenance.ts`):
 - `pos.card` 월합 ↔ `card_settlement` 월합 ±3% → 카드매출 🟢, 아니면 🟠
-- `pos.cash` → 대조 출처 없음 → 🔵 (이상치면 🟠)
+- `pos.cash` 월합 ↔ `cash_receipt` + `bank_deposit` 월합 ±3% → 현금매출 🟢. 대조 자료가 없으면 🔵 (이상치면 🟠)
 - `delivery` (플랫폼 정산서 자체가 원본) → 🟢
-- 정보 수집 입력(숫자·선택·장비 CSV) → 🔵
+- `readBy: 'llm_document'` 재무 행 → 🟠에서 시작, 다른 자료와 대조되면 올린다
+- 점주 입력(숫자·선택) → 🔵
+- 자료에서 LLM이 읽은 facts → 🟠 (A가 저장), 점주가 패널에서 확인하면 🔵
 
 ## 6. 환경 변수
 

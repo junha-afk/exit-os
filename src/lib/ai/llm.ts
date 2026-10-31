@@ -18,6 +18,8 @@ export interface ChatJsonOptions<T> {
   system: string;
   /** 이번 호출의 데이터만 (보통 JSON.stringify 한 입력). 지시문은 system 에 둔다 */
   user: string;
+  /** 사진·스캔 문서 (data URL, 예: 'data:image/jpeg;base64,...'). 모델이 이미지를 직접 읽는다 (2026-10-31 확인) */
+  images?: string[];
   schema: z.ZodType<T>;
   /** DEMO_MODE=true 이면 호출 없이 이 값을 그대로 돌려준다 */
   fixture?: T;
@@ -58,7 +60,15 @@ export async function chatJson<T>(opts: ChatJsonOptions<T>): Promise<T> {
     model,
     messages: [
       { role: 'system', content: `${COMMON_SYSTEM_PROMPT}\n\n${opts.system}` },
-      { role: 'user', content: opts.user },
+      {
+        role: 'user',
+        content: opts.images?.length
+          ? [
+              { type: 'text', text: opts.user },
+              ...opts.images.map((url) => ({ type: 'image_url', image_url: { url } })),
+            ]
+          : opts.user,
+      },
     ],
     temperature: opts.temperature ?? 0.3,
     max_tokens: opts.maxTokens ?? (thinking ? 4000 : 1000),
