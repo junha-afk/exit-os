@@ -6,6 +6,7 @@ import { buildListingDetail } from '@/lib/listing/build';
 import { listListings, upsertListing } from '@/lib/listing/repo';
 import { fallbackSellerReport } from '@/lib/report/prompts/seller';
 import { getSellerReport } from '@/lib/report/repo';
+import { forbidOtherStore } from '@/lib/store-session';
 
 // GET /api/listings → 목록(공개 필드만)
 export async function GET() {
@@ -31,6 +32,8 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: parsed.error.issues[0]?.message ?? '매물 가격 정보를 확인해 주세요.' }, { status: 400 });
   }
   const { storeId, intro, premiumBreakdownLevel, ...prices } = parsed.data;
+  const denied = forbidOtherStore(req, storeId);
+  if (denied) return denied;
   const [facts, analysis] = await Promise.all([getFacts(storeId), runAnalysis(storeId)]);
   if (!analysis) return NextResponse.json({ error: 'POS 매출이나 배달앱 정산 자료를 먼저 올려주세요.' }, { status: 400 });
   // 보고서 화면을 거치지 않고 게시해도 소개 문구가 비지 않게 코드 폴백을 쓴다 (게시가 LLM을 기다리지 않게)

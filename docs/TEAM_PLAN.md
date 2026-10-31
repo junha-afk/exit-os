@@ -406,3 +406,4 @@ PR-0 이후 `types.ts` 변경이 필요하면: 채널 공지 → B가 반영 →
 - 2026-10-31 · A · **받을 자료는 고정하지 않는다.** LLM이 판단해 `DOC_KINDS` 중에서 하나씩 계속 요청(최대 12건, "없어요" 가능). 파일 형식 제한 없음, CSV가 아닌 문서·사진도 LLM이 내용을 읽어 반영. 모델의 이미지 입력 동작 확인(2026-10-31)
 - 2026-10-31 · A · 자료에서 LLM이 읽은 facts 값은 🟠 + 근거 원문으로 저장하고, 점주가 패널에서 확인하면 🔵. 표 파일은 LLM이 열 매핑만 하고 행은 코드가 읽는다
 - 저장소 결정 · B · stores/facts, 업로드 자료 메타데이터·재무 행, 게시 매물은 Supabase Postgres에 저장. 업로드 원본 바이너리의 Supabase Storage 보관은 미구현이며 별도 작업 필요.
+- 2026-11-01 · B · **판매자 매장을 브라우저별로 분리.** `/seller` 첫 방문 때 `src/middleware.ts` 가 `store_id` 쿠키(`store-<uuid>`)를 발급하고, 판매자 화면·API는 `MOCK_STORE_ID` 대신 이 값을 쓴다(`src/lib/store-session.ts`, 공용). 매장 API(`/api/stores/:id/**`, `/api/ai/interview`, `/api/ai/report`, `POST /api/listings`)는 쿠키와 다른 매장 id면 403. 새 매장은 빈 facts로 시작(재무는 업로드 전까지 A의 샘플 행). "처음부터 다시"는 같은 매장을 비운다. 로그인은 없으므로 브라우저(쿠키)가 바뀌면 새 매장

@@ -57,6 +57,12 @@ export function sellerReportUserPrompt(analysis: AnalysisResult, facts: StoreFac
   });
 }
 
+// 조사 '(으)로': 받침이 있으면 '으로'(매장으로), 없거나 ㄹ 받침이면 '로'(카페로·서울로)
+const needsEuro = (word: string) => {
+  const c = word.charCodeAt(word.length - 1) - 0xac00;
+  return c >= 0 && c <= 11171 && c % 28 !== 0 && c % 28 !== 8;
+};
+
 // LLM 실패·미연결 시 폴백: 코드가 숫자와 facts 로 문장을 만든다 (숫자는 전부 analysis 값 그대로)
 export function fallbackSellerReport(analysis: AnalysisResult, facts: StoreFacts): SellerReport {
   const v = factsView(facts);
@@ -86,7 +92,7 @@ export function fallbackSellerReport(analysis: AnalysisResult, facts: StoreFacts
   return {
     headline: `${place}, 월평균 영업이익 ${formatKRW(analysis.avgOperatingProfit.value)}`.slice(0, 40),
     summary: [
-      `${place ? `${place}로, ` : ''}최근 ${analysis.months.length}개월 월평균 매출은 ${formatKRW(analysis.avgRevenue.value)}, 월평균 영업이익은 ${formatKRW(analysis.avgOperatingProfit.value)}입니다.`,
+      `${place ? `${place}${needsEuro(place) ? '으로' : '로'}, ` : ''}최근 ${analysis.months.length}개월 월평균 매출은 ${formatKRW(analysis.avgRevenue.value)}, 월평균 영업이익은 ${formatKRW(analysis.avgOperatingProfit.value)}입니다.`,
       years ? `${years}년째 운영 중이며 ${v.saleReason ? `매각 사유는 ${v.saleReason}입니다.` : '매각을 준비하고 있습니다.'}` : '매각을 준비하고 있습니다.',
       flagged.length ? `${flagged.join(', ')} 자료는 확인이 필요해, 보완하면 가치 추정의 신뢰도가 높아집니다.` : '모든 달의 자료가 확인되었습니다.',
     ].join(' '),

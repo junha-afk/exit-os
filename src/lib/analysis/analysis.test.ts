@@ -1,9 +1,10 @@
 // 계산 함수 가벼운 테스트 (소유: B). 실행: npx -y tsx --test src/lib/analysis/analysis.test.ts
 // 샘플 CSV(data/sample)에 심어 둔 데모 이슈 4개가 모두 잡히는지 확인한다 (docs/DEMO_SCRIPT.md)
-// 재무 행은 A의 getFinancialRows 가 주는 형식(FinancialRow) 그대로 넣는다
+// 재무 행은 A의 getFinancialRows 가 주는 형식(FinancialRow) 그대로 넣는다 (DB 없이 data/sample 을 직접 읽음)
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
 import { test } from 'node:test';
-import { getFinancialRows } from '@/lib/documents/repo';
+import Papa from 'papaparse';
 import type { FinancialRow } from '@/lib/documents/types';
 import { MOCK_STORE_ID, mockFacts } from '@/lib/mocks';
 import { analyzeStore } from './analyze';
@@ -13,8 +14,12 @@ import { crossCheck, lowest } from './provenance';
 import { ownerDependency, revenueStability } from './scores';
 import { adjustedMonthlyProfit, facilityValue } from './valuation';
 
-// 아무 자료도 안 올린 매장 → A가 data/sample 행을 준다
-const sampleRows = () => getFinancialRows(`test-${Math.random()}`);
+// A의 documents/repo.ts sampleRows 와 같은 방식으로 data/sample CSV → FinancialRow
+const SAMPLE = { pos: 'pos_sales', card_settlement: 'card_settlement', delivery: 'delivery_settlement', purchases: 'purchases', fixed: 'fixed_costs', payroll: 'payroll' };
+const NUMERIC = new Set(['amount', 'gross_sales', 'fees', 'net_payout', 'orders', 'hours', 'pay']);
+const sampleRows = async (): Promise<FinancialRow[]> => Object.entries(SAMPLE).flatMap(([kind, file]) =>
+  Papa.parse<Record<string, string>>(readFileSync(`data/sample/${file}.csv`, 'utf8'), { header: true, skipEmptyLines: true }).data
+    .map(({ month, ...rest }) => row(kind, month, Object.fromEntries(Object.entries(rest).map(([k, v]) => [k, NUMERIC.has(k) ? Number(v) : v])), `sample:${file}`)));
 const analyze = (rows: FinancialRow[]) => analyzeStore({ storeId: MOCK_STORE_ID, ...fromFinancialRows(rows), facts: mockFacts });
 
 const row = (kind: string, date: string, fields: FinancialRow['fields'], documentId = 'doc-1', readBy: FinancialRow['readBy'] = 'code_table'): FinancialRow =>
