@@ -1,5 +1,6 @@
 'use client';
 // 매물 상세 탭 (소유: A). 탭을 누르면 그 섹션만 보여준다. 주소 #해시로 바로 열 수 있다.
+import { Lock } from 'lucide-react';
 import { useEffect, useState, type ReactNode } from 'react';
 import { cn } from '@/lib/utils';
 
@@ -24,26 +25,33 @@ export function ListingTabs({ tabs }: { tabs: ListingTab[] }) {
   }
 
   return (
-    <div className="flex flex-col gap-4">
-      <div role="tablist" aria-label="매물 정보" className="sticky top-0 z-10 flex overflow-x-auto rounded-lg border bg-background/95 p-1 backdrop-blur">
-        {tabs.map((t) => (
-          <button
-            key={t.id}
-            id={`tab-${t.id}`}
-            type="button"
-            role="tab"
-            aria-selected={active === t.id}
-            aria-controls={`panel-${t.id}`}
-            onClick={() => select(t.id)}
-            className={cn(
-              'min-h-10 flex-1 whitespace-nowrap rounded-md px-3 text-sm transition-colors focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-ring',
-              active === t.id ? 'bg-foreground font-semibold text-background' : 'text-muted-foreground hover:text-foreground',
-            )}
-          >
-            {t.label}
-            {t.locked && <span aria-label="잠김" className="ml-1 opacity-60">🔒</span>}
-          </button>
-        ))}
+    <div className="flex flex-col gap-8">
+      {/* 폴더 탭: 선택된 탭만 흰 바탕에 아래 테두리가 열린다 */}
+      <div role="tablist" aria-label="매물 정보" className="sticky top-0 z-10 flex overflow-x-auto bg-background">
+        {tabs.map((t, i) => {
+          const on = active === t.id;
+          return (
+            <button
+              key={t.id}
+              id={`tab-${t.id}`}
+              type="button"
+              role="tab"
+              aria-selected={on}
+              aria-controls={`panel-${t.id}`}
+              onClick={() => select(t.id)}
+              className={cn(
+                'h-14 min-w-28 flex-1 whitespace-nowrap border border-border px-4 text-[15px] transition-colors focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ring',
+                i > 0 && '-ml-px',
+                on
+                  ? 'border-b-transparent bg-background font-bold text-foreground'
+                  : 'bg-muted text-muted-foreground hover:text-foreground',
+              )}
+            >
+              {t.label}
+              {t.locked && <Lock aria-label="잠김" className="ml-1 inline size-3.5 -translate-y-px opacity-50" />}
+            </button>
+          );
+        })}
       </div>
       {/* 숨긴 탭은 아예 그리지 않는다 (차트가 0px 크기로 그려지는 문제 방지) */}
       {tabs

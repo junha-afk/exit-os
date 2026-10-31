@@ -33,7 +33,7 @@ export function RevenueTrend({ months }: { months: MonthlyMetric[] }) {
               return note ? `${label} · ${note}` : label;
             }}
           />
-          <Bar dataKey="revenue" radius={[4, 4, 0, 0]} maxBarSize={28} isAnimationActive={false}>
+          <Bar dataKey="revenue" radius={0} maxBarSize={28} isAnimationActive={false}>
             {data.map((d) => (
               <Cell key={d.month} fill={d.flagged ? '#fbbf24' : '#cbd5e1'} />
             ))}

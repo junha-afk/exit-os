@@ -2,7 +2,8 @@
 import { headers } from 'next/headers';
 import { notFound } from 'next/navigation';
 import type { ReactNode } from 'react';
-import { CalendarClock, ImageIcon, Lock, MapPin, Store } from 'lucide-react';
+import Link from 'next/link';
+import { CalendarClock, ChevronLeft, ImageIcon, Lock, MapPin, Store } from 'lucide-react';
 import { AiEstimateNotice, LockedSection, Metric, ProvenanceBadge, RoleSwitcher } from '@/components/common';
 import { formatKRW, formatKRWRange, formatMonths, formatPercent } from '@/lib/format';
 import { mockListing, mockListings } from '@/lib/mocks';
@@ -66,7 +67,7 @@ export default async function ListingPage({ params }: { params: Promise<{ id: st
     <div className="min-h-screen bg-muted/40">
       <div className="border-b bg-background">
         <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-6 py-3">
-          <span className="text-sm font-bold tracking-tight">ExitOS</span>
+          <Link href="/" className="-ml-1 inline-flex min-h-11 items-center gap-1 text-sm"><ChevronLeft aria-hidden className="size-4" /><b className="tracking-tight">ExitOS</b><span className="text-muted-foreground">매물 목록</span></Link>
           <RoleSwitcher current={viewer} />
         </div>
       </div>
@@ -74,7 +75,7 @@ export default async function ListingPage({ params }: { params: Promise<{ id: st
       <main className="mx-auto grid max-w-6xl gap-6 px-6 py-8 lg:grid-cols-[1fr_320px]">
         <div className="flex min-w-0 flex-col gap-6">
           {/* 히어로: 사진 + 핵심 숫자 4칸 (레퍼런스: Empire Flippers 상단 요약, 점포라인 손익 요약) */}
-          <header className="overflow-hidden rounded-xl border bg-background">
+          <header className="overflow-hidden border bg-background">
             <div className="grid sm:grid-cols-[260px_1fr]">
               <div className="flex aspect-[4/3] items-center justify-center bg-gradient-to-br from-slate-100 to-slate-200 text-slate-500 sm:aspect-auto">
                 <div className="text-center">
@@ -213,12 +214,12 @@ export default async function ListingPage({ params }: { params: Promise<{ id: st
               <>
                 <ul className="grid gap-2 sm:grid-cols-2">
                   {f.equipment.map((e) => (
-                    <li key={e.name} className="flex items-start justify-between gap-3 rounded-lg border p-3 text-sm">
+                    <li key={e.name} className="flex items-start justify-between gap-3 border p-3 text-sm">
                       <div>
                         <p className="font-medium">{e.name} {e.qty > 1 && <span className="text-muted-foreground">×{e.qty}</span>}</p>
                         <p className="text-xs text-muted-foreground">{e.year}년식{e.repairs?.length ? ` · ${e.repairs.join(', ')}` : ''}</p>
                       </div>
-                      <span className={cn('shrink-0 rounded px-1.5 py-0.5 text-xs', e.condition === '양호' ? 'bg-emerald-50 text-emerald-800' : 'bg-slate-100 text-slate-700')}>
+                      <span className={cn('shrink-0 px-1.5 py-0.5 text-xs', e.condition === '양호' ? 'bg-emerald-50 text-emerald-800' : 'bg-slate-100 text-slate-700')}>
                         {e.condition}
                       </span>
                     </li>
@@ -246,7 +247,7 @@ export default async function ListingPage({ params }: { params: Promise<{ id: st
                   <Score label="점주 의존도" value={f.scores.ownerDependency} inverse />
                 </div>
 
-                <div className="rounded-lg border p-4">
+                <div className=" border p-4">
                   <p className="text-xs text-muted-foreground">AI 추정 권리금 범위</p>
                   <p className="mt-1 text-xl font-bold tabular-nums">{formatKRWRange(f.valuation.premiumLow, f.valuation.premiumHigh)}</p>
                   <p className="mt-1 text-sm text-muted-foreground">
@@ -263,7 +264,7 @@ export default async function ListingPage({ params }: { params: Promise<{ id: st
                   <h3 className="mb-3 text-sm font-semibold">투자금 회수 시나리오</h3>
                   <div className="grid gap-3 sm:grid-cols-3">
                     {f.paybackScenarios.map((s) => (
-                      <div key={s.label} className={cn('rounded-lg border p-4', s.label === '기준' && 'border-foreground/40')}>
+                      <div key={s.label} className={cn(' border p-4', s.label === '기준' && 'border-foreground/40')}>
                         <p className="text-xs text-muted-foreground">{s.label} · 월 {formatKRW(s.monthlyProfit)}</p>
                         <p className="mt-1 text-2xl font-bold tabular-nums">{formatMonths(s.months)}</p>
                       </div>
@@ -276,7 +277,7 @@ export default async function ListingPage({ params }: { params: Promise<{ id: st
                   <ul className="space-y-2">
                     {f.riskFactors.map((r, i) => (
                       <li key={i} className="flex items-start gap-3 text-sm">
-                        <span className={cn('shrink-0 rounded px-1.5 py-0.5 text-xs ring-1 ring-inset', SEVERITY[r.severity])}>{ANOMALY_LABEL[r.kind]}</span>
+                        <span className={cn('shrink-0 px-1.5 py-0.5 text-xs ring-1 ring-inset', SEVERITY[r.severity])}>{ANOMALY_LABEL[r.kind]}</span>
                         <span>{r.detail}</span>
                       </li>
                     ))}
@@ -306,7 +307,7 @@ export default async function ListingPage({ params }: { params: Promise<{ id: st
           />
 
           {/* 하단: 자료 안내 + 비슷한 매물 (레퍼런스: BizBuySell 면책·유사 매물) */}
-          <p className="rounded-lg border border-dashed px-4 py-3 text-xs leading-relaxed text-muted-foreground">
+          <p className=" border border-dashed px-4 py-3 text-xs leading-relaxed text-muted-foreground">
             숫자는 판매자가 입력하거나 올린 자료에서 나왔어요. 매출 증빙과 대조된 숫자에만 &lsquo;증빙 확인&rsquo; 배지가 붙고, 맞지 않는 부분은
             &lsquo;확인 필요&rsquo;로 표시돼요. 권리금 계약 전 원본 자료를 꼭 확인하세요.
           </p>
@@ -314,7 +315,7 @@ export default async function ListingPage({ params }: { params: Promise<{ id: st
             <h2 id="similar-title" className="mb-3 text-lg font-semibold">비슷한 매물</h2>
             <ul className="grid gap-3 sm:grid-cols-2">
               {similar.map((s) => (
-                <li key={s.id} className="rounded-xl border bg-background p-4">
+                <li key={s.id} className=" border bg-background p-4">
                   <p className="text-xs text-muted-foreground">{s.industry} · {s.region}</p>
                   <p className="mt-1 font-semibold">{s.displayName}</p>
                   <p className="mt-2 text-sm">
@@ -329,7 +330,7 @@ export default async function ListingPage({ params }: { params: Promise<{ id: st
 
         {/* 오른쪽 고정 영역 */}
         <aside className="lg:sticky lg:top-6 lg:self-start">
-          <div className="space-y-5 rounded-xl border bg-background p-5">
+          <div className="space-y-5 border bg-background p-5">
             <div>
               <p className="text-xs text-muted-foreground">희망 권리금</p>
               <p className="text-2xl font-bold tabular-nums">{!isLocked(f.premiumAsk) && formatKRW(f.premiumAsk.value)}</p>
@@ -373,12 +374,14 @@ function Section({
   children: ReactNode;
 }) {
   return (
-    <section id={id} className="scroll-mt-16 rounded-xl border bg-background p-6" aria-labelledby={`${id}-title`}>
-      <div className="mb-5 flex items-center justify-between gap-3">
-        <h2 id={`${id}-title`} className="text-lg font-semibold">{title}</h2>
+    <section id={id} className="scroll-mt-16" aria-labelledby={`${id}-title`}>
+      <div className="mb-4 flex items-end justify-between gap-3">
+        <h2 id={`${id}-title`} className="text-2xl font-bold tracking-tight">{title}</h2>
         <span className="text-xs text-muted-foreground">{level === 'public' ? '전체 공개' : '구독자 공개'}</span>
       </div>
-      {lock?.lock ? <LockedSection level={lock.lock.level} itemCount={lock.count} /> : children}
+      <div className="border bg-background p-8">
+        {lock?.lock ? <LockedSection level={lock.lock.level} itemCount={lock.count} /> : children}
+      </div>
     </section>
   );
 }
@@ -425,7 +428,7 @@ function Row({ label, value, icon }: { label: string; value: string; icon?: bool
 function Legend({ className, label }: { className: string; label: string }) {
   return (
     <span className="inline-flex items-center gap-1.5">
-      <span aria-hidden className={cn('inline-block h-2.5 w-2.5 rounded-sm', className)} />
+      <span aria-hidden className={cn('inline-block h-2.5 w-2.5', className)} />
       {label}
     </span>
   );
@@ -437,13 +440,13 @@ function Score({ label, value, inverse }: { label: string; value: number; invers
   const bad = inverse ? value >= 70 : value < 50;
   const tone = good ? 'bg-emerald-500' : bad ? 'bg-amber-500' : 'bg-slate-400';
   return (
-    <div className="rounded-lg border p-4">
+    <div className=" border p-4">
       <div className="flex items-baseline justify-between">
         <p className="text-sm text-muted-foreground">{label}</p>
         <p className="text-xl font-bold tabular-nums">{value}</p>
       </div>
-      <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-muted" role="meter" aria-valuenow={value} aria-valuemin={0} aria-valuemax={100} aria-label={label}>
-        <div className={cn('h-full rounded-full', tone)} style={{ width: `${value}%` }} />
+      <div className="mt-3 h-1.5 overflow-hidden bg-muted" role="meter" aria-valuenow={value} aria-valuemin={0} aria-valuemax={100} aria-label={label}>
+        <div className={cn('h-full', tone)} style={{ width: `${value}%` }} />
       </div>
       {inverse && <p className="mt-2 text-xs text-muted-foreground">높을수록 점주가 빠지면 흔들려요</p>}
     </div>
@@ -459,13 +462,13 @@ function PremiumBar({ breakdown, provenance }: { breakdown: { facility: number; 
   ];
   return (
     <div className="space-y-3">
-      <div className="flex h-3 overflow-hidden rounded-full">
+      <div className="flex h-3 overflow-hidden">
         {parts.map((p) => <div key={p.label} className={p.cls} style={{ width: `${(p.value / total) * 100}%` }} />)}
       </div>
       <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-sm">
         {parts.map((p) => (
           <span key={p.label} className="inline-flex items-center gap-1.5">
-            <span aria-hidden className={cn('size-2.5 rounded-sm', p.cls)} />
+            <span aria-hidden className={cn('size-2.5', p.cls)} />
             {p.label} <b className="tabular-nums">{formatKRW(p.value)}</b>
             <span className="text-muted-foreground">({formatPercent(p.value / total)})</span>
           </span>
@@ -481,7 +484,7 @@ function TagList({ title, items }: { title: string; items: string[] }) {
     <div>
       <p className="mb-2 text-xs text-muted-foreground">{title}</p>
       <ul className="flex flex-wrap gap-1.5">
-        {items.map((i) => <li key={i} className="rounded-md bg-muted px-2 py-1 text-sm">{i}</li>)}
+        {items.map((i) => <li key={i} className=" bg-muted px-2 py-1 text-sm">{i}</li>)}
       </ul>
     </div>
   );

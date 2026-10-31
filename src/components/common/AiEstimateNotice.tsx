@@ -8,7 +8,7 @@ export function AiEstimateNotice({ className }: { className?: string }) {
     <p
       role="note"
       className={cn(
-        'flex items-start gap-2 rounded-md border border-dashed border-border bg-muted/50 px-3 py-2 text-xs text-muted-foreground',
+        'flex items-start gap-2 border border-dashed border-border bg-muted/50 px-3 py-2 text-xs text-muted-foreground',
         className,
       )}
     >

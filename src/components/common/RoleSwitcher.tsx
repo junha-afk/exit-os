@@ -33,7 +33,7 @@ export function RoleSwitcher({ current, className }: { current: Viewer; classNam
       role="radiogroup"
       aria-label="시연 역할 선택"
       aria-busy={pending}
-      className={cn('inline-flex flex-wrap gap-1 rounded-lg border bg-muted p-1', className)}
+      className={cn('inline-flex flex-wrap gap-1 border bg-muted p-1', className)}
     >
       {ROLES.map((r) => {
         const active = r.value === current;
@@ -45,7 +45,7 @@ export function RoleSwitcher({ current, className }: { current: Viewer; classNam
             aria-checked={active}
             onClick={() => select(r.value)}
             className={cn(
-              'min-h-9 whitespace-nowrap rounded-md px-3 text-sm transition-colors focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-ring',
+              'min-h-9 whitespace-nowrap px-3 text-sm transition-colors focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-ring',
               active ? 'bg-background font-semibold shadow-sm' : 'text-muted-foreground hover:text-foreground',
             )}
           >

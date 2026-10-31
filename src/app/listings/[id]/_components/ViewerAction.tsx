@@ -16,7 +16,7 @@ const NEXT: Partial<Record<Viewer, { label: string; hint: string; to: Viewer }>>
 };
 
 const BTN =
-  'flex min-h-11 w-full items-center justify-center rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground transition-opacity hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring disabled:opacity-60';
+  'flex min-h-11 w-full items-center justify-center bg-primary px-4 text-sm font-medium text-primary-foreground transition-opacity hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring disabled:opacity-60';
 
 export function ViewerAction({ viewer, listingId }: { viewer: Viewer; listingId: string }) {
   const router = useRouter();

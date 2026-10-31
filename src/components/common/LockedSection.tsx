@@ -32,7 +32,7 @@ export function LockedSection({
 }) {
   const copy = COPY[level];
   return (
-    <div className={cn('relative overflow-hidden rounded-lg border', className)}>
+    <div className={cn('relative overflow-hidden border', className)}>
       <div aria-hidden className="pointer-events-none select-none blur-sm">
         {children ?? <PlaceholderRows />}
       </div>
@@ -48,7 +48,7 @@ export function LockedSection({
           <button
             type="button"
             onClick={onUnlock}
-            className="mt-1 min-h-11 rounded-md bg-foreground px-4 text-sm font-medium text-background transition-opacity hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+            className="mt-1 min-h-11 bg-foreground px-4 text-sm font-medium text-background transition-opacity hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
           >
             {copy.cta}
           </button>
@@ -63,8 +63,8 @@ function PlaceholderRows() {
     <div className="space-y-3 p-5">
       {[72, 56, 64, 40].map((w) => (
         <div key={w} className="flex items-center justify-between gap-4">
-          <div className="h-3 rounded bg-muted" style={{ width: `${w / 2}%` }} />
-          <div className="h-5 w-24 rounded bg-muted" />
+          <div className="h-3 bg-muted" style={{ width: `${w / 2}%` }} />
+          <div className="h-5 w-24 bg-muted" />
         </div>
       ))}
     </div>

@@ -44,7 +44,7 @@ export function ProvenanceBadge({
     <span
       title={description}
       className={cn(
-        'inline-flex shrink-0 items-center gap-1 rounded-full border font-medium leading-none',
+        'inline-flex shrink-0 items-center gap-1 border font-medium leading-none',
         compact ? 'size-6 justify-center' : 'px-2 py-1 text-xs',
         tone,
         className,
