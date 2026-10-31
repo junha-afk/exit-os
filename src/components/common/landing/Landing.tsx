@@ -82,7 +82,7 @@ export function Landing() {
   const startX = narrow ? 16 : 175;
   const endX = Math.max(startX, stageW - paperW - startX); // 두 사람 손 앞에서 시작·끝 (얼굴을 가리지 않게)
   const inDesk = flowP > 0.3 && flowP < 0.62;
-  const pct = Math.round(((5 + done.filter(Boolean).length) / 12) * 100); // 12단계 중 5단계 완료에서 시작
+  const pct = 42 + done.filter(Boolean).length * 6;
 
   return (
     <div className="landing bg-background text-foreground">
@@ -97,8 +97,8 @@ export function Landing() {
             <a className="px-3 py-2 hover:text-foreground" href="#flow">진행 방식</a>
             <Link className="px-3 py-2 hover:text-foreground" href={ROUTES.listings}>매물 찾기</Link>
           </nav>
-          <Link href={ROUTES.listings} className="ml-auto hidden text-sm text-muted-foreground hover:text-foreground sm:block md:hidden">매물 둘러보기</Link>
-          <Link href={ROUTES.sell} className="ml-auto flex h-10 items-center bg-primary px-4 text-sm font-semibold text-primary-foreground sm:ml-0 md:ml-auto">가치 진단 시작</Link>
+          <Link href={ROUTES.listings} className="ml-auto hidden text-sm text-muted-foreground hover:text-foreground sm:block">매물 둘러보기</Link>
+          <Link href={ROUTES.sell} className="ml-auto flex h-10 items-center bg-primary px-4 text-sm font-semibold text-primary-foreground sm:ml-0">가치 진단 시작</Link>
         </div>
       </header>
 
@@ -119,7 +119,7 @@ export function Landing() {
               <article className="receipt paper print relative px-6 pb-10 pt-7 text-center font-mono text-neutral-800 md:px-8" aria-label="ExitOS 가치 정산서">
                 <p className="text-[12px] font-bold tracking-[.25em]">EXITOS 가치 정산서</p>
                 <p className="mt-1 text-[10px] text-muted-foreground">No. 2026-1031-0042 · 2026.10.31 14:20</p>
-                <div className="my-4 border-t border-dashed border-neutral-400" />
+                <div className="my-4 border-t border-dashed border-neutral-300" />
 
                 <div className="relative h-[200px] overflow-hidden md:h-[210px]">
                   <h1
@@ -145,7 +145,7 @@ export function Landing() {
                   </div>
                 </div>
 
-                <div className="my-4 border-t border-dashed border-neutral-400" />
+                <div className="my-4 border-t border-dashed border-neutral-300" />
                 <div className="line-in space-y-1.5 text-left text-[12px]" style={{ animationDelay: '2.3s' }}>
                   {['시설권리금', '바닥권리금', '영업권리금'].map((k) => (
                     <p key={k} className="flex items-end"><span className="font-sans">{k}</span><span className="dots" /><span className="tabular-nums">₩ ?</span></p>
@@ -172,7 +172,7 @@ export function Landing() {
             className="hero-in absolute bottom-4 z-30 flex items-center gap-2 bg-black/40 px-3 py-1.5 text-sm text-white"
             style={{ animationDelay: '2.9s', visibility: heroP > 0.05 ? 'hidden' : 'visible' }} /* 애니메이션 opacity 를 덮지 못하므로 visibility 로 숨긴다 */
           >
-            <span aria-hidden className="inline-block h-px w-8 bg-white/70" /> 스크롤하면 바로 진단을 시작할 수 있어요
+            <span aria-hidden className="inline-block h-px w-8 bg-white/70" /> 스크롤해서 금액을 확인해 보세요
           </p>
         </div>
       </section>
@@ -237,11 +237,10 @@ export function Landing() {
                           />
                         ))}
                       </div>
-                      <div className="mt-1 flex justify-between border-t pt-1 font-mono text-[10px] tabular-nums text-muted-foreground"><span>{MONTHS[0]}</span><span className="flex items-center gap-1 font-sans"><i className="size-2 bg-amber-400" />확인 필요 <i className="ml-2 size-2 bg-slate-300" />정상</span><span>{MONTHS[MONTHS.length - 1]}</span></div>
                       <p className="mt-2 h-10 text-[12px] text-muted-foreground">{barNote}</p>
                       <p className="mt-2 text-[12px] font-semibold">권리금 구성</p>
                       <div className="mt-1.5 flex h-3"><div className="w-[25%] bg-primary" /><div className="w-[22%] bg-[#378262]" /><div className="w-[53%] bg-[#9cc9b4]" /></div>
-                      <div className="mt-1.5 flex text-[11px] tabular-nums text-muted-foreground"><span className="w-[25%]">시설 4,000만</span><span className="w-[22%]">바닥 3,500만</span><span className="w-[53%]">영업 8,500만</span></div>
+                      <div className="mt-1.5 flex gap-4 text-[11px] text-muted-foreground"><span>시설 4,000만</span><span>바닥 3,500만</span><span>영업 8,500만</span></div>
                     </div>
 
                     {/* 화면 3: 판매 페이지 (구독 토글) */}
