@@ -1,5 +1,6 @@
 // 매각 준비 보고서 (소유: B). 분석·보고서는 서버에서 바로 만들고, 시뮬레이터·게시 폼만 클라이언트
 // 머리글·단계 표시는 A의 seller/layout.tsx 가 그린다
+import { cookies } from 'next/headers';
 import Link from 'next/link';
 import { AiEstimateNotice, Metric } from '@/components/common';
 import { ROUTES } from '@/components/common/routes';
@@ -14,15 +15,17 @@ import { ValuationRange } from '@/components/report/ValuationRange';
 import { runAnalysis } from '@/lib/analysis/run';
 import { getFacts } from '@/lib/facts/repo';
 import { getListingByStore } from '@/lib/listing/repo';
-import { MOCK_STORE_ID } from '@/lib/mocks';
 import { factsView } from '@/lib/report/facts';
 import { generateSellerReport } from '@/lib/report/prompts/seller';
 import { getSellerReport, saveSellerReport } from '@/lib/report/repo';
+import { storeIdFromCookies } from '@/lib/store-session';
 
 export const dynamic = 'force-dynamic';
 
-export default async function SellerReportPage({ searchParams }: { searchParams: Promise<{ store?: string }> }) {
-  const storeId = (await searchParams).store ?? MOCK_STORE_ID;
+// 매장 = 이 브라우저의 store_id 쿠키. 다른 매장은 볼 수 없다
+export default async function SellerReportPage() {
+  const storeId = storeIdFromCookies(await cookies());
+  if (!storeId) throw new Error('store_id 쿠키가 없습니다 (src/middleware.ts 확인)');
   const [analysis, facts] = await Promise.all([runAnalysis(storeId), getFacts(storeId)]);
 
   if (!analysis) {

@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { forbidOtherStore } from '@/lib/store-session';
 import { DOC_KIND_IDS, getDocKind, type DocKind } from '@/lib/documents/catalog';
 import { MAX_UPLOAD_BYTES, UnsupportedFileError, readUploadedFile } from '@/lib/documents/read';
 import { getFacts } from '@/lib/facts/repo';
@@ -10,6 +11,8 @@ export const maxDuration = 60;
 
 export async function POST(req: Request, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
+  const denied = forbidOtherStore(req, id);
+  if (denied) return denied;
   const form = await req.formData().catch(() => null);
   const file = form?.get('file');
   const requested = String(form?.get('requestedKind') ?? 'other');

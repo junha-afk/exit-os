@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { forbidOtherStore } from '@/lib/store-session';
 import { z } from 'zod';
 import { confirmFact } from '@/lib/facts/repo';
 import { FACT_KEYS } from '@/lib/types';
@@ -8,6 +9,8 @@ const Body = z.object({ key: z.enum(FACT_KEYS) });
 
 export async function POST(req: Request, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
+  const denied = forbidOtherStore(req, id);
+  if (denied) return denied;
   const parsed = Body.safeParse(await req.json().catch(() => null));
   if (!parsed.success) return NextResponse.json({ error: '알 수 없는 항목입니다.' }, { status: 400 });
   const ok = await confirmFact(id, parsed.data.key);

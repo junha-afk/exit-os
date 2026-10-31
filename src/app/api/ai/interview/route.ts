@@ -5,6 +5,7 @@ import { resetFacts, setFact } from '@/lib/facts/repo';
 import { buildTurn } from '@/lib/interview/next';
 import { SLOT_BY_KEY, parseSlotInput } from '@/lib/interview/slots';
 import { getInterviewState, resetInterviewState } from '@/lib/interview/state';
+import { forbidOtherStore } from '@/lib/store-session';
 import { FACT_KEYS } from '@/lib/types';
 
 // 소유: A. 진단 1턴: 답 검증·저장 → 다음 할 일(질문 / 자료 요청 / 끝)
@@ -20,6 +21,8 @@ export async function POST(req: Request) {
   const parsed = Body.safeParse(await req.json().catch(() => null));
   if (!parsed.success) return NextResponse.json({ error: '요청 형식이 올바르지 않습니다.' }, { status: 400 });
   const { storeId, answer, reset } = parsed.data;
+  const denied = forbidOtherStore(req, storeId);
+  if (denied) return denied;
 
   if (reset) {
     await resetFacts(storeId);

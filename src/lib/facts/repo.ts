@@ -68,10 +68,10 @@ export async function resetFacts(storeId: string): Promise<void> {
   if (error) throw new Error(`SUPABASE_FACTS_RESET_FAILED: ${error.message}`);
 }
 
-// 데모 매장은 단일 고정 ID를 사용한다.
-export async function createStore(input: { name: string; industry: string }): Promise<string> {
-  await saveStoreMetadata({ id: MOCK_STORE_ID, name: input.name, industry: input.industry });
-  await setFact(MOCK_STORE_ID, 'store_name', input.name);
-  await setFact(MOCK_STORE_ID, 'industry', input.industry);
-  return MOCK_STORE_ID;
+// 매장 id 는 브라우저별 쿠키로 정해진다 (src/lib/store-session.ts). 여기서는 이름·업종만 저장
+export async function createStore(storeId: string, input: { name: string; industry: string }): Promise<string> {
+  await saveStoreMetadata({ id: storeId, name: input.name, industry: input.industry });
+  await setFact(storeId, 'store_name', input.name);
+  await setFact(storeId, 'industry', input.industry);
+  return storeId;
 }

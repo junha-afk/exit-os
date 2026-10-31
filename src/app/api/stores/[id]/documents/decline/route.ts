@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { forbidOtherStore } from '@/lib/store-session';
 import { z } from 'zod';
 import { DOC_KIND_IDS, getDocKind, type DocKind } from '@/lib/documents/catalog';
 import { declineDocument } from '@/lib/documents/repo';
@@ -9,6 +10,8 @@ const Body = z.object({ kind: z.enum(DOC_KIND_IDS as [DocKind, ...DocKind[]]) })
 
 export async function POST(req: Request, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
+  const denied = forbidOtherStore(req, id);
+  if (denied) return denied;
   const parsed = Body.safeParse(await req.json().catch(() => null));
   if (!parsed.success) return NextResponse.json({ error: '알 수 없는 자료 종류입니다.' }, { status: 400 });
   await declineDocument(id, parsed.data.kind);
