@@ -1,10 +1,10 @@
 {
   "tasks": [
     {
-      "id": "task-01",
+      "id": "mock-deal-1-t01",
       "dealId": "mock-deal-1",
-      "priority": "normal",
       "status": "done",
+      "priority": "normal",
       "dependsOn": [],
       "stage": "prep",
       "category": "admin",
@@ -12,12 +12,12 @@
       "owner": "seller"
     },
     {
-      "id": "task-02",
+      "id": "mock-deal-1-t02",
       "dealId": "mock-deal-1",
-      "priority": "normal",
       "status": "done",
+      "priority": "normal",
       "dependsOn": [
-        "task-01"
+        "mock-deal-1-t01"
       ],
       "stage": "valuation",
       "category": "admin",
@@ -25,12 +25,12 @@
       "owner": "seller"
     },
     {
-      "id": "task-03",
+      "id": "mock-deal-1-t03",
       "dealId": "mock-deal-1",
-      "priority": "normal",
       "status": "done",
+      "priority": "normal",
       "dependsOn": [
-        "task-02"
+        "mock-deal-1-t02"
       ],
       "stage": "buyer_search",
       "category": "admin",
@@ -38,44 +38,44 @@
       "owner": "seller"
     },
     {
-      "id": "task-04",
+      "id": "mock-deal-1-t04",
       "dealId": "mock-deal-1",
-      "priority": "normal",
       "status": "todo",
+      "priority": "normal",
       "dependsOn": [
-        "task-03"
+        "mock-deal-1-t03"
       ],
       "stage": "due_diligence",
       "category": "admin",
       "title": "실사: 확인 필요 항목 증빙 제출",
       "owner": "both",
       "checklist": [
-        "2026-08 현금 매출 증빙(현금영수증·통장 입금 내역)",
-        "2026-03 원재료 매입 명세",
-        "2026-05 카드사 정산 내역"
+        "매출 증빙(카드사 정산·현금영수증·통장 입금 내역)",
+        "원재료 매입 명세",
+        "임대차계약서"
       ]
     },
     {
-      "id": "task-05",
+      "id": "mock-deal-1-t05",
       "dealId": "mock-deal-1",
-      "priority": "high",
       "status": "todo",
+      "priority": "high",
       "dependsOn": [
-        "task-04"
+        "mock-deal-1-t04"
       ],
       "stage": "landlord",
       "category": "contract",
-      "title": "임대인 갱신 협의",
       "owner": "seller",
+      "title": "임대인 갱신 협의",
       "description": "임대차 만료 2027-06 (12개월 이내)"
     },
     {
-      "id": "task-06",
+      "id": "mock-deal-1-t06",
       "dealId": "mock-deal-1",
-      "priority": "high",
       "status": "todo",
+      "priority": "high",
       "dependsOn": [
-        "task-05"
+        "mock-deal-1-t05"
       ],
       "stage": "premium_contract",
       "category": "contract",
@@ -83,12 +83,12 @@
       "owner": "both"
     },
     {
-      "id": "task-07",
+      "id": "mock-deal-1-t07",
       "dealId": "mock-deal-1",
-      "priority": "high",
       "status": "todo",
+      "priority": "high",
       "dependsOn": [
-        "task-06"
+        "mock-deal-1-t06"
       ],
       "stage": "lease_contract",
       "category": "contract",
@@ -96,25 +96,30 @@
       "owner": "buyer"
     },
     {
-      "id": "task-08",
+      "id": "mock-deal-1-t08",
       "dealId": "mock-deal-1",
-      "priority": "high",
       "status": "todo",
+      "priority": "high",
       "dependsOn": [
-        "task-07"
+        "mock-deal-1-t07"
       ],
       "stage": "license_transfer",
       "category": "admin",
       "title": "영업신고 지위승계 신고",
-      "owner": "buyer"
+      "owner": "buyer",
+      "checklist": [
+        "양도양수 계약서",
+        "양도인 인감증명서",
+        "위생교육 수료증"
+      ]
     },
     {
-      "id": "task-09",
+      "id": "mock-deal-1-t09",
       "dealId": "mock-deal-1",
-      "priority": "normal",
       "status": "todo",
+      "priority": "normal",
       "dependsOn": [
-        "task-07"
+        "mock-deal-1-t07"
       ],
       "stage": "tax_registration",
       "category": "admin",
@@ -122,220 +127,331 @@
       "owner": "both"
     },
     {
-      "id": "task-10",
+      "id": "mock-deal-1-t10",
       "dealId": "mock-deal-1",
-      "priority": "normal",
       "status": "todo",
+      "priority": "normal",
       "dependsOn": [
-        "task-06"
+        "mock-deal-1-t06"
       ],
       "stage": "staff_contracts",
       "category": "staff",
       "title": "고용 승계 협의: 매니저(바리스타)",
-      "owner": "both"
+      "owner": "both",
+      "checklist": [
+        "근무 조건·급여 공유",
+        "본인 의사 확인",
+        "근로계약서 새로 작성"
+      ]
     },
     {
-      "id": "task-11",
+      "id": "mock-deal-1-t11",
       "dealId": "mock-deal-1",
-      "priority": "normal",
       "status": "todo",
+      "priority": "normal",
       "dependsOn": [
-        "task-06"
+        "mock-deal-1-t06"
       ],
       "stage": "staff_contracts",
       "category": "staff",
       "title": "고용 승계 협의: 파트타임(오픈)",
-      "owner": "both"
+      "owner": "both",
+      "checklist": [
+        "근무 조건·급여 공유",
+        "본인 의사 확인",
+        "근로계약서 새로 작성"
+      ]
     },
     {
-      "id": "task-12",
+      "id": "mock-deal-1-t12",
       "dealId": "mock-deal-1",
-      "priority": "normal",
       "status": "todo",
+      "priority": "normal",
       "dependsOn": [
-        "task-06"
+        "mock-deal-1-t06"
       ],
       "stage": "staff_contracts",
       "category": "staff",
       "title": "고용 승계 협의: 파트타임(마감)",
-      "owner": "both"
+      "owner": "both",
+      "checklist": [
+        "근무 조건·급여 공유",
+        "본인 의사 확인",
+        "근로계약서 새로 작성"
+      ]
     },
     {
-      "id": "task-13",
+      "id": "mock-deal-1-t13",
       "dealId": "mock-deal-1",
-      "priority": "normal",
       "status": "todo",
+      "priority": "normal",
       "dependsOn": [
-        "task-07"
+        "mock-deal-1-t07"
       ],
       "stage": "staff_contracts",
       "category": "supplier",
       "title": "거래처 명의 변경: 망원커피상사",
-      "owner": "seller"
+      "owner": "seller",
+      "description": "원두 · 발주 주 1회",
+      "checklist": [
+        "거래 조건·단가 공유",
+        "명의·결제 정보 변경 요청",
+        "첫 발주 같이 하기"
+      ]
     },
     {
-      "id": "task-14",
+      "id": "mock-deal-1-t14",
       "dealId": "mock-deal-1",
-      "priority": "normal",
       "status": "todo",
+      "priority": "normal",
       "dependsOn": [
-        "task-07"
+        "mock-deal-1-t07"
       ],
       "stage": "staff_contracts",
       "category": "supplier",
       "title": "거래처 명의 변경: 서울우유대리점",
-      "owner": "seller"
+      "owner": "seller",
+      "description": "유제품 · 발주 주 3회",
+      "checklist": [
+        "거래 조건·단가 공유",
+        "명의·결제 정보 변경 요청",
+        "첫 발주 같이 하기"
+      ]
     },
     {
-      "id": "task-15",
+      "id": "mock-deal-1-t15",
       "dealId": "mock-deal-1",
-      "priority": "normal",
       "status": "todo",
+      "priority": "normal",
       "dependsOn": [
-        "task-07"
+        "mock-deal-1-t07"
       ],
       "stage": "staff_contracts",
       "category": "supplier",
       "title": "거래처 명의 변경: 베이크마켓",
-      "owner": "seller"
+      "owner": "seller",
+      "description": "베이커리 재료 · 발주 주 1회",
+      "checklist": [
+        "거래 조건·단가 공유",
+        "명의·결제 정보 변경 요청",
+        "첫 발주 같이 하기"
+      ]
     },
     {
-      "id": "task-16",
+      "id": "mock-deal-1-t16",
       "dealId": "mock-deal-1",
-      "priority": "normal",
       "status": "todo",
+      "priority": "normal",
       "dependsOn": [
-        "task-07"
+        "mock-deal-1-t07"
       ],
       "stage": "handover_settlement",
       "category": "equipment",
       "title": "장비 인계: 에스프레소 머신 작동 확인·매뉴얼 전달",
-      "owner": "both"
+      "owner": "both",
+      "description": "1대 · 2021년",
+      "checklist": [
+        "작동 확인",
+        "매뉴얼·보증서 전달",
+        "수리 이력 공유"
+      ]
     },
     {
-      "id": "task-17",
+      "id": "mock-deal-1-t17",
       "dealId": "mock-deal-1",
-      "priority": "normal",
       "status": "todo",
+      "priority": "normal",
       "dependsOn": [
-        "task-07"
+        "mock-deal-1-t07"
       ],
       "stage": "handover_settlement",
       "category": "equipment",
       "title": "장비 인계: 그라인더 작동 확인·매뉴얼 전달",
-      "owner": "both"
+      "owner": "both",
+      "description": "2대 · 2022년",
+      "checklist": [
+        "작동 확인",
+        "매뉴얼·보증서 전달",
+        "수리 이력 공유"
+      ]
     },
     {
-      "id": "task-18",
+      "id": "mock-deal-1-t18",
       "dealId": "mock-deal-1",
-      "priority": "normal",
       "status": "todo",
+      "priority": "normal",
       "dependsOn": [
-        "task-07"
+        "mock-deal-1-t07"
       ],
       "stage": "handover_settlement",
       "category": "equipment",
       "title": "장비 인계: 제빙기 작동 확인·매뉴얼 전달",
-      "owner": "both"
+      "owner": "both",
+      "description": "1대 · 2020년 · 수리 이력 2025-07 컴프레서 수리",
+      "checklist": [
+        "작동 확인",
+        "매뉴얼·보증서 전달",
+        "수리 이력 공유"
+      ]
     },
     {
-      "id": "task-19",
+      "id": "mock-deal-1-t19",
       "dealId": "mock-deal-1",
-      "priority": "normal",
       "status": "todo",
+      "priority": "normal",
       "dependsOn": [
-        "task-07"
+        "mock-deal-1-t07"
       ],
       "stage": "handover_settlement",
       "category": "equipment",
       "title": "장비 인계: 오븐 작동 확인·매뉴얼 전달",
-      "owner": "both"
+      "owner": "both",
+      "description": "1대 · 2023년",
+      "checklist": [
+        "작동 확인",
+        "매뉴얼·보증서 전달",
+        "수리 이력 공유"
+      ]
     },
     {
-      "id": "task-20",
+      "id": "mock-deal-1-t20",
       "dealId": "mock-deal-1",
-      "priority": "normal",
       "status": "todo",
+      "priority": "normal",
       "dependsOn": [
-        "task-07"
+        "mock-deal-1-t07"
       ],
       "stage": "handover_settlement",
       "category": "equipment",
       "title": "장비 인계: 쇼케이스 냉장고 작동 확인·매뉴얼 전달",
-      "owner": "both"
+      "owner": "both",
+      "description": "1대 · 2022년",
+      "checklist": [
+        "작동 확인",
+        "매뉴얼·보증서 전달",
+        "수리 이력 공유"
+      ]
     },
     {
-      "id": "task-21",
+      "id": "mock-deal-1-t21",
       "dealId": "mock-deal-1",
-      "priority": "normal",
       "status": "todo",
+      "priority": "normal",
       "dependsOn": [
-        "task-07"
+        "mock-deal-1-t07"
       ],
       "stage": "handover_settlement",
       "category": "account",
       "title": "계정 이전: 배달의민족",
-      "owner": "seller"
+      "owner": "seller",
+      "description": "배달앱",
+      "checklist": [
+        "계정 소유자 변경",
+        "정산 계좌 변경",
+        "비밀번호 재설정"
+      ]
     },
     {
-      "id": "task-22",
+      "id": "mock-deal-1-t22",
       "dealId": "mock-deal-1",
-      "priority": "normal",
       "status": "todo",
+      "priority": "normal",
       "dependsOn": [
-        "task-07"
+        "mock-deal-1-t07"
       ],
       "stage": "handover_settlement",
       "category": "account",
       "title": "계정 이전: 쿠팡이츠",
-      "owner": "seller"
+      "owner": "seller",
+      "description": "배달앱",
+      "checklist": [
+        "계정 소유자 변경",
+        "정산 계좌 변경",
+        "비밀번호 재설정"
+      ]
     },
     {
-      "id": "task-23",
+      "id": "mock-deal-1-t23",
       "dealId": "mock-deal-1",
-      "priority": "normal",
       "status": "todo",
+      "priority": "normal",
       "dependsOn": [
-        "task-07"
+        "mock-deal-1-t07"
       ],
       "stage": "handover_settlement",
       "category": "account",
       "title": "계정 이전: 토스플레이스 POS",
-      "owner": "seller"
+      "owner": "seller",
+      "description": "POS",
+      "checklist": [
+        "계정 소유자 변경",
+        "정산 계좌 변경",
+        "비밀번호 재설정"
+      ]
     },
     {
-      "id": "task-24",
+      "id": "mock-deal-1-t24",
       "dealId": "mock-deal-1",
-      "priority": "normal",
       "status": "todo",
+      "priority": "normal",
       "dependsOn": [
-        "task-07"
+        "mock-deal-1-t07"
       ],
       "stage": "handover_settlement",
       "category": "account",
       "title": "계정 이전: 인스타그램",
-      "owner": "seller"
+      "owner": "seller",
+      "description": "SNS",
+      "checklist": [
+        "계정 소유자 변경",
+        "정산 계좌 변경",
+        "비밀번호 재설정"
+      ]
     },
     {
-      "id": "task-25",
+      "id": "mock-deal-1-t25",
       "dealId": "mock-deal-1",
-      "priority": "normal",
       "status": "todo",
+      "priority": "normal",
       "dependsOn": [
-        "task-07"
+        "mock-deal-1-t07"
       ],
       "stage": "handover_settlement",
       "category": "account",
       "title": "계정 이전: 네이버 플레이스",
-      "owner": "seller"
+      "owner": "seller",
+      "description": "지도",
+      "checklist": [
+        "계정 소유자 변경",
+        "정산 계좌 변경",
+        "비밀번호 재설정"
+      ]
     },
     {
-      "id": "task-26",
+      "id": "mock-deal-1-t26",
       "dealId": "mock-deal-1",
-      "priority": "normal",
       "status": "todo",
+      "priority": "normal",
       "dependsOn": [
-        "task-07"
+        "mock-deal-1-t06"
+      ],
+      "stage": "handover_settlement",
+      "category": "manual",
+      "title": "점주 업무 인계: 원두 로스팅·발주·SNS 운영",
+      "owner": "seller",
+      "checklist": [
+        "원두 로스팅 방법 문서로 정리·시연",
+        "발주 방법 문서로 정리·시연",
+        "SNS 운영 방법 문서로 정리·시연"
+      ]
+    },
+    {
+      "id": "mock-deal-1-t27",
+      "dealId": "mock-deal-1",
+      "status": "todo",
+      "priority": "normal",
+      "dependsOn": [
+        "mock-deal-1-t07"
       ],
       "stage": "post_tax",
       "category": "admin",
