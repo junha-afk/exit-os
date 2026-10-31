@@ -6,12 +6,12 @@
 // - 대상 업종은 F&B(외식업)만이다.
 import type { DocKind } from '@/lib/documents/catalog';
 import type { FactKey } from '@/lib/types';
+import { FNB_INDUSTRIES } from './fnb';
 
 // ── 대상 업종: F&B ───────────────────────────────────────────
 
-/** 업종 선택지 (industry 슬롯의 choice 보기). slots.ts 도 이 목록을 쓴다 */
-export const FNB_INDUSTRIES = ['카페', '베이커리·디저트', '음식점', '분식·간편식', '주점·바', '기타 외식업'] as const;
-export type FnbIndustry = (typeof FNB_INDUSTRIES)[number];
+/** 업종 선택지 (industry 슬롯의 choice 보기). 원본은 fnb.ts */
+export { FNB_INDUSTRIES, type FnbIndustry } from './fnb';
 
 // 모든 정보 수집 프롬프트에 들어가는 업종 범위 설명
 const FNB_SCOPE = `## 대상 업종
