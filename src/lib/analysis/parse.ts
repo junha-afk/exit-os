@@ -1,8 +1,7 @@
-// 재무 CSV 6종 → 표준 행(financial_records) 정규화 (소유: B). 템플릿: docs/ARCHITECTURE.md §5
-import Papa from 'papaparse';
-import { z } from 'zod';
+// A의 재무 행(FinancialRow) → B의 분석용 행 정규화 (소유: B). A는 자료를 읽어 저장만 하고 정리·중복 제거·월 합계는 여기서 한다
+// 행 형식: docs/TEAM_PLAN.md §4, src/lib/documents/catalog.ts targetFields
+import type { FinancialRow } from '@/lib/documents/types';
 import type { RecordKind } from '@/lib/types';
-import { dedupeKey } from './dedupe';
 
 export interface FinancialRecord {
   kind: RecordKind;
@@ -10,98 +9,94 @@ export interface FinancialRecord {
   category: string;           // channel / card_company / platform / vendor / item / role
   amount: number;             // 원
   extra: Record<string, string | number>;
-  dedupeKey: string;
+  readByLlm: boolean;         // 문서·사진에서 LLM이 옮겨 적은 값이 섞임 → 확인 필요
 }
 
-const month = z.string().regex(/^\d{4}-(0[1-9]|1[0-2])$/);
-const won = z.coerce.number().int().nonnegative();
-const text = z.string().trim().min(1);
-
-const ROW = {
-  pos: z.object({ month, channel: z.enum(['card', 'cash']), amount: won }),
-  card_settlement: z.object({ month, card_company: text, amount: won }),
-  delivery: z.object({
-    month, platform: text, gross_sales: won, fees: won, net_payout: won,
-    orders: won, included_in_pos: z.enum(['Y', 'N']),
-  }),
-  purchases: z.object({ month, vendor: text, category: text, amount: won }),
-  fixed: z.object({ month, item: text, amount: won }),
-  payroll: z.object({ month, role: text, hours: won, pay: won }),
-} satisfies Record<RecordKind, z.ZodType>;
+export interface FinancialInput {
+  records: FinancialRecord[];
+  cashEvidence: Map<string, number>;   // month → 현금 매출 증빙액 (현금영수증·통장 입금 중 큰 값)
+}
 
 export const KIND_LABEL: Record<RecordKind, string> = {
   pos: 'POS 매출', card_settlement: '카드사 정산', delivery: '배달앱 정산',
   purchases: '원재료 매입', fixed: '임대료·공과금', payroll: '급여',
 };
 
-// 행 하나를 (category, amount, extra) 로 바꾼다
-function normalize(kind: RecordKind, r: Record<string, string | number>): Pick<FinancialRecord, 'category' | 'amount' | 'extra'> {
+const MONTH = /^\d{4}-(0[1-9]|1[0-2])$/;
+// 통장 입금 중 카드사·배달앱 정산 입금은 현금 증빙이 아니다
+const NOT_CASH_DEPOSIT = /카드|card|배민|배달|쿠팡|요기요|땡겨요|정산|페이/i;
+
+// 금액은 A가 원 단위 숫자로 주지만 문서에서 읽은 값은 문자열일 수 있다. 못 읽으면 null
+function num(v: unknown): number | null {
+  if (v === null || v === undefined || v === '') return null;
+  const n = typeof v === 'number' ? v : Number(String(v).replace(/[,\s원₩]/g, ''));
+  return Number.isFinite(n) && n >= 0 ? Math.round(n) : null;
+}
+const text = (v: unknown) => String(v ?? '').trim() || '미상';
+// 파일마다 표기가 달라 코드가 판정한다 (Y·예·포함·TRUE…)
+const yes = (v: unknown) => /^(y|yes|true|1|예|네|포함|o|○)$/i.test(String(v ?? '').trim());
+// 현금·계좌이체만 현금으로 보고, 나머지(카드·간편결제 등)는 카드사 정산과 대조되는 카드로 본다
+const channel = (v: unknown) => (/^cash$|현금|계좌|이체/i.test(String(v ?? '')) ? 'cash' : 'card');
+
+type Normalized = Pick<FinancialRecord, 'category' | 'amount' | 'extra'>;
+
+function normalize(kind: RecordKind, f: FinancialRow['fields']): Normalized | null {
+  const n = (k: string) => num(f[k]) ?? 0;
+  let row: Normalized;
   switch (kind) {
-    case 'pos': return { category: String(r.channel), amount: Number(r.amount), extra: {} };
-    case 'card_settlement': return { category: String(r.card_company), amount: Number(r.amount), extra: {} };
-    case 'delivery': return {
-      category: String(r.platform), amount: Number(r.gross_sales),
-      extra: { fees: r.fees, net_payout: r.net_payout, orders: r.orders, included_in_pos: r.included_in_pos },
-    };
-    case 'purchases': return { category: String(r.vendor), amount: Number(r.amount), extra: { category: r.category } };
-    case 'fixed': return { category: String(r.item), amount: Number(r.amount), extra: {} };
-    case 'payroll': return { category: String(r.role), amount: Number(r.pay), extra: { hours: r.hours } };
+    case 'pos': row = { category: channel(f.channel), amount: n('amount'), extra: {} }; break;
+    case 'card_settlement': row = { category: text(f.card_company), amount: n('amount'), extra: {} }; break;
+    case 'delivery': row = {
+      category: text(f.platform), amount: n('gross_sales'),
+      extra: { fees: n('fees'), net_payout: n('net_payout'), orders: n('orders'), included_in_pos: yes(f.included_in_pos) ? 'Y' : 'N' },
+    }; break;
+    case 'purchases': row = { category: text(f.vendor), amount: n('amount'), extra: { category: text(f.category) } }; break;
+    case 'fixed': row = { category: text(f.item), amount: n('amount'), extra: {} }; break;
+    case 'payroll': row = { category: text(f.role), amount: n('pay'), extra: { hours: n('hours') } }; break;
   }
+  return row.amount > 0 ? row : null;
 }
 
-export type ParseResult =
-  | { ok: true; records: FinancialRecord[]; duplicates: number; warnings: string[] }
-  | { ok: false; error: string };
+const RECORD_KINDS = new Set<string>(['pos', 'card_settlement', 'delivery', 'purchases', 'fixed', 'payroll']);
 
-export function parseFinancialCsv(kind: RecordKind, csv: string): ParseResult {
-  const parsed = Papa.parse<Record<string, string>>(csv.replace(/^﻿/, ''), {
-    header: true, skipEmptyLines: true, transformHeader: (h) => h.trim(),
-  });
-  const schema = ROW[kind];
-  const required = Object.keys(schema.shape);
-  const missingCols = required.filter((c) => !parsed.meta.fields?.includes(c));
-  if (missingCols.length) {
-    return { ok: false, error: `${KIND_LABEL[kind]} 템플릿과 컬럼이 다릅니다. 필요한 컬럼: ${required.join(', ')}` };
+export function fromFinancialRows(rows: FinancialRow[]): FinancialInput {
+  // 같은 종류·같은 달 자료를 다시 올리면 마지막 자료만 쓴다 (두 번 올려도 이중 집계되지 않게, 나눠 올린 달은 합친다)
+  const latestDoc = new Map<string, string>();
+  for (const r of rows) latestDoc.set(`${r.kind}|${r.month}`, r.documentId);
+  const current = rows.filter((r) => MONTH.test(r.month) && latestDoc.get(`${r.kind}|${r.month}`) === r.documentId);
+
+  // 일별 행도 월·항목별로 합친다 → "중복 제거 N건" 은 월·플랫폼 단위
+  const merged = new Map<string, FinancialRecord>();
+  const receipts = new Map<string, number>();
+  const deposits = new Map<string, number>();
+  const add = (m: Map<string, number>, month: string, x: number) => m.set(month, (m.get(month) ?? 0) + x);
+
+  for (const r of current) {
+    if (r.kind === 'cash_receipt') { add(receipts, r.month, num(r.fields.amount) ?? 0); continue; }
+    if (r.kind === 'bank_deposit') {
+      if (!NOT_CASH_DEPOSIT.test(String(r.fields.counterparty ?? ''))) add(deposits, r.month, num(r.fields.amount) ?? 0);
+      continue;
+    }
+    if (!RECORD_KINDS.has(r.kind)) continue;
+    const kind = r.kind as RecordKind;
+    const row = normalize(kind, r.fields);
+    if (!row) continue;
+    const key = `${kind}|${r.month}|${row.category}|${row.extra.included_in_pos ?? ''}`;
+    const prev = merged.get(key);
+    if (!prev) {
+      merged.set(key, { kind, month: r.month, ...row, readByLlm: r.readBy === 'llm_document' });
+      continue;
+    }
+    prev.amount += row.amount;
+    prev.readByLlm ||= r.readBy === 'llm_document';
+    for (const [k, v] of Object.entries(row.extra)) {
+      if (typeof v === 'number') prev.extra[k] = Number(prev.extra[k] ?? 0) + v;
+    }
   }
 
-  const warnings: string[] = [];
-  const badRows: number[] = [];
-  const seen = new Set<string>();
-  const records: FinancialRecord[] = [];
-  let duplicates = 0;
-
-  parsed.data.forEach((raw, i) => {
-    const row = schema.safeParse(raw);
-    if (!row.success) { badRows.push(i + 2); return; }   // +2 = 헤더 줄 + 1부터 세기
-    const r = row.data as Record<string, string | number>;
-    const n = normalize(kind, r);
-    const key = dedupeKey(kind, String(r.month), n.category, n.amount);
-    if (seen.has(key)) { duplicates++; return; }
-    seen.add(key);
-    records.push({ kind, month: String(r.month), ...n, dedupeKey: key });
-  });
-
-  if (!records.length) return { ok: false, error: `${KIND_LABEL[kind]}: 읽을 수 있는 행이 없습니다.` };
-  if (badRows.length) warnings.push(`형식이 맞지 않아 ${badRows.length}행을 건너뛰었습니다 (줄 ${badRows.slice(0, 5).join(', ')}${badRows.length > 5 ? ' …' : ''})`);
-  for (const m of monthGaps(records.map((r) => r.month))) warnings.push(`${m} ${KIND_LABEL[kind]} 자료 누락`);
-  return { ok: true, records, duplicates, warnings };
-}
-
-// 첫 달~마지막 달 사이에 빠진 달
-export function monthGaps(months: string[]): string[] {
-  const have = new Set(months);
-  const sorted = [...have].sort();
-  if (sorted.length < 2) return [];
-  return monthRange(sorted[0], sorted.at(-1)!).filter((m) => !have.has(m));
-}
-
-export function monthRange(from: string, to: string): string[] {
-  const out: string[] = [];
-  let [y, m] = from.split('-').map(Number);
-  const [ty, tm] = to.split('-').map(Number);
-  while (y < ty || (y === ty && m <= tm)) {
-    out.push(`${y}-${String(m).padStart(2, '0')}`);
-    if (++m > 12) { m = 1; y++; }
+  const cashEvidence = new Map<string, number>();
+  for (const month of new Set([...receipts.keys(), ...deposits.keys()])) {
+    cashEvidence.set(month, Math.max(receipts.get(month) ?? 0, deposits.get(month) ?? 0));
   }
-  return out;
+  return { records: [...merged.values()], cashEvidence };
 }

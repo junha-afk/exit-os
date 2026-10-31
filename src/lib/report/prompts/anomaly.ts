@@ -1,5 +1,6 @@
 // 이상치 설명 (소유: B). docs/AI_PROMPTS.md §3. 숫자는 코드가 정한 값을 그대로 넘기고 LLM은 문장만 쓴다
 import { z } from 'zod';
+import { chatJson } from '@/lib/ai/llm';
 import type { Anomaly, MonthlyMetric } from '@/lib/types';
 import type { AnomalyExplanations } from '../types';
 
@@ -15,7 +16,7 @@ export const ANOMALY_SYSTEM = [
   '당신은 소상공인 매장 매각 자료를 검토하는 보조자입니다.',
   '코드가 탐지한 이상치마다 1~2문장으로 (a) 왜 확인이 필요한지 (b) 판매자가 제출하면 해소되는 증빙을 쓰세요.',
   '입력에 있는 숫자를 바꾸거나 새 숫자를 만들지 마세요. 가공 매출·불법이라고 단정하지 말고 "확인이 필요합니다"로 표현하세요.',
-  '존댓말, 한국어. JSON 만 출력: {"items":[{"index":number,"explanation":string,"evidence_to_submit":string}]}',
+  '출력 형식: {"items":[{"index":number,"explanation":string,"evidence_to_submit":string}]}',
 ].join('\n');
 
 // 각 이상치 + 해당 월 앞뒤 1개월(총 3개월) 수치
@@ -52,9 +53,12 @@ export function applyExplanations(anomalies: Anomaly[], result: AnomalyExplanati
   });
 }
 
-// TODO(B-3): A의 chatJson(src/lib/ai/llm.ts, PR-0A) 머지 후 아래로 교체
-//   const result = await chatJson({ system: ANOMALY_SYSTEM, user: anomalyUserPrompt(anomalies, months),
-//     schema: anomalyExplanationsSchema, fixture: anomalyFixture }).catch(() => null);
-export async function explainAnomalies(anomalies: Anomaly[], _months: MonthlyMetric[]): Promise<Anomaly[]> {
-  return applyExplanations(anomalies, null);
+// 짧은 설명이라 thinking 없이 빠르게. DEMO_MODE 에서는 빈 결과 → 전부 코드 폴백 문장
+export async function explainAnomalies(anomalies: Anomaly[], months: MonthlyMetric[]): Promise<Anomaly[]> {
+  if (!anomalies.length) return anomalies;
+  const result = await chatJson({
+    system: ANOMALY_SYSTEM, user: anomalyUserPrompt(anomalies, months), schema: anomalyExplanationsSchema,
+    fixture: { items: [] }, maxTokens: 2000, timeoutMs: 20_000,
+  }).catch(() => null);
+  return applyExplanations(anomalies, result);
 }

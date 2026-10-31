@@ -1,6 +1,7 @@
 // 구매자 리스크 보고서 (소유: B). docs/AI_PROMPTS.md §5
 // 입력은 filterListingForViewer 를 통과한 ListingView 만 — 잠긴 필드는 값이 없으므로 새어 나갈 수 없다
 import { z } from 'zod';
+import { chatJson } from '@/lib/ai/llm';
 import { formatKRW, formatKRWRange } from '@/lib/format';
 import { isLocked, type Anomaly, type Gated, type ListingView } from '@/lib/types';
 import { monthsBetween } from '../facts';
@@ -23,7 +24,6 @@ export const RISK_SYSTEM = [
   '숫자를 바꾸거나 새로 계산하지 마세요. 금액은 입력의 *_text 표기를 그대로 쓰세요. value_opinion 은 입력의 추정 범위를 인용해 희망가가 범위 안/밖인지 쓰세요.',
   'question_to_seller 는 실사 때 판매자에게 그대로 물어볼 수 있는 문장으로 쓰세요.',
   '법률 판단("불법", "무효")이나 가공 매출 단정은 금지합니다. "확인이 필요한 항목", "전문가 확인 권장"으로 표현하세요.',
-  '존댓말, 한국어. JSON 만 출력.',
 ].join('\n');
 
 const open = <T,>(v: Gated<T>): T | undefined => (isLocked(v) ? undefined : v);
@@ -147,9 +147,14 @@ export function fallbackRiskReport(view: ListingView, today = new Date()): Buyer
   };
 }
 
-// TODO(B-7): A의 chatJson(src/lib/ai/llm.ts, PR-0A) 머지 후 아래로 교체. fixture = src/lib/report/fixtures/risk.json
-//   return chatJson({ system: RISK_SYSTEM, user: riskUserPrompt(view), schema: buyerRiskReportSchema, fixture })
-//     .catch(() => fallbackRiskReport(view));
+// DEMO_MODE 에서는 코드 폴백 (viewer 마다 볼 수 있는 정보가 달라 녹화본 하나로는 잠긴 정보가 새어 나간다)
 export async function generateRiskReport(view: ListingView): Promise<BuyerRiskReport> {
-  return fallbackRiskReport(view);
+  const fallback = fallbackRiskReport(view);
+  const report = await chatJson({
+    system: RISK_SYSTEM, user: riskUserPrompt(view), schema: buyerRiskReportSchema,
+    fixture: fallback, thinking: true, maxTokens: 4000, timeoutMs: 30_000,
+  }).catch(() => fallback);
+  // 재무를 못 본 상태의 '위험 낮음'은 판단 불가라서 최소 medium (폴백과 같은 규칙)
+  if (isLocked(view.fields.riskFactors) && report.overall.level === 'low') report.overall.level = 'medium';
+  return report;
 }

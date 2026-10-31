@@ -1,6 +1,7 @@
 // 인수인계 업무 문구 보강 (소유: B). docs/AI_PROMPTS.md §6
 // LLM 은 각 업무의 description(1문장)·checklist(2~4개)만 바꾼다. 업무 추가·순서·stage 변경 금지
 import { z } from 'zod';
+import { chatJson } from '@/lib/ai/llm';
 import type { HandoverTask } from '@/lib/types';
 
 export const enrichSchema = z.object({
@@ -15,7 +16,7 @@ export type EnrichResult = z.infer<typeof enrichSchema>;
 export const ENRICH_SYSTEM = [
   '당신은 소상공인 매장 인수인계를 돕는 보조자입니다.',
   '각 업무에 description(1문장)과 checklist(2~4개)를 쓰세요. 업무를 추가하거나 순서·stage 를 바꾸지 마세요.',
-  '법률 판단은 하지 말고 필요하면 "전문가 확인 권장"이라고 쓰세요. 존댓말, 한국어. JSON 만 출력: {"items":[{"id","description","checklist"}]}',
+  '법률 판단은 하지 말고 필요하면 "전문가 확인 권장"이라고 쓰세요. 존댓말, 한국어. 출력 형식: {"items":[{"id","description","checklist"}]}',
 ].join('\n');
 
 export const enrichUserPrompt = (tasks: HandoverTask[], industry: string) =>
@@ -30,9 +31,11 @@ export function applyEnrichment(tasks: HandoverTask[], result: EnrichResult | nu
   });
 }
 
-// TODO(B-8): A의 chatJson(src/lib/ai/llm.ts, PR-0A) 머지 후 아래로 교체. fixture = src/lib/report/fixtures/handover_enrich.json
-//   const result = await chatJson({ system: ENRICH_SYSTEM, user: enrichUserPrompt(tasks, industry), schema: enrichSchema, fixture })
-//     .catch(() => null);
-export async function enrichTasks(tasks: HandoverTask[], _industry: string): Promise<HandoverTask[]> {
-  return applyEnrichment(tasks, null);
+// 업무가 30개 가까이라 출력이 길다. DEMO_MODE 에서는 빈 결과 → 규칙이 만든 문구 그대로
+export async function enrichTasks(tasks: HandoverTask[], industry: string): Promise<HandoverTask[]> {
+  const result = await chatJson({
+    system: ENRICH_SYSTEM, user: enrichUserPrompt(tasks, industry), schema: enrichSchema,
+    fixture: { items: [] }, maxTokens: 6000, timeoutMs: 30_000,
+  }).catch(() => null);
+  return applyEnrichment(tasks, result);
 }
