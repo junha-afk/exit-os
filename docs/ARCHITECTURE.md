@@ -14,6 +14,8 @@
 | 검증 | zod | API 입력·LLM 출력 모두 |
 | 배포 | Vercel | 환경변수는 `.env.example` 참고 |
 
+현재 매장 facts, 업로드 파일 메타데이터, 재무 행, 게시 매물은 서버 전용 service-role 연결로 Postgres에 저장한다. 업로드한 원본 파일 바이너리는 아직 Supabase Storage에 저장하지 않는다. 기존 DB에는 `supabase/listings-detail-migration.sql`을 적용해야 한다.
+
 ## 2. 폴더 구조 (괄호 = 소유자: A 정보 수집 · B 분석·보고서 · F 플랫폼 프론트, [TEAM_PLAN.md](TEAM_PLAN.md) §2 참고)
 
 ```

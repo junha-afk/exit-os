@@ -106,8 +106,12 @@ create table if not exists listings (
   premium_breakdown jsonb,
   premium_breakdown_level text not null default 'approved'
     check (premium_breakdown_level in ('public', 'approved')),
+  detail jsonb not null default '{}'::jsonb,
   created_at timestamptz not null default now()
 );
+
+alter table listings
+  add column if not exists detail jsonb not null default '{}'::jsonb;
 
 create table if not exists analyses (
   id uuid primary key default gen_random_uuid(),
