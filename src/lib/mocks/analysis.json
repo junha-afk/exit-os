@@ -200,7 +200,7 @@
       "revenue": {
         "value": 41900000,
         "provenance": "needs_check",
-        "note": "매출 급변, 현금 매출 비중 급증, 매입 대비 매출 비율 이상"
+        "note": "매출 급증, 현금 매출 비중 급증, 매입 대비 매출 비율 이상"
       },
       "posCard": 22800000,
       "posCash": 14000000,
@@ -213,7 +213,7 @@
       "operatingProfit": {
         "value": 22801500,
         "provenance": "needs_check",
-        "note": "매출 급변, 현금 매출 비중 급증, 매입 대비 매출 비율 이상"
+        "note": "매출 급증, 현금 매출 비중 급증, 매입 대비 매출 비율 이상"
       }
     },
     {
@@ -239,12 +239,12 @@
   "avgRevenue": {
     "value": 28300000,
     "provenance": "needs_check",
-    "note": "8월 포함 12개월 평균"
+    "note": "최근 12개월 평균"
   },
   "avgOperatingProfit": {
     "value": 10950500,
     "provenance": "needs_check",
-    "note": "8월 포함 12개월 평균"
+    "note": "최근 12개월 평균"
   },
   "margin": 0.387,
   "dedupeCount": 6,
@@ -253,31 +253,36 @@
       "month": "2026-03",
       "kind": "missing",
       "severity": "medium",
-      "detail": "2026-03 원재료 매입 자료 누락"
+      "detail": "2026-03 원재료 매입 자료 누락",
+      "aiExplanation": "확인이 필요한 항목입니다. 다음 자료를 올려주시면 증빙으로 전환할 수 있습니다: 누락된 달의 원본 자료."
     },
     {
       "month": "2026-05",
       "kind": "settlement_mismatch",
       "severity": "medium",
-      "detail": "2026-05 POS 카드매출 2,200만 원 ↔ 카드사 정산 2,090만 원 (5.0% 불일치)"
+      "detail": "2026-05 POS 카드매출 2,200만 원 ↔ 카드사 정산 2,090만 원 (5.0% 불일치)",
+      "aiExplanation": "확인이 필요한 항목입니다. 다음 자료를 올려주시면 증빙으로 전환할 수 있습니다: 해당 월 카드사 정산 내역 원본."
     },
     {
       "month": "2026-08",
       "kind": "revenue_spike",
       "severity": "medium",
-      "detail": "2026-08 매출 4,190만 원으로 12개월 평균(2,830만 원) 대비 +48.1%"
+      "detail": "2026-08 매출 4,190만 원으로 12개월 평균(2,830만 원) 대비 +48.1%",
+      "aiExplanation": "확인이 필요한 항목입니다. 다음 자료를 올려주시면 증빙으로 전환할 수 있습니다: 해당 월 POS 일별 매출 내역."
     },
     {
       "month": "2026-08",
       "kind": "cash_ratio",
       "severity": "high",
-      "detail": "2026-08 현금 매출 1,400만 원 (매출의 33.4%, 평소 6.0%). 현금영수증·통장 입금 내역 제출 시 증빙 전환 가능"
+      "detail": "2026-08 현금 매출 1,400만 원 (매출의 33.4%, 평소 6.0%). 현금영수증·통장 입금 내역 제출 시 증빙 전환 가능",
+      "aiExplanation": "확인이 필요한 항목입니다. 다음 자료를 올려주시면 증빙으로 전환할 수 있습니다: 현금영수증 발행 내역이나 통장 입금 내역."
     },
     {
       "month": "2026-08",
       "kind": "cogs_ratio",
       "severity": "medium",
-      "detail": "2026-08 매출/원재료 매입 비율 5.06 (평균 3.71, +36.6%)"
+      "detail": "2026-08 매출/원재료 매입 비율 5.06 (평균 3.71, +36.6%)",
+      "aiExplanation": "확인이 필요한 항목입니다. 다음 자료를 올려주시면 증빙으로 전환할 수 있습니다: 해당 월 원재료 매입 세금계산서."
     }
   ],
   "missing": [
@@ -285,15 +290,15 @@
   ],
   "scores": {
     "revenueStability": 68,
-    "dataCompleteness": 69,
+    "dataCompleteness": 88,
     "ownerDependency": 84
   },
   "valuation": {
     "goodwillLow": 93865200,
     "goodwillHigh": 187730400,
-    "facilityValue": 1716667,
-    "premiumLow": 95581867,
-    "premiumHigh": 189447067,
+    "facilityValue": 1975000,
+    "premiumLow": 95840200,
+    "premiumHigh": 189705400,
     "monthlyProfitP25": 8648313,
     "monthlyProfitMedian": 9962000,
     "monthlyProfitP75": 10719188,
